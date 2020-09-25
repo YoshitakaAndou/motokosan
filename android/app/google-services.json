@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "294036523187",
+    "firebase_url": "https://motokosan-a5567.firebaseio.com",
+    "project_id": "motokosan-a5567",
+    "storage_bucket": "motokosan-a5567.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:294036523187:android:c607276b547c505356c8c6",
+        "android_client_info": {
+          "package_name": "net.miraimu.motokosan"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "294036523187-ogkbl2brign951ichc336jpfmcl3rh10.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTHYDsuPyWgfMWRZzAdTkqzcLqCdnCsEQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "294036523187-ogkbl2brign951ichc336jpfmcl3rh10.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
