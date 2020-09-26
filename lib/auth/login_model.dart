@@ -29,8 +29,12 @@ class LoginModel extends ChangeNotifier {
   }
 
   Future<UserData> getUserDataFromFs(_uid) async {
-    final doc =
-        await Firestore.instance.collection("Groups").document(_uid).get();
+    final doc = await Firestore.instance
+        .collection("Groups")
+        .document(userData.userGroup)
+        .collection("Users")
+        .document(_uid)
+        .get();
     return Future.value(convert(doc));
   }
 

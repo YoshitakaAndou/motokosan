@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:motokosan/create_edit/target_page.dart';
 import 'package:provider/provider.dart';
 import 'lecture/lec_database_model.dart';
 import 'auth/user_data.dart';
@@ -158,7 +159,7 @@ class Home extends StatelessWidget {
                     children: [
                       _menuItem(
                         context: context,
-                        title: "問題を編集",
+                        title: "データを編集",
                         icon: Icon(Icons.edit, color: Colors.green[800]),
                         onTap: () async {
                           Navigator.pop(context);
@@ -166,7 +167,8 @@ class Home extends StatelessWidget {
                           await Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => QuizFs(quizId: cQuizId),
+                              builder: (context) =>
+                                  TargetPage(groupName: userData.userGroup),
                             ),
                           );
                         },

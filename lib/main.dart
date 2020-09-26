@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'auth/login_page.dart';
 import 'auth/signup_model.dart';
 import 'auth/signup_page.dart';
+import 'create_edit/target_model.dart';
 import 'widgets/user_data.dart';
 import 'lecture/lec_model.dart';
 import 'quiz/quiz_model.dart';
@@ -19,6 +20,7 @@ void main() {
     ChangeNotifierProvider(create: (context) => LecModel()),
     ChangeNotifierProvider(create: (context) => LoginModel()),
     ChangeNotifierProvider(create: (context) => SignupModel()),
+    ChangeNotifierProvider(create: (context) => TargetModel()),
   ], child: MyApp())));
   //Future処理に必要
   WidgetsFlutterBinding.ensureInitialized();

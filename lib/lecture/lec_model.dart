@@ -409,12 +409,6 @@ class LecModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // void setDates(List<Lecture> _dates) {
-  //   dates = _dates;
-  //   isLoading = false;
-  //   notifyListeners();
-  // }
-
   void setDatesDb(List<Lecture> _dates) {
     datesDb = _dates;
     notifyListeners();
