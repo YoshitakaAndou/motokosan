@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:motokosan/create_edit/target_model.dart';
+import 'package:motokosan/create_edit/target/target_model.dart';
 import 'package:motokosan/widgets/ok_show_dialog.dart';
 import 'package:provider/provider.dart';
 
-import '../constants.dart';
+import '../../constants.dart';
+import 'category_model.dart';
 
-class TargetEdit extends StatelessWidget {
+class CategoryEdit extends StatelessWidget {
   final String groupName;
+  final Category _category;
   final Target _target;
-  TargetEdit(this.groupName, this._target);
+  CategoryEdit(this.groupName, this._category, this._target);
 
   @override
   Widget build(BuildContext context) {
@@ -17,19 +19,19 @@ class TargetEdit extends StatelessWidget {
     final option1TextController = TextEditingController();
     final option2TextController = TextEditingController();
     final option3TextController = TextEditingController();
-    titleTextController.text = _target.title;
-    subTitleTextController.text = _target.subTitle;
-    option1TextController.text = _target.option1;
-    option2TextController.text = _target.option2;
-    option3TextController.text = _target.option3;
+    titleTextController.text = _category.title;
+    subTitleTextController.text = _category.subTitle;
+    option1TextController.text = _category.option1;
+    option2TextController.text = _category.option2;
+    option3TextController.text = _category.option3;
 
-    return Consumer<TargetModel>(builder: (context, model, child) {
+    return Consumer<CategoryModel>(builder: (context, model, child) {
       return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
           centerTitle: true,
           title: Text(
-            "対象名の編集",
+            "分類名の編集",
             style: cTextTitleL,
             textScaleFactor: 1,
           ),
@@ -44,19 +46,19 @@ class TargetEdit extends StatelessWidget {
                   ),
                   onPressed: () async {
                     // 更新処理（外だしは出来ません）
-                    model.target.title = titleTextController.text;
-                    model.target.subTitle = subTitleTextController.text;
-                    model.target.option1 = option1TextController.text;
-                    model.target.option2 = option2TextController.text;
-                    model.target.option3 = option3TextController.text;
-                    model.target.targetId = _target.targetId;
-                    model.target.targetNo = _target.targetNo;
-                    model.target.createAt = _target.createAt;
-                    model.target.updateAt = _target.updateAt;
+                    model.category.title = titleTextController.text;
+                    model.category.subTitle = subTitleTextController.text;
+                    model.category.option1 = option1TextController.text;
+                    model.category.option2 = option2TextController.text;
+                    model.category.option3 = option3TextController.text;
+                    model.category.categoryId = _category.categoryId;
+                    model.category.categoryNo = _category.categoryNo;
+                    model.category.createAt = _category.createAt;
+                    model.category.updateAt = _category.updateAt;
                     model.startLoading();
                     try {
-                      await model.updateTargetFs(groupName, DateTime.now());
-                      await model.fetchTarget(groupName);
+                      await model.updateCategoryFs(groupName, DateTime.now());
+                      await model.fetchCategory(groupName);
                       model.stopLoading();
                       await okShowDialog(context, "更新しました");
                       Navigator.pop(context);
@@ -88,7 +90,7 @@ class TargetEdit extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        _targetNumber(model),
+                        _number(model),
                         _title(model, titleTextController),
                         _subTitle(model, subTitleTextController),
                         Divider(height: 5, color: Colors.grey, thickness: 1),
@@ -117,30 +119,40 @@ class TargetEdit extends StatelessWidget {
       width: double.infinity,
       height: 50,
       color: cContBg,
-      child: Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 10.0),
-            child: Text("　対象名を情報を編集し、登録ボタンを押してください",
-                style: cTextUpBarM, textScaleFactor: 1),
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Expanded(
+                flex: 3,
+                child: Text("${_target.title} ＞",
+                    style: cTextUpBarL, textScaleFactor: 1)),
+            Expanded(
+              flex: 2,
+              child: Text(
+                  "分類名を情報を入力し、"
+                  "\n登録ボタンを押してください！",
+                  style: cTextUpBarS,
+                  textScaleFactor: 1),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _targetNumber(TargetModel model) {
-    return Text("${_target.targetNo}");
+  Widget _number(CategoryModel model) {
+    return Text("${_category.categoryNo}");
   }
 
-  Widget _title(TargetModel model, _titleTextController) {
+  Widget _title(CategoryModel model, _titleTextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
       decoration: const InputDecoration(
           labelText: "Title:",
           labelStyle: TextStyle(fontSize: 10),
-          hintText: "Title を入力してください",
+          hintText: "分類名 を入力してください",
           hintStyle: TextStyle(fontSize: 12)),
       controller: _titleTextController,
       onChanged: (text) {
@@ -150,7 +162,7 @@ class TargetEdit extends StatelessWidget {
     );
   }
 
-  Widget _subTitle(TargetModel model, _subTitleTextController) {
+  Widget _subTitle(CategoryModel model, _subTitleTextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
@@ -167,7 +179,7 @@ class TargetEdit extends StatelessWidget {
     );
   }
 
-  Widget _option1(TargetModel model, _option1TextController) {
+  Widget _option1(CategoryModel model, _option1TextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
@@ -184,7 +196,7 @@ class TargetEdit extends StatelessWidget {
     );
   }
 
-  Widget _option2(TargetModel model, _option2TextController) {
+  Widget _option2(CategoryModel model, _option2TextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
@@ -201,7 +213,7 @@ class TargetEdit extends StatelessWidget {
     );
   }
 
-  Widget _option3(TargetModel model, _option3TextController) {
+  Widget _option3(CategoryModel model, _option3TextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,

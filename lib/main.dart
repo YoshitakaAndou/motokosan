@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:motokosan/create_edit/category/category_model.dart';
 import 'package:provider/provider.dart';
 import 'auth/login_page.dart';
 import 'auth/signup_model.dart';
 import 'auth/signup_page.dart';
-import 'create_edit/target_model.dart';
+import 'create_edit/target/target_model.dart';
 import 'widgets/user_data.dart';
 import 'lecture/lec_model.dart';
 import 'quiz/quiz_model.dart';
@@ -21,6 +22,7 @@ void main() {
     ChangeNotifierProvider(create: (context) => LoginModel()),
     ChangeNotifierProvider(create: (context) => SignupModel()),
     ChangeNotifierProvider(create: (context) => TargetModel()),
+    ChangeNotifierProvider(create: (context) => CategoryModel()),
   ], child: MyApp())));
   //Future処理に必要
   WidgetsFlutterBinding.ensureInitialized();

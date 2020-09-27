@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:motokosan/create_edit/target_page.dart';
+import 'package:motokosan/create_edit/target/target_page.dart';
 import 'package:provider/provider.dart';
 import 'lecture/lec_database_model.dart';
 import 'auth/user_data.dart';
@@ -37,94 +37,38 @@ class Home extends StatelessWidget {
         centerTitle: true,
       ),
       drawer: _drawer(context, model, _database, _databaseLec),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(height: _sizedBox),
-            Container(
-                height: MediaQuery.of(context).size.height / 3,
-                child: Image.asset("assets/images/nurse.png")),
-            SizedBox(height: 30),
-            ChoiceButton(
-              label: "講義を受ける",
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LecList(lecsId: cLecsId),
-                  ),
-                );
-              },
-              backColor: Colors.green,
-              borderColor: Colors.black54,
-              textColor: Colors.white,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // SizedBox(height: _sizedBox),
+          Container(
+            padding: EdgeInsets.only(bottom: 10, top: 5),
+            child: Image.asset(
+              "assets/images/workshop01.png",
+              width: MediaQuery.of(context).size.width,
+              fit: BoxFit.fitWidth,
             ),
-            SizedBox(height: _sizedBox),
-            ChoiceButton(
-              label: "問題を解く（残り ${model.dates.length}問）",
-              onPressed: () async {
-                if (model.dates.length != 0) {
-                  await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => QuizPlay(
-                              datesQs: model.dates,
-                              index: 0,
-                              isShowOnly: false)));
-                }
-              },
-              backColor: Colors.green,
-              borderColor: Colors.black54,
-              textColor: Colors.white,
-            ),
-            SizedBox(height: _sizedBox),
-            ChoiceButton(
-              label: "解答済み問題",
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => QuizList(quizId: cQuizId),
-                  ),
-                );
-              },
-              backColor: Colors.green,
-              borderColor: Colors.black54,
-              textColor: Colors.white,
-            ),
-            SizedBox(height: _sizedBox),
-            ChoiceButton(
-              label: "放射線安全 Q & A",
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => QaList(qasId: cQasId),
-                  ),
-                );
-              },
-              backColor: Colors.green,
-              borderColor: Colors.black54,
-              textColor: Colors.white,
-            ),
-            SizedBox(height: _sizedBox),
-            ChoiceButton(
-              label: "看護師のための放射線科入門",
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Pdf()),
-                );
-              },
-              backColor: Colors.green,
-              borderColor: Colors.black54,
-              textColor: Colors.white,
-            ),
-            SizedBox(height: _sizedBox),
-            SizedBox(height: _sizedBox),
-          ],
-        ),
+          ),
+          Column(
+            children: [
+              ChoiceButton(
+                label: "講義を受ける",
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LecList(lecsId: cLecsId),
+                    ),
+                  );
+                },
+                backColor: Colors.green,
+                borderColor: Colors.black54,
+                textColor: Colors.white,
+              ),
+              SizedBox(height: 50)
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -171,54 +115,6 @@ class Home extends StatelessWidget {
                                   TargetPage(groupName: userData.userGroup),
                             ),
                           );
-                        },
-                      ),
-                      _menuItem(
-                        context: context,
-                        title: "Q&Aを編集",
-                        icon: Icon(Icons.edit, color: Colors.green[800]),
-                        onTap: () async {
-                          Navigator.pop(context);
-                          model.isLoading = true;
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => QaFs(qasId: cQasId),
-                            ),
-                          );
-                        },
-                      ),
-                      _menuItem(
-                        context: context,
-                        title: "講義を編集",
-                        icon: Icon(Icons.edit, color: Colors.green[800]),
-                        onTap: () async {
-                          Navigator.pop(context);
-                          model.isLoading = true;
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => LecFs(lecsId: cLecsId),
-                            ),
-                          );
-                        },
-                      ),
-                      _menuItem(
-                        context: context,
-                        title: "回答済みをリセット",
-                        icon: Icon(Icons.restore, color: Colors.green[800]),
-                        onTap: () {
-                          Navigator.pop(context);
-                          okShowDialogFunc(
-                              context: context,
-                              mainTitle: "回答済みをリセット",
-                              subTitle: "実行しますか？",
-                              onPressed: () async {
-                                await _database.updateQuizAnswered("");
-                                model.setDates(
-                                    await _database.getQuizzesNotKey("○"));
-                                Navigator.pop(context);
-                              });
                         },
                       ),
                       _menuItem(

@@ -14,6 +14,9 @@ class LoginModel extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<String> logIn() async {
+    if (userData.userGroup.isEmpty) {
+      throw ("グループ名を入力してください");
+    }
     if (userData.userEmail.isEmpty) {
       throw ("メールアドレスを入力してください");
     }

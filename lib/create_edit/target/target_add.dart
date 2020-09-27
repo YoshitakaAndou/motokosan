@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:motokosan/widgets/ok_show_dialog.dart';
 import 'package:provider/provider.dart';
 
-import '../constants.dart';
+import '../../constants.dart';
 import 'target_model.dart';
 
 class TargetAdd extends StatelessWidget {
@@ -53,7 +53,7 @@ class TargetAdd extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _targetNumber(model),
+                      _number(model),
                       _title(model),
                       _subTitle(model),
                       Divider(height: 5, color: Colors.grey, thickness: 1),
@@ -93,7 +93,7 @@ class TargetAdd extends StatelessWidget {
     );
   }
 
-  Widget _targetNumber(TargetModel model) {
+  Widget _number(TargetModel model) {
     return Text("${model.target.targetNo}");
   }
 

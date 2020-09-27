@@ -22,12 +22,15 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<LoginModel>(context, listen: false);
+    final groupController = TextEditingController();
     final emailController = TextEditingController();
     final passwordController = TextEditingController();
+    final beforeGroup = model.userData.userGroup;
     final beforeEmail = model.userData.userEmail;
     final beforePassword = model.userData.userPassword;
     //todo print
     userDataPrint(model.userData, "login_page");
+    groupController.text = model.userData.userGroup;
     emailController.text = model.userData.userEmail;
     passwordController.text = model.userData.userPassword;
     return Consumer<LoginModel>(
@@ -39,41 +42,41 @@ class LoginPage extends StatelessWidget {
           ),
           body: Stack(children: [
             SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(8),
+              child: Container(
+                padding: EdgeInsets.all(10),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    SizedBox(height: 20),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (model.isUpdate == false &&
-                            model.userData.userName.isNotEmpty)
-                          Expanded(
-                            flex: 2,
-                            child: Bubble(
-                              color: Color.fromRGBO(225, 255, 199, 1.0),
-                              nip: BubbleNip.rightBottom,
-                              nipWidth: 10,
-                              nipHeight: 5,
-                              alignment: Alignment.topRight,
-                              child: Text(
-                                "${model.userData.userName}さん"
-                                "\nお帰りなさい！",
-                                style: TextStyle(fontSize: 15),
-                                textScaleFactor: 1,
+                    Container(
+                      height: MediaQuery.of(context).size.height / 3,
+                      padding: EdgeInsets.all(5),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (model.isUpdate == false &&
+                              model.userData.userName.isNotEmpty)
+                            Expanded(
+                              child: Bubble(
+                                color: Color.fromRGBO(225, 255, 199, 1.0),
+                                nip: BubbleNip.rightBottom,
+                                nipWidth: 10,
+                                nipHeight: 5,
+                                alignment: Alignment.topRight,
+                                child: Text(
+                                  "${model.userData.userName}さん"
+                                  "\nお帰りなさい！",
+                                  style: TextStyle(fontSize: 15),
+                                  textScaleFactor: 1,
+                                ),
                               ),
                             ),
+                          Expanded(
+                            child: Image.asset("assets/images/nurse02.png",
+                                fit: BoxFit.fitHeight,
+                                alignment: Alignment.bottomRight),
                           ),
-                        Expanded(
-                          flex: 3,
-                          child: Image.asset("assets/images/nurse05.png",
-                              fit: BoxFit.fitHeight,
-                              height: MediaQuery.of(context).size.height / 2.5,
-                              alignment: Alignment.bottomRight),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     SizedBox(height: 10),
                     Card(
@@ -104,7 +107,56 @@ class LoginPage extends StatelessWidget {
                             padding: EdgeInsets.all(8),
                             child: Column(
                               children: [
-                                SizedBox(height: 10),
+                                Container(
+                                  height: 30,
+                                  width: double.infinity,
+                                  alignment: Alignment.centerRight,
+                                  child: FlatButton(
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Icon(Icons.account_box,
+                                            size: 18, color: Colors.black54),
+                                        Text("新規登録の方はこちら→",
+                                            style: cTextListS,
+                                            textScaleFactor: 1),
+                                      ],
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => SignUpPage(),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                        flex: 1,
+                                        child: Icon(Icons.group,
+                                            size: 20, color: Colors.black54)),
+                                    Expanded(
+                                      flex: 5,
+                                      child: TextField(
+                                        keyboardType: TextInputType.text,
+                                        controller: groupController,
+                                        decoration:
+                                            InputDecoration(hintText: "グループ名"),
+                                        onChanged: (text) {
+                                          if (beforeGroup != text) {
+                                            model.setIsUpdate(true);
+                                          } else {
+                                            model.setIsUpdate(false);
+                                          }
+                                          model.userData.userGroup = text;
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
                                 Row(
                                   children: [
                                     Expanded(
@@ -160,7 +212,7 @@ class LoginPage extends StatelessWidget {
                                     ),
                                   ],
                                 ),
-                                SizedBox(height: 20),
+                                SizedBox(height: 30),
                                 Container(
                                   width: double.infinity,
                                   height: 40,
@@ -182,31 +234,7 @@ class LoginPage extends StatelessWidget {
                                         _loginProcess(context, model),
                                   ),
                                 ),
-                                SizedBox(height: 10),
-                                Container(
-                                  width: double.infinity,
-                                  alignment: Alignment.centerRight,
-                                  child: FlatButton(
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Icon(Icons.account_box,
-                                            size: 18, color: Colors.black54),
-                                        Text("新規登録の方はこちら→",
-                                            style: cTextListS,
-                                            textScaleFactor: 1),
-                                      ],
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => SignUpPage(),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
+                                SizedBox(height: 20),
                               ],
                             ),
                           ),
@@ -232,7 +260,6 @@ class LoginPage extends StatelessWidget {
       //Authにログインしてuidを取得
       final _uid = await model.logIn();
       //FirebaseStorageからUser情報を取得
-
       print("_uid:$_uid");
       print("model.userData.uid:${model.userData.uid}");
       //Authのuidと本体のuidを比較

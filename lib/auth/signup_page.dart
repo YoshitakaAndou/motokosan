@@ -38,7 +38,7 @@ class SignUpPage extends StatelessWidget {
                   SizedBox(height: 5),
                   Container(
                       height: MediaQuery.of(context).size.height / 3,
-                      child: Image.asset("assets/images/nurse06.png")),
+                      child: Image.asset("assets/images/nurse03.png")),
                   Card(
                     elevation: 15,
                     shape: RoundedRectangleBorder(
@@ -67,6 +67,31 @@ class SignUpPage extends StatelessWidget {
                           padding: EdgeInsets.all(8),
                           child: Column(
                             children: [
+                              Container(
+                                height: 20,
+                                width: double.infinity,
+                                alignment: Alignment.centerRight,
+                                child: FlatButton(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Icon(Icons.account_circle,
+                                          size: 18, color: Colors.black54),
+                                      Text("登録済みの方はログイン画面へ→",
+                                          style: cTextListS,
+                                          textScaleFactor: 1),
+                                    ],
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => LoginPage(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
                               Row(
                                 children: [
                                   Expanded(
@@ -177,30 +202,7 @@ class SignUpPage extends StatelessWidget {
                             onPressed: () => _signupProcess(context, model),
                           ),
                         ),
-                        SizedBox(height: 10),
-                        Container(
-                          width: double.infinity,
-                          alignment: Alignment.centerRight,
-                          child: FlatButton(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Icon(Icons.account_circle,
-                                    size: 18, color: Colors.black54),
-                                Text("登録済みの方はログイン画面へ→",
-                                    style: cTextListS, textScaleFactor: 1),
-                              ],
-                            ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => LoginPage(),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
+                        SizedBox(height: 20),
                       ],
                     ),
                   ),

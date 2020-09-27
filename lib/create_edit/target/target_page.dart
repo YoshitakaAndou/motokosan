@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:motokosan/create_edit/target_model.dart';
+import 'package:motokosan/create_edit/category/category_page.dart';
+import 'package:motokosan/create_edit/target/target_model.dart';
 import 'package:motokosan/widgets/bar_title.dart';
 import 'package:motokosan/widgets/ok_show_dialog.dart';
 import 'package:motokosan/widgets/ok_show_dialog_func.dart';
 import 'package:provider/provider.dart';
 
-import '../constants.dart';
+import '../../constants.dart';
 import 'target_add.dart';
 import 'target_edit.dart';
 
@@ -42,19 +43,39 @@ class TargetPage extends StatelessWidget {
                               key: Key(_target.targetId),
                               elevation: 15,
                               child: ListTile(
-                                title: Text(
-                                  "${_target.targetNo}",
-                                  style: cTextListS,
-                                  textScaleFactor: 1,
+                                dense: true,
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 0, vertical: 5),
+                                title: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: Text(
+                                        "${_target.targetNo}",
+                                        style: cTextListS,
+                                        textScaleFactor: 1,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 5,
+                                      child: Text(
+                                        "${_target.title}",
+                                        style: cTextListL,
+                                        textScaleFactor: 1,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 subtitle: Text(
-                                  "${_target.title}",
-                                  style: cTextListL,
+                                  "${_target.subTitle}",
+                                  style: cTextListS,
+                                  textAlign: TextAlign.center,
                                   textScaleFactor: 1,
                                 ),
                                 leading: IconButton(
                                   icon: Icon(Icons.delete),
-                                  iconSize: 25,
+                                  iconSize: 20,
                                   onPressed: () {
                                     okShowDialogFunc(
                                         context: context,
@@ -68,27 +89,22 @@ class TargetPage extends StatelessWidget {
                                         });
                                   },
                                 ),
+                                // Categoryへ
                                 trailing: IconButton(
-                                  icon:
-                                      Icon(Icons.play_circle_outline_outlined),
-                                  iconSize: 25,
+                                  icon: Icon(Icons.arrow_forward_ios),
+                                  iconSize: 20,
                                   onPressed: () {
-                                    okShowDialogFunc(
-                                        context: context,
-                                        mainTitle: _target.title,
-                                        subTitle: "削除しますか？",
-                                        // delete
-                                        onPressed: () async {
-                                          await _deleteSave(
-                                              context, model, _target.targetId);
-                                          Navigator.pop(context);
-                                        });
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              CategoryPage(groupName, _target),
+                                        ));
+                                    // await model.fetchTarget(groupName);
                                   },
                                 ),
                                 // Edit
                                 onTap: () async {
-                                  // model.initBeforeEditing(_lecture);
-                                  // model.resetUpdate();
                                   await Navigator.push(
                                       context,
                                       MaterialPageRoute(
