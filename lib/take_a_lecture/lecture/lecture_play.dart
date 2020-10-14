@@ -1,0 +1,426 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:motokosan/widgets/convert_date_to_int.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:flutter/services.dart';
+import '../../constants.dart';
+import '../lecture/lecture_model.dart';
+import '../organizer/organizer_model.dart';
+import '../question/question_list_page.dart';
+import '../workshop/workshop_model.dart';
+import '../../widgets/bar_title.dart';
+import '../../widgets/go_back.dart';
+
+class LecturePlay extends StatefulWidget {
+  final String groupName;
+  final Organizer _organizer;
+  final WorkshopList _workshopList;
+  final Lecture _lecture;
+  final List<Slide> _slides;
+  LecturePlay(
+    this.groupName,
+    this._organizer,
+    this._workshopList,
+    this._lecture,
+    this._slides,
+  );
+
+  @override
+  _LecturePlayState createState() => _LecturePlayState();
+}
+
+class _LecturePlayState extends State<LecturePlay> {
+  final ScrollController _homeController = ScrollController();
+  final GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
+  LectureResult _lectureResult = LectureResult();
+  // 状態設定
+  int answerNum = 0;
+  bool isPopWind = false;
+  bool isPlaying = false;
+  bool isCorrect = false;
+  bool isAnswered = false;
+  bool isCorrectImage = false;
+  bool isDescription = false;
+  bool isHelp = false;
+  bool isVideoPlay = false;
+  bool isSlideButton = true;
+  bool isSlide = false;
+  String testDesc = "";
+  String testQues = "";
+  String testAns = "";
+  String tapSlideUrl = "";
+  YoutubePlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget._lecture.videoUrl.isNotEmpty) {
+      startVideo(widget._lecture.videoUrl, true);
+    }
+  }
+
+  void startVideo(String _videoUrl, bool _autoPlay) {
+    _controller = YoutubePlayerController(
+      initialVideoId: YoutubePlayer.convertUrlToId(_videoUrl),
+      flags: YoutubePlayerFlags(
+        autoPlay: _autoPlay,
+        hideThumbnail: true,
+        mute: false,
+        loop: false,
+      ),
+    );
+  }
+
+  // @override
+  // void dispose() {
+  //   _controller.dispose();
+  //   super.dispose();
+  // }
+
+  @override
+  Widget build(BuildContext context) {
+    //サイズ
+    final _mediaHeight = MediaQuery.of(context).size.height;
+    final _mediaWidth = MediaQuery.of(context).size.width;
+    final _upHeight = _mediaWidth / 1.42;
+    final _bottomHeight = _mediaHeight - _upHeight - 100;
+    //向き
+    var isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    print("slides:${widget._slides.length}件");
+    return Scaffold(
+      key: _scaffoldState,
+      appBar: isPortrait
+          // 縦向きの時
+          ? AppBar(
+              centerTitle: true,
+              title: barTitle(context),
+              leading: isPopWind
+                  ? Container()
+                  : goBackWithArg(
+                      context: context,
+                      icon: Icon(FontAwesomeIcons.chevronLeft),
+                      arg: false,
+                      num: 1,
+                    ),
+              actions: [
+                isPopWind
+                    ? _closeButton(context)
+                    : goBackWithArg(
+                        context: context,
+                        icon: Icon(FontAwesomeIcons.chevronRight),
+                        arg: true,
+                        num: 1,
+                      ),
+              ],
+            )
+          // 横向きの時
+          : PreferredSize(
+              preferredSize: Size.fromHeight(0),
+              child: AppBar(
+                backgroundColor: Colors.white.withOpacity(0.0),
+                elevation: 0.0,
+              ),
+            ),
+      body: Stack(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // 縦向きの時の動画画面
+              if (isPortrait)
+                Container(
+                  width: _mediaWidth,
+                  height: _upHeight,
+                  color: Colors.black,
+                  child: Column(
+                    children: [
+                      _infoArea(),
+                      if (widget._lecture.videoUrl.isNotEmpty)
+                        _videoTile(isPortrait),
+                    ],
+                  ),
+                ),
+              // 横向きの時の動画画面
+              if (!isPortrait)
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  color: Colors.black,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (widget._lecture.videoUrl.isNotEmpty)
+                        _videoTile(isPortrait),
+                    ],
+                  ),
+                ),
+              // 縦向きの時の残り画面
+              if (isPortrait)
+                Container(
+                  width: _mediaWidth,
+                  height: _bottomHeight,
+                  child: SingleChildScrollView(
+                    controller: _homeController,
+                    child: Column(
+                      children: [
+                        if (widget._slides.length > 0 && isSlideButton)
+                          _slideButton(),
+                        if (widget._slides.length > 0 && isSlide)
+                          _gridView(context),
+                        Divider(height: 5, color: Colors.grey, thickness: 1),
+                        _descriptionTile(),
+                        Divider(height: 5, color: Colors.grey, thickness: 1),
+                        // _nextButton(),
+                        SizedBox(height: 30),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+      // bottomNavigationBar: BottomAppBar(
+      //   color: Theme.of(context).primaryColor,
+      //   notchMargin: 6.0,
+      //   shape: AutomaticNotchedShape(
+      //     RoundedRectangleBorder(),
+      //     StadiumBorder(
+      //       side: BorderSide(),
+      //     ),
+      //   ),
+      //   child: Container(
+      //     height: 45,
+      //     padding: EdgeInsets.all(10),
+      //     child: Text(
+      //       "",
+      //       style: cTextUpBarL,
+      //       textScaleFactor: 1,
+      //     ),
+      //   ),
+      // ),
+    );
+  }
+
+  Widget _infoArea() {
+    return Container(
+      width: double.infinity,
+      height: 50,
+      color: cContBg,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(widget._workshopList.title,
+                    style: cTextUpBarS, textScaleFactor: 1),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text("主催者：", style: cTextUpBarS, textScaleFactor: 1),
+                    Text(widget._workshopList.organizerName,
+                        style: cTextUpBarS, textScaleFactor: 1),
+                  ],
+                ),
+              ],
+            ),
+            Container(
+              width: double.infinity,
+              child: Text(widget._lecture.title,
+                  style: cTextUpBarL,
+                  textScaleFactor: 1,
+                  textAlign: TextAlign.start),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _videoTile(bool _isPortrait) {
+    // FullScreenボタンを隠してみる
+    return Expanded(
+      child: YoutubePlayer(
+        controller: _controller,
+        // 動画の最後まで再生したら
+        onEnded: (data) async {
+          _controller.pause();
+          // 画面の向き固定を元に戻す
+          SystemChrome.setPreferredOrientations(
+            [
+              DeviceOrientation.portraitUp,
+            ],
+          );
+          // 講義を見た証をDBに登録
+          _lectureResult.lectureId = widget._lecture.lectureId;
+          _lectureResult.isTaken = "終了";
+          _lectureResult.isTakenAt = convertDateToInt(DateTime.now());
+          // ボトムシートを表示して次の動作を選択してもらう
+          await showModalBottomSheet(
+            context: context,
+            elevation: 15,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(18.0),
+                  topRight: Radius.circular(18.0)),
+            ),
+            builder: (BuildContext context) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(18)),
+                      color: Colors.green,
+                    ),
+                    child: Center(
+                      child: Text(
+                        "この講義の動画再生が終了しました",
+                        style: cTextUpBarL,
+                        textScaleFactor: 1,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                      leading: Icon(FontAwesomeIcons.youtube),
+                      title: Text('次を見る'),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop(true);
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                      leading: Icon(FontAwesomeIcons.undo),
+                      title: Text('一覧へ戻る'),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop(false);
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                      leading: Icon(FontAwesomeIcons.school),
+                      title: Text('確認テストに進む'),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => QuestionListPage(
+                              widget.groupName,
+                              widget._lecture,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height / 8,
+                  )
+                ],
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _slideButton() {
+    return RaisedButton(
+      child: Text("スライドを表示"),
+      color: Colors.white,
+      shape: OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
+      onPressed: () {
+        setState(() {
+          isSlide = true;
+          isSlideButton = false;
+        });
+      },
+    );
+  }
+
+  Widget _gridView(context) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.width / 1.4,
+      color: Colors.grey,
+      // padding: EdgeInsets.only(top: 15, left: 5, right: 5, bottom: 5),
+      child: GridView.builder(
+        scrollDirection: Axis.horizontal,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          mainAxisSpacing: 4,
+          crossAxisSpacing: 4,
+          crossAxisCount: 1,
+          childAspectRatio: 0.7,
+        ),
+        itemCount: widget._slides.length,
+        itemBuilder: (context, index) {
+          return _gridTile(widget._slides[index], index);
+        },
+      ),
+    );
+  }
+
+  Widget _gridTile(Slide _slide, int _index) {
+    return GestureDetector(
+      // onLongPress: onLongPress,
+      onTap: () {
+        setState(() {
+          isSlide = false;
+          isSlideButton = true;
+        });
+      },
+      child: Container(
+        color: Colors.grey,
+        width: MediaQuery.of(context).size.width,
+        child: Image.network(_slide.slideUrl),
+      ),
+    );
+  }
+
+  Widget _closeButton(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.close),
+      iconSize: 35,
+      color: Colors.black54,
+      onPressed: () {
+        isPopWind = false;
+        setState(() {});
+      },
+    );
+  }
+
+  Widget _descriptionTile() {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("【解説】", textScaleFactor: 1, style: cTextListL),
+          Text("${widget._lecture.description}",
+              textScaleFactor: 1, style: cTextListL),
+        ],
+      ),
+    );
+  }
+}

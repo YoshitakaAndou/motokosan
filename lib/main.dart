@@ -1,28 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:motokosan/create_edit/category/category_model.dart';
+import 'take_a_lecture/organizer/organizer_model.dart';
+import 'take_a_lecture/question/question_model.dart';
+import 'take_a_lecture/workshop/workshop_model.dart';
 import 'package:provider/provider.dart';
 import 'auth/login_page.dart';
 import 'auth/signup_model.dart';
 import 'auth/signup_page.dart';
-import 'create_edit/target/target_model.dart';
+import 'take_a_lecture/target/target_model.dart';
+import 'take_a_lecture/lecture/lecture_model.dart';
 import 'widgets/user_data.dart';
-import 'lecture/lec_model.dart';
-import 'quiz/quiz_model.dart';
+import 'lec/lec_model.dart';
 import 'auth/login_model.dart';
 import 'q_and_a/qa_model.dart';
 import 'widgets/datasave_widget.dart';
 
 void main() {
   runApp((MultiProvider(providers: [
-    ChangeNotifierProvider(create: (context) => QuizModel()),
     ChangeNotifierProvider(create: (context) => QaModel()),
     ChangeNotifierProvider(create: (context) => LecModel()),
     ChangeNotifierProvider(create: (context) => LoginModel()),
     ChangeNotifierProvider(create: (context) => SignupModel()),
     ChangeNotifierProvider(create: (context) => TargetModel()),
-    ChangeNotifierProvider(create: (context) => CategoryModel()),
+    ChangeNotifierProvider(create: (context) => OrganizerModel()),
+    ChangeNotifierProvider(create: (context) => WorkshopModel()),
+    ChangeNotifierProvider(create: (context) => LectureModel()),
+    ChangeNotifierProvider(create: (context) => QuestionModel()),
   ], child: MyApp())));
   //Future処理に必要
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,7 +51,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-    //内臓メモリ
+    //内蔵メモリ
     checkUserId();
     checkUserGroup();
     checkUserName();

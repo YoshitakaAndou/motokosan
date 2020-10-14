@@ -1,22 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:motokosan/create_edit/target/target_page.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:motokosan/take_a_lecture/organizer/organizer_list_page.dart';
+import 'package:motokosan/take_a_lecture/organizer/organizer_model.dart';
+import 'package:motokosan/take_a_lecture/target/target_page.dart';
 import 'package:provider/provider.dart';
-import 'lecture/lec_database_model.dart';
 import 'auth/user_data.dart';
-import 'lecture/lec_list.dart';
-import 'q_and_a/qa_fs.dart';
-import 'q_and_a/qa_list.dart';
-import 'quiz/quiz_fs.dart';
 import 'constants.dart';
-import 'lecture/lec_fs.dart';
-import 'quiz/quiz_database_model.dart';
-import 'quiz/quiz_model.dart';
-import 'quiz/quiz_list.dart';
-import 'pdf_page/pdf.dart';
+import 'take_a_lecture/organizer/organizer_page.dart';
 import 'widgets/bar_title.dart';
-import 'quiz/quiz_play.dart';
-import 'widgets/ok_show_dialog_func.dart';
+import 'widgets/ok_show_dialog.dart';
 
 class Home extends StatelessWidget {
   final UserData userData;
@@ -24,57 +17,80 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = Provider.of<QuizModel>(context);
-    final _database = DatabaseModel();
-    final _databaseLec = LecDatabaseModel();
-    const double _sizedBox = 15.0;
-    Future(() async {
-      model.setDates(await _database.getQuizzesNotKey("○"));
-    });
+    final model = Provider.of<OrganizerModel>(context);
+    // final _database = DatabaseModel();
+    // final _databaseLec = LecDatabaseModel();
+    // // const double _sizedBox = 15.0;
+    // Future(() async {
+    //   model.setDates(await _database.getQuizzesNotKey("○"));
+    // });
     return Scaffold(
       appBar: AppBar(
         title: barTitle(context),
         centerTitle: true,
       ),
-      drawer: _drawer(context, model, _database, _databaseLec),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // SizedBox(height: _sizedBox),
-          Container(
-            padding: EdgeInsets.only(bottom: 10, top: 5),
-            child: Image.asset(
-              "assets/images/workshop01.png",
-              width: MediaQuery.of(context).size.width,
-              fit: BoxFit.fitWidth,
-            ),
-          ),
-          Column(
-            children: [
-              ChoiceButton(
-                label: "講義を受ける",
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => LecList(lecsId: cLecsId),
-                    ),
-                  );
-                },
-                backColor: Colors.green,
-                borderColor: Colors.black54,
-                textColor: Colors.white,
+      drawer: _drawer(context),
+      body: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // SizedBox(height: _sizedBox),
+            Container(
+              padding: EdgeInsets.only(bottom: 10, top: 5),
+              child: Image.asset(
+                "assets/images/workshop01.png",
+                width: MediaQuery.of(context).size.width,
+                fit: BoxFit.fitWidth,
               ),
-              SizedBox(height: 50)
-            ],
-          ),
-        ],
+            ),
+            Column(
+              children: [
+                SizedBox(
+                  height: 50,
+                  width: MediaQuery.of(context).size.width - 40,
+                  child: RaisedButton.icon(
+                    icon: Icon(
+                      FontAwesomeIcons.chalkboardTeacher,
+                      color: Colors.white,
+                    ),
+                    label: Text(
+                      "　研修会に参加する",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    onPressed: () async {
+                      await model.fetchOrganizerList(userData.userGroup);
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OrganizerListPage(
+                              userData.userGroup, true, model.organizerList),
+                        ),
+                      );
+                    },
+                    elevation: 10,
+                    shape: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
+                    color: Colors.green,
+                    splashColor: Colors.white.withOpacity(0.5),
+                    textColor: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 50),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _drawer(BuildContext context, QuizModel model, DatabaseModel _database,
-      LecDatabaseModel _databaseLec) {
+  Widget _drawer(BuildContext context) {
     return SafeArea(
       child: ClipRRect(
         borderRadius: BorderRadius.only(topRight: Radius.circular(30)),
@@ -103,11 +119,12 @@ class Home extends StatelessWidget {
                     children: [
                       _menuItem(
                         context: context,
-                        title: "データを編集",
-                        icon: Icon(Icons.edit, color: Colors.green[800]),
+                        title: "対象者リストを編集",
+                        icon: Icon(FontAwesomeIcons.solidAddressCard,
+                            color: Colors.green[800]),
                         onTap: () async {
                           Navigator.pop(context);
-                          model.isLoading = true;
+                          // model.isLoading = true;
                           await Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -119,20 +136,37 @@ class Home extends StatelessWidget {
                       ),
                       _menuItem(
                         context: context,
-                        title: "受講済みをリセット",
-                        icon: Icon(Icons.restore, color: Colors.green[800]),
-                        onTap: () {
+                        title: "データを編集",
+                        icon: Icon(FontAwesomeIcons.tools,
+                            color: Colors.green[800]),
+                        onTap: () async {
                           Navigator.pop(context);
-                          okShowDialogFunc(
-                              context: context,
-                              mainTitle: "受講済みをリセット",
-                              subTitle: "実行しますか？",
-                              onPressed: () async {
-                                await _databaseLec.resetLecAnswered("", "");
-                                Navigator.pop(context);
-                              });
+                          // model.isLoading = true;
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  OrganizerPage(userData.userGroup),
+                            ),
+                          );
                         },
                       ),
+                      // _menuItem(
+                      //   context: context,
+                      //   title: "受講済みをリセット",
+                      //   icon: Icon(Icons.restore, color: Colors.green[800]),
+                      //   onTap: () {
+                      //     Navigator.pop(context);
+                      //     okShowDialogFunc(
+                      //         context: context,
+                      //         mainTitle: "受講済みをリセット",
+                      //         subTitle: "実行しますか？",
+                      //         onPressed: () async {
+                      //           // await _databaseLec.resetLecAnswered("", "");
+                      //           Navigator.pop(context);
+                      //         });
+                      //   },
+                      // ),
                       Container(
                         width: double.infinity,
                         height: 70,
@@ -200,7 +234,7 @@ class Home extends StatelessWidget {
 
 class ChoiceButton extends StatelessWidget {
   final String label;
-  final VoidCallback onPressed;
+  final Function onPressed;
   final Color backColor;
   final Color borderColor;
   final Color textColor;
@@ -213,7 +247,7 @@ class ChoiceButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onPressed,
       child: Container(
         width: MediaQuery.of(context).size.width - 40,

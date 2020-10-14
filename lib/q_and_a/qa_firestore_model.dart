@@ -27,7 +27,7 @@ Future<void> addFsCloud(_qasId, _data, _timeStamp) async {
   final _qaId = _timeStamp.toString();
   await Firestore.instance.collection(_qasId).document(_qaId).setData({
     "qaId": _qaId,
-    "category": _data.category,
+    "category": _data.organizer,
     "question": _data.question,
     "answer": _data.answer,
     "description": _data.description,
@@ -42,7 +42,7 @@ Future<void> addFsCloud(_qasId, _data, _timeStamp) async {
 Future<void> updateFsCloud(_qasId, _qaId, _data) async {
   await Firestore.instance.collection(_qasId).document(_qaId).setData({
     "qaId": _qaId,
-    "category": _data.category,
+    "category": _data.organizer,
     "question": _data.question,
     "answer": _data.answer,
     "description": _data.description,

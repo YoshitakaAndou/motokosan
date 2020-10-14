@@ -4,15 +4,8 @@ import 'package:provider/provider.dart';
 import '../widgets/done.dart';
 import '../widgets/bar_title.dart';
 import '../widgets/user_data.dart';
-import '../widgets/ok_show_dialog_func.dart';
 import '../widgets/ok_show_dialog.dart';
 import '../widgets/bubble/bubble.dart';
-import '../lecture/lec_database_model.dart';
-import '../lecture/lec_firestore_model.dart';
-import '../q_and_a/qa_database_model.dart';
-import '../quiz/quiz_database_model.dart';
-import '../quiz/quiz_firestore_model.dart';
-import '../q_and_a/qa_firestore_model.dart';
 import '../constants.dart';
 import '../home.dart';
 import 'login_model.dart';
@@ -40,215 +33,220 @@ class LoginPage extends StatelessWidget {
             title: barTitle(context),
             centerTitle: true,
           ),
-          body: Stack(children: [
-            SingleChildScrollView(
-              child: Container(
-                padding: EdgeInsets.all(10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      height: MediaQuery.of(context).size.height / 3,
-                      padding: EdgeInsets.all(5),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (model.isUpdate == false &&
-                              model.userData.userName.isNotEmpty)
+          body: SafeArea(
+            child: Stack(children: [
+              SingleChildScrollView(
+                child: Container(
+                  padding: EdgeInsets.all(10),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        height: MediaQuery.of(context).size.height / 3,
+                        padding: EdgeInsets.all(5),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (model.isUpdate == false &&
+                                model.userData.userName.isNotEmpty)
+                              Expanded(
+                                child: Bubble(
+                                  color: Color.fromRGBO(225, 255, 199, 1.0),
+                                  nip: BubbleNip.rightBottom,
+                                  nipWidth: 10,
+                                  nipHeight: 5,
+                                  alignment: Alignment.topRight,
+                                  child: Text(
+                                    "${model.userData.userName}さん"
+                                    "\nお帰りなさい！",
+                                    style: TextStyle(fontSize: 15),
+                                    textScaleFactor: 1,
+                                  ),
+                                ),
+                              ),
                             Expanded(
-                              child: Bubble(
-                                color: Color.fromRGBO(225, 255, 199, 1.0),
-                                nip: BubbleNip.rightBottom,
-                                nipWidth: 10,
-                                nipHeight: 5,
-                                alignment: Alignment.topRight,
+                              child: Image.asset("assets/images/nurse02.png",
+                                  fit: BoxFit.fitHeight,
+                                  alignment: Alignment.bottomRight),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // SizedBox(height: 10),
+                      Card(
+                        elevation: 15,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(8)),
+                                color: Colors.green,
+                              ),
+                              child: Center(
                                 child: Text(
-                                  "${model.userData.userName}さん"
-                                  "\nお帰りなさい！",
-                                  style: TextStyle(fontSize: 15),
+                                  "ログイン画面",
+                                  style: cTextUpBarL,
                                   textScaleFactor: 1,
                                 ),
                               ),
                             ),
-                          Expanded(
-                            child: Image.asset("assets/images/nurse02.png",
-                                fit: BoxFit.fitHeight,
-                                alignment: Alignment.bottomRight),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    Card(
-                      elevation: 15,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: double.infinity,
-                            height: 30,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(8)),
-                              color: Colors.green,
-                            ),
-                            child: Center(
-                              child: Text(
-                                "ログイン画面",
-                                style: cTextUpBarL,
-                                textScaleFactor: 1,
+                            Container(
+                              padding: EdgeInsets.all(8),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    height: 30,
+                                    width: double.infinity,
+                                    alignment: Alignment.centerRight,
+                                    child: FlatButton(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Icon(Icons.account_box,
+                                              size: 18, color: Colors.black54),
+                                          Text("新規登録の方はこちら→",
+                                              style: cTextListS,
+                                              textScaleFactor: 1),
+                                        ],
+                                      ),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => SignUpPage(),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                          flex: 1,
+                                          child: Icon(Icons.group,
+                                              size: 20, color: Colors.black54)),
+                                      Expanded(
+                                        flex: 5,
+                                        child: TextField(
+                                          keyboardType: TextInputType.text,
+                                          controller: groupController,
+                                          decoration: InputDecoration(
+                                              hintText: "グループ名"),
+                                          onChanged: (text) {
+                                            if (beforeGroup != text) {
+                                              model.setIsUpdate(true);
+                                            } else {
+                                              model.setIsUpdate(false);
+                                            }
+                                            model.userData.userGroup = text;
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                          flex: 1,
+                                          child: Icon(Icons.email,
+                                              size: 20, color: Colors.black54)),
+                                      Expanded(
+                                        flex: 5,
+                                        child: TextField(
+                                          keyboardType:
+                                              TextInputType.emailAddress,
+                                          controller: emailController,
+                                          decoration: InputDecoration(
+                                              hintText: "aaa@bbb.ccc"),
+                                          onChanged: (text) {
+                                            if (beforeEmail != text) {
+                                              model.setIsUpdate(true);
+                                            } else {
+                                              model.setIsUpdate(false);
+                                            }
+                                            model.userData.userEmail = text;
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                          flex: 1,
+                                          child: Icon(
+                                            Icons.vpn_key,
+                                            size: 20,
+                                            color: Colors.black54,
+                                          )),
+                                      Expanded(
+                                        flex: 5,
+                                        child: TextField(
+                                          keyboardType: TextInputType.text,
+                                          controller: passwordController,
+                                          decoration: InputDecoration(
+                                              hintText: "password"),
+                                          obscureText: true,
+                                          onChanged: (text) {
+                                            if (beforePassword != text) {
+                                              model.setIsUpdate(true);
+                                            } else {
+                                              model.setIsUpdate(false);
+                                            }
+                                            model.userData.userPassword = text;
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 30),
+                                  Container(
+                                    width: double.infinity,
+                                    height: 40,
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 10),
+                                    child: RaisedButton.icon(
+                                      icon: Icon(FontAwesomeIcons.signInAlt,
+                                          color: Colors.white),
+                                      color: Colors.green,
+                                      label: Text("ログインする",
+                                          style: cTextUpBarL,
+                                          textScaleFactor: 1),
+                                      shape: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10.0)),
+                                        borderSide: BorderSide(
+                                            color: Colors.green, width: 2),
+                                      ),
+                                      elevation: 15,
+                                      onPressed: () =>
+                                          _loginProcess(context, model),
+                                    ),
+                                  ),
+                                  SizedBox(height: 20),
+                                ],
                               ),
                             ),
-                          ),
-                          Container(
-                            padding: EdgeInsets.all(8),
-                            child: Column(
-                              children: [
-                                Container(
-                                  height: 30,
-                                  width: double.infinity,
-                                  alignment: Alignment.centerRight,
-                                  child: FlatButton(
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Icon(Icons.account_box,
-                                            size: 18, color: Colors.black54),
-                                        Text("新規登録の方はこちら→",
-                                            style: cTextListS,
-                                            textScaleFactor: 1),
-                                      ],
-                                    ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => SignUpPage(),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                        flex: 1,
-                                        child: Icon(Icons.group,
-                                            size: 20, color: Colors.black54)),
-                                    Expanded(
-                                      flex: 5,
-                                      child: TextField(
-                                        keyboardType: TextInputType.text,
-                                        controller: groupController,
-                                        decoration:
-                                            InputDecoration(hintText: "グループ名"),
-                                        onChanged: (text) {
-                                          if (beforeGroup != text) {
-                                            model.setIsUpdate(true);
-                                          } else {
-                                            model.setIsUpdate(false);
-                                          }
-                                          model.userData.userGroup = text;
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                        flex: 1,
-                                        child: Icon(Icons.email,
-                                            size: 20, color: Colors.black54)),
-                                    Expanded(
-                                      flex: 5,
-                                      child: TextField(
-                                        keyboardType:
-                                            TextInputType.emailAddress,
-                                        controller: emailController,
-                                        decoration: InputDecoration(
-                                            hintText: "aaa@bbb.ccc"),
-                                        onChanged: (text) {
-                                          if (beforeEmail != text) {
-                                            model.setIsUpdate(true);
-                                          } else {
-                                            model.setIsUpdate(false);
-                                          }
-                                          model.userData.userEmail = text;
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                        flex: 1,
-                                        child: Icon(
-                                          Icons.vpn_key,
-                                          size: 20,
-                                          color: Colors.black54,
-                                        )),
-                                    Expanded(
-                                      flex: 5,
-                                      child: TextField(
-                                        keyboardType: TextInputType.text,
-                                        controller: passwordController,
-                                        decoration: InputDecoration(
-                                            hintText: "password"),
-                                        obscureText: true,
-                                        onChanged: (text) {
-                                          if (beforePassword != text) {
-                                            model.setIsUpdate(true);
-                                          } else {
-                                            model.setIsUpdate(false);
-                                          }
-                                          model.userData.userPassword = text;
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 30),
-                                Container(
-                                  width: double.infinity,
-                                  height: 40,
-                                  padding: EdgeInsets.symmetric(horizontal: 10),
-                                  child: RaisedButton.icon(
-                                    icon: Icon(FontAwesomeIcons.signInAlt,
-                                        color: Colors.white),
-                                    color: Colors.green,
-                                    label: Text("ログインする",
-                                        style: cTextUpBarL, textScaleFactor: 1),
-                                    shape: OutlineInputBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10.0)),
-                                      borderSide: BorderSide(
-                                          color: Colors.green, width: 2),
-                                    ),
-                                    elevation: 15,
-                                    onPressed: () =>
-                                        _loginProcess(context, model),
-                                  ),
-                                ),
-                                SizedBox(height: 20),
-                              ],
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            if (model.isLoading)
-              Container(color: Colors.black.withOpacity(0.7)),
-            if (model.isLoading) Center(child: CircularProgressIndicator()),
-          ]),
+              if (model.isLoading)
+                Container(color: Colors.black.withOpacity(0.7)),
+              if (model.isLoading) Center(child: CircularProgressIndicator()),
+            ]),
+          ),
         );
       },
     );
@@ -282,28 +280,28 @@ class LoginPage extends StatelessWidget {
       await done(context);
       // await firework(context);
       //DataBaseのチェック
-      final _databaseQuiz = DatabaseModel();
-      Future(() async {
-        final _datesQuiz = await _databaseQuiz.getQuizzes();
-        if (_datesQuiz.length == 0) {
-          //新規の場合はDBが空なのでFBからデータを注入
-          await _databaseQuiz.insertQuizzes(await fetchQuizFsCloud(cQuizId));
-        }
-      });
-      final _databaseQa = QaDatabaseModel();
-      Future(() async {
-        await _databaseQa.deleteAllQa();
-        await _databaseQa.insertQas(await fetchFsCloud(cQasId));
-      });
-      final _databaseLec = LecDatabaseModel();
-      Future(() async {
-        final _datesLec = await _databaseLec.getLecs();
-        if (_datesLec.length == 0) {
-          //新規の場合はDBが空なのでFBからデータを注入
-          await _databaseLec.insertLecs(await lFetchFsCloud(cLecsId));
-        }
-      });
-      await Navigator.push(
+      // final _databaseQuiz = DatabaseModel();
+      // Future(() async {
+      //   final _datesQuiz = await _databaseQuiz.getQuizzes();
+      //   if (_datesQuiz.length == 0) {
+      //     //新規の場合はDBが空なのでFBからデータを注入
+      //     await _databaseQuiz.insertQuizzes(await fetchQuizFsCloud(cQuizId));
+      //   }
+      // });
+      // final _databaseQa = QaDatabaseModel();
+      // Future(() async {
+      //   await _databaseQa.deleteAllQa();
+      //   await _databaseQa.insertQas(await fetchFsCloud(cQasId));
+      // });
+      // final _databaseLec = LecDatabaseModel();
+      // Future(() async {
+      //   final _datesLec = await _databaseLec.getLecs();
+      //   if (_datesLec.length == 0) {
+      //     //新規の場合はDBが空なのでFBからデータを注入
+      //     await _databaseLec.insertLecs(await lFetchFsCloud(cLecsId));
+      //   }
+      // });
+      await Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => Home(userData: model.userData),

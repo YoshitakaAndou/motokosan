@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:native_pdf_view/native_pdf_view.dart';
 import '../constants.dart';
 import '../pdf_page/pdf_data.dart';
-import '../widgets/go_back_one.dart';
+import '../widgets/go_back.dart';
 
 class Pdf extends StatefulWidget {
   @override
@@ -38,7 +38,7 @@ class _PdfState extends State<Pdf> {
           textScaleFactor: 1,
           style: cTextTitleL,
         ),
-        leading: goBackOne(context: context, icon: Icon(Icons.home)),
+        leading: goBack(context: context, icon: Icon(Icons.home), num: 1),
       ),
       body: PdfView(
         documentLoader: Center(child: CircularProgressIndicator()),

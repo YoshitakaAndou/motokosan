@@ -41,6 +41,8 @@ dependencies:
   flare_flutter: ^2.0.6
   awesome_dialog: ^1.2.0
   youtube_player_flutter: ^7.0.0+7
+  uuid: ^2.2.2
+  webview_flutter: ^1.0.1
 
   cupertino_icons: ^0.1.3
 

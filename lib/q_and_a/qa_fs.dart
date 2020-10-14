@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../widgets/go_back_one.dart';
-import '../widgets/ok_show_dialog_func.dart';
+import '../widgets/go_back.dart';
 import '../widgets/ok_show_dialog.dart';
 import 'qa_database_model.dart';
 import '../constants.dart';
@@ -32,7 +31,7 @@ class QaFs extends StatelessWidget {
             style: cTextTitleL,
             textScaleFactor: 1,
           ),
-          leading: goBackOne(context: context, icon: Icon(Icons.home)),
+          leading: goBack(context: context, icon: Icon(Icons.home), num: 1),
           actions: [
             Container(
               padding: EdgeInsets.symmetric(horizontal: 10),
@@ -115,19 +114,11 @@ class QaFs extends StatelessWidget {
             currentIndex: 0,
             items: [
               BottomNavigationBarItem(
-                title: Text(
-                  "Cloud",
-                  style: TextStyle(fontSize: 10),
-                  textScaleFactor: 1,
-                ),
+                label: "Cloud",
                 icon: Icon(Icons.cloud),
               ),
               BottomNavigationBarItem(
-                title: Text(
-                  "本体",
-                  style: TextStyle(fontSize: 10),
-                  textScaleFactor: 1,
-                ),
+                label: "本体",
                 icon: Icon(Icons.phone_android),
               ),
             ],

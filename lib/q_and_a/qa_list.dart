@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../widgets/bar_title.dart';
 import '../widgets/bubble/bubble.dart';
-import '../widgets/go_back_one.dart';
+import '../widgets/go_back.dart';
 import '../constants.dart';
 import 'qa_database_model.dart';
 import 'qa_model.dart';
@@ -25,7 +25,7 @@ class QaList extends StatelessWidget {
         appBar: AppBar(
           title: barTitle(context),
           centerTitle: true,
-          leading: goBackOne(context: context, icon: Icon(Icons.home)),
+          leading: goBack(context: context, icon: Icon(Icons.home), num: 1),
           actions: [
             GestureDetector(
               onTap: () {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../widgets/ok_show_dialog_func.dart';
 import '../widgets/ok_show_dialog.dart';
 import 'qa_database_model.dart';
 import '../constants.dart';
@@ -133,11 +132,7 @@ class QaDb extends StatelessWidget {
                 icon: Icon(Icons.cloud),
               ),
               BottomNavigationBarItem(
-                title: Text(
-                  "本体",
-                  style: TextStyle(fontSize: 10),
-                  textScaleFactor: 1,
-                ),
+                label: "本体",
                 icon: Icon(Icons.phone_android),
               ),
             ],

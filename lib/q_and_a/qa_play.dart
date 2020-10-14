@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:photo_view/photo_view.dart';
 import '../widgets/bar_title.dart';
-import '../widgets/go_back_one.dart';
+import '../widgets/go_back.dart';
 import '../constants.dart';
 import 'package:soundpool/soundpool.dart';
 
@@ -101,7 +101,8 @@ class _QaPlayState extends State<QaPlay> {
         title: barTitle(context),
         leading: isPopWind
             ? Container()
-            : goBackOne(context: context, icon: Icon(Icons.arrow_back_ios)),
+            : goBack(
+                context: context, icon: Icon(Icons.arrow_back_ios), num: 1),
         actions: [
           isPopWind ? _closeButton(context) : Container(),
         ],
