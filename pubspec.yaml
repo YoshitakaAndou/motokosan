@@ -43,6 +43,7 @@ dependencies:
   youtube_player_flutter: ^7.0.0+7
   uuid: ^2.2.2
   webview_flutter: ^1.0.1
+  http: ^0.12.2
 
   cupertino_icons: ^0.1.3
 

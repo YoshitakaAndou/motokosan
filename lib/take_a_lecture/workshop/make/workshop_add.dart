@@ -1,38 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:motokosan/take_a_lecture/organizer/organizer_model.dart';
 import 'package:motokosan/widgets/ok_show_dialog.dart';
 import 'package:provider/provider.dart';
 
-import '../../constants.dart';
-import 'target_model.dart';
+import '../../../constants.dart';
+import '../workshop_model.dart';
 
-class TargetAdd extends StatelessWidget {
+class WorkshopAdd extends StatelessWidget {
   final String groupName;
-  TargetAdd({this.groupName});
+  final Organizer _organizer;
+  WorkshopAdd(this.groupName, this._organizer);
 
   @override
   Widget build(BuildContext context) {
-    final model = Provider.of<TargetModel>(context, listen: false);
+    final model = Provider.of<WorkshopModel>(context, listen: false);
     final titleTextController = TextEditingController();
     final subTitleTextController = TextEditingController();
     final option1TextController = TextEditingController();
     final option2TextController = TextEditingController();
     final option3TextController = TextEditingController();
-    titleTextController.text = model.target.title;
-    subTitleTextController.text = model.target.subTitle;
-    option1TextController.text = model.target.option1;
-    option2TextController.text = model.target.option2;
-    option3TextController.text = model.target.option3;
-    model.target.targetNo =
-        (model.targets.length + 1).toString().padLeft(4, "0");
-    return Consumer<TargetModel>(builder: (context, model, child) {
+    titleTextController.text = model.workshop.title;
+    subTitleTextController.text = model.workshop.subTitle;
+    option1TextController.text = model.workshop.option1;
+    option2TextController.text = model.workshop.option2;
+    option3TextController.text = model.workshop.option3;
+    model.workshop.workshopNo =
+        (model.workshops.length + 1).toString().padLeft(4, "0");
+    return Consumer<WorkshopModel>(builder: (context, model, child) {
       model.isEditing = _checkValue(model);
       return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
-          centerTitle: true,
           toolbarHeight: cToolBarH,
-          title: Text("対象者の新規登録", style: cTextTitleL, textScaleFactor: 1),
+          centerTitle: true,
+          title: Text("研修会の新規登録", style: cTextTitleL, textScaleFactor: 1),
           actions: [
             if (model.isEditing)
               Padding(
@@ -93,7 +95,7 @@ class TargetAdd extends StatelessWidget {
     });
   }
 
-  Widget _infoArea(TargetModel model) {
+  Widget _infoArea(WorkshopModel model) {
     return Container(
       width: double.infinity,
       height: 50,
@@ -104,7 +106,7 @@ class TargetAdd extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: Text("　番号：${model.target.targetNo}",
+              child: Text("　番号：${model.workshop.workshopNo}",
                   style: cTextUpBarL, textScaleFactor: 1),
             ),
             Expanded(
@@ -112,7 +114,8 @@ class TargetAdd extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(" ", style: cTextUpBarS, textScaleFactor: 1),
+                  Text("主催：${_organizer.title}",
+                      style: cTextUpBarS, textScaleFactor: 1),
                 ],
               ),
             ),
@@ -122,20 +125,20 @@ class TargetAdd extends StatelessWidget {
     );
   }
 
-  Widget _title(TargetModel model, titleTextController) {
+  Widget _title(WorkshopModel model, _titleTextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      controller: titleTextController,
+      controller: _titleTextController,
       decoration: InputDecoration(
-        labelText: "対象者:",
+        labelText: "研修会名:",
         labelStyle: TextStyle(fontSize: 10),
-        hintText: "対象者 を入力してください（必須）",
+        hintText: "研修会名 を入力してください（必須）",
         hintStyle: TextStyle(fontSize: 12),
         suffixIcon: IconButton(
           onPressed: () {
-            titleTextController.text = "";
+            _titleTextController.text = "";
           },
           icon: Icon(Icons.clear, size: 15),
         ),
@@ -143,15 +146,18 @@ class TargetAdd extends StatelessWidget {
       onChanged: (text) {
         model.changeValue("title", text);
       },
+      onSubmitted: (text) {
+        model.changeValue("title", text);
+      },
     );
   }
 
-  Widget _subTitle(TargetModel model, subTitleTextController) {
+  Widget _subTitle(WorkshopModel model, _subTitleTextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      controller: subTitleTextController,
+      controller: _subTitleTextController,
       decoration: InputDecoration(
         labelText: "subTitle:",
         labelStyle: TextStyle(fontSize: 10),
@@ -159,7 +165,7 @@ class TargetAdd extends StatelessWidget {
         hintStyle: TextStyle(fontSize: 12),
         suffixIcon: IconButton(
           onPressed: () {
-            subTitleTextController.text = "";
+            _subTitleTextController.text = "";
           },
           icon: Icon(Icons.clear, size: 15),
         ),
@@ -167,10 +173,13 @@ class TargetAdd extends StatelessWidget {
       onChanged: (text) {
         model.changeValue("subTitle", text);
       },
+      onSubmitted: (text) {
+        model.changeValue("subTitle", text);
+      },
     );
   }
 
-  Widget _option1(TargetModel model, option1TextController) {
+  Widget _option1(WorkshopModel model, option1TextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
@@ -191,10 +200,13 @@ class TargetAdd extends StatelessWidget {
       onChanged: (text) {
         model.changeValue("option1", text);
       },
+      onSubmitted: (text) {
+        model.changeValue("option1", text);
+      },
     );
   }
 
-  Widget _option2(TargetModel model, option2TextController) {
+  Widget _option2(WorkshopModel model, option2TextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
@@ -215,10 +227,13 @@ class TargetAdd extends StatelessWidget {
       onChanged: (text) {
         model.changeValue("option2", text);
       },
+      onSubmitted: (text) {
+        model.changeValue("option2", text);
+      },
     );
   }
 
-  Widget _option3(TargetModel model, option3TextController) {
+  Widget _option3(WorkshopModel model, option3TextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
@@ -239,17 +254,20 @@ class TargetAdd extends StatelessWidget {
       onChanged: (text) {
         model.changeValue("option3", text);
       },
+      onSubmitted: (text) {
+        model.changeValue("option3", text);
+      },
     );
   }
 
-  Future<void> _addProcess(BuildContext context, TargetModel model) async {
+  Future<void> _addProcess(BuildContext context, WorkshopModel model) async {
     DateTime _timeStamp = DateTime.now();
-    model.target.targetId = _timeStamp.toString();
+    model.workshop.workshopId = _timeStamp.toString();
     // model.target.targetNo =
     //     model.targets.length.toString().padLeft(4, "0"); //questionId
     try {
       model.startLoading();
-      await model.addTargetFs(groupName, _timeStamp);
+      await model.addWorkshopFs(groupName, _timeStamp);
       model.stopLoading();
       await okShowDialog(context, "登録完了しました");
       Navigator.pop(context);
@@ -259,17 +277,17 @@ class TargetAdd extends StatelessWidget {
     }
   }
 
-  bool _checkValue(TargetModel model) {
+  bool _checkValue(WorkshopModel model) {
     bool _result = false;
-    _result = model.target.title.isNotEmpty ? true : _result;
-    _result = model.target.subTitle.isNotEmpty ? true : _result;
-    _result = model.target.option1.isNotEmpty ? true : _result;
-    _result = model.target.option2.isNotEmpty ? true : _result;
-    _result = model.target.option3.isNotEmpty ? true : _result;
+    _result = model.workshop.title.isNotEmpty ? true : _result;
+    _result = model.workshop.subTitle.isNotEmpty ? true : _result;
+    _result = model.workshop.option1.isNotEmpty ? true : _result;
+    _result = model.workshop.option2.isNotEmpty ? true : _result;
+    _result = model.workshop.option3.isNotEmpty ? true : _result;
     return _result;
   }
 
-  Widget _saveButton(BuildContext context, TargetModel model) {
+  Widget _saveButton(BuildContext context, WorkshopModel model) {
     return Container(
       height: 45,
       child: Row(
@@ -294,7 +312,7 @@ class TargetAdd extends StatelessWidget {
     );
   }
 
-  Widget _closeButton(BuildContext context, TargetModel model) {
+  Widget _closeButton(BuildContext context, WorkshopModel model) {
     return Container(
       height: 45,
       child: Row(

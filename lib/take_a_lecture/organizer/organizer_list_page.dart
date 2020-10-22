@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:motokosan/widgets/go_back.dart';
+import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../widgets/bar_title.dart';
@@ -52,82 +53,58 @@ class _OrganizerListPageState extends State<OrganizerListPage> {
       return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
+          toolbarHeight: cToolBarH,
           title: barTitle(context),
           leading: goBack(
               context: context, icon: Icon(FontAwesomeIcons.home), num: 1),
         ),
-        body: Stack(
+        body: Column(
           children: [
-            SingleChildScrollView(
-              child: Column(
-                children: [
-                  _infoArea(),
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    height: MediaQuery.of(context).size.height - 150,
-                    width: MediaQuery.of(context).size.width,
-                    child: ListView.builder(
-                      itemCount: model.organizerList.length,
-                      itemBuilder: (context, index) {
-                        return Card(
-                          key: Key(model.organizerList[index].organizerId),
-                          elevation: 15,
-                          child: ListTile(
-                            dense: true,
-                            title: Text(
-                              "${model.organizerList[index].title}",
-                              style: cTextListL,
-                              textScaleFactor: 1,
-                            ),
-                            trailing: Icon(
-                              FontAwesomeIcons.arrowRight,
-                              size: 20,
-                            ),
-                            onTap: () {
-                              // Workshopへ
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => WorkshopListPage(
-                                      widget.groupName,
-                                      model.organizerList[index]),
-                                ),
-                              );
-                              // await model.fetchTarget(groupName);
-                            },
+            _infoArea(),
+            Stack(
+              children: [
+                Container(
+                  // padding: EdgeInsets.all(8),
+                  height: MediaQuery.of(context).size.height - cListOffsetH,
+                  width: MediaQuery.of(context).size.width - cListOffsetW,
+                  child: ListView.builder(
+                    itemCount: model.organizerList.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        key: Key(model.organizerList[index].organizerId),
+                        elevation: 15,
+                        child: ListTile(
+                          dense: true,
+                          title: Text(
+                            "${model.organizerList[index].title}",
+                            style: cTextListL,
+                            textScaleFactor: 1,
                           ),
-                        );
-                      },
-                    ),
+                          // trailing: Icon(FontAwesomeIcons.arrowRight, size: 20),
+                          onTap: () {
+                            // Workshopへ
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => WorkshopListPage(
+                                  widget.groupName,
+                                  model.organizerList[index],
+                                ),
+                              ),
+                            );
+                            // await model.fetchTarget(groupName);
+                          },
+                        ),
+                      );
+                    },
                   ),
-                ],
-              ),
+                ),
+                if (model.isLoading) guriguri(context),
+              ],
             ),
-            if (model.isLoading)
-              Container(
-                  color: Colors.black87.withOpacity(0.8),
-                  child: Center(child: CircularProgressIndicator())),
           ],
         ),
-        bottomNavigationBar: BottomAppBar(
-          color: Theme.of(context).primaryColor,
-          notchMargin: 6.0,
-          shape: AutomaticNotchedShape(
-            RoundedRectangleBorder(),
-            StadiumBorder(
-              side: BorderSide(),
-            ),
-          ),
-          child: Container(
-            height: 45,
-            padding: EdgeInsets.all(10),
-            child: Text(
-              "",
-              style: cTextUpBarL,
-              textScaleFactor: 1,
-            ),
-          ),
-        ),
+        bottomNavigationBar: _bottomNavigationBar(context),
       );
     });
   }
@@ -150,6 +127,28 @@ class _OrganizerListPageState extends State<OrganizerListPage> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _bottomNavigationBar(BuildContext context) {
+    return BottomAppBar(
+      color: Theme.of(context).primaryColor,
+      notchMargin: 6.0,
+      shape: AutomaticNotchedShape(
+        RoundedRectangleBorder(),
+        StadiumBorder(
+          side: BorderSide(),
+        ),
+      ),
+      child: Container(
+        height: cBottomAppBarH,
+        padding: EdgeInsets.all(10),
+        child: Text(
+          "",
+          style: cTextUpBarL,
+          textScaleFactor: 1,
         ),
       ),
     );

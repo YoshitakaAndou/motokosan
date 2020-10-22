@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:motokosan/widgets/ok_show_dialog.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class LectureVideo extends StatefulWidget {

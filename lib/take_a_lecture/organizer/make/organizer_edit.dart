@@ -1,40 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:motokosan/widgets/ok_show_dialog.dart';
 import 'package:provider/provider.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../../widgets/ok_show_dialog.dart';
+import '../../../constants.dart';
+import '../organizer_model.dart';
 
-import '../../constants.dart';
-import 'target_model.dart';
-
-class TargetAdd extends StatelessWidget {
+class OrganizerEdit extends StatelessWidget {
   final String groupName;
-  TargetAdd({this.groupName});
+  final Organizer _category;
+  OrganizerEdit(this.groupName, this._category);
 
   @override
   Widget build(BuildContext context) {
-    final model = Provider.of<TargetModel>(context, listen: false);
     final titleTextController = TextEditingController();
     final subTitleTextController = TextEditingController();
     final option1TextController = TextEditingController();
     final option2TextController = TextEditingController();
     final option3TextController = TextEditingController();
-    titleTextController.text = model.target.title;
-    subTitleTextController.text = model.target.subTitle;
-    option1TextController.text = model.target.option1;
-    option2TextController.text = model.target.option2;
-    option3TextController.text = model.target.option3;
-    model.target.targetNo =
-        (model.targets.length + 1).toString().padLeft(4, "0");
-    return Consumer<TargetModel>(builder: (context, model, child) {
-      model.isEditing = _checkValue(model);
+    titleTextController.text = _category.title;
+    subTitleTextController.text = _category.subTitle;
+    option1TextController.text = _category.option1;
+    option2TextController.text = _category.option2;
+    option3TextController.text = _category.option3;
+
+    return Consumer<OrganizerModel>(builder: (context, model, child) {
       return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
-          centerTitle: true,
           toolbarHeight: cToolBarH,
-          title: Text("対象者の新規登録", style: cTextTitleL, textScaleFactor: 1),
+          centerTitle: true,
+          title: Text("主催者情報の編集", style: cTextTitleL, textScaleFactor: 1),
           actions: [
-            if (model.isEditing)
+            if (model.isUpdate)
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Icon(
@@ -57,6 +54,7 @@ class TargetAdd extends StatelessWidget {
                     padding: EdgeInsets.all(10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         _title(model, titleTextController),
                         _subTitle(model, subTitleTextController),
@@ -76,6 +74,8 @@ class TargetAdd extends StatelessWidget {
                   child: Center(child: CircularProgressIndicator())),
           ],
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.startDocked,
+        floatingActionButton: _deleteButton(context, model),
         bottomNavigationBar: BottomAppBar(
           color: Theme.of(context).primaryColor,
           notchMargin: 6.0,
@@ -85,15 +85,23 @@ class TargetAdd extends StatelessWidget {
               side: BorderSide(),
             ),
           ),
-          child: model.isEditing
-              ? _saveButton(context, model)
+          child: model.isUpdate
+              ? _saveButton(
+                  context,
+                  model,
+                  titleTextController,
+                  subTitleTextController,
+                  option1TextController,
+                  option2TextController,
+                  option3TextController,
+                )
               : _closeButton(context, model),
         ),
       );
     });
   }
 
-  Widget _infoArea(TargetModel model) {
+  Widget _infoArea(OrganizerModel model) {
     return Container(
       width: double.infinity,
       height: 50,
@@ -104,7 +112,7 @@ class TargetAdd extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: Text("　番号：${model.target.targetNo}",
+              child: Text("　番号：${_category.organizerNo}",
                   style: cTextUpBarL, textScaleFactor: 1),
             ),
             Expanded(
@@ -122,36 +130,37 @@ class TargetAdd extends StatelessWidget {
     );
   }
 
-  Widget _title(TargetModel model, titleTextController) {
+  Widget _title(OrganizerModel model, _titleTextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      controller: titleTextController,
       decoration: InputDecoration(
-        labelText: "対象者:",
+        labelText: "主催者:",
         labelStyle: TextStyle(fontSize: 10),
-        hintText: "対象者 を入力してください（必須）",
+        hintText: "主催者 を入力してください",
         hintStyle: TextStyle(fontSize: 12),
         suffixIcon: IconButton(
           onPressed: () {
-            titleTextController.text = "";
+            _titleTextController.text = "";
+            model.setUpdate();
           },
           icon: Icon(Icons.clear, size: 15),
         ),
       ),
+      controller: _titleTextController,
       onChanged: (text) {
         model.changeValue("title", text);
+        model.setUpdate();
       },
     );
   }
 
-  Widget _subTitle(TargetModel model, subTitleTextController) {
+  Widget _subTitle(OrganizerModel model, _subTitleTextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      controller: subTitleTextController,
       decoration: InputDecoration(
         labelText: "subTitle:",
         labelStyle: TextStyle(fontSize: 10),
@@ -159,23 +168,25 @@ class TargetAdd extends StatelessWidget {
         hintStyle: TextStyle(fontSize: 12),
         suffixIcon: IconButton(
           onPressed: () {
-            subTitleTextController.text = "";
+            _subTitleTextController.text = "";
+            model.setUpdate();
           },
           icon: Icon(Icons.clear, size: 15),
         ),
       ),
+      controller: _subTitleTextController,
       onChanged: (text) {
         model.changeValue("subTitle", text);
+        model.setUpdate();
       },
     );
   }
 
-  Widget _option1(TargetModel model, option1TextController) {
+  Widget _option1(OrganizerModel model, _option1TextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      controller: option1TextController,
       decoration: InputDecoration(
         labelText: "option1:",
         labelStyle: TextStyle(fontSize: 10),
@@ -183,23 +194,25 @@ class TargetAdd extends StatelessWidget {
         hintStyle: TextStyle(fontSize: 12),
         suffixIcon: IconButton(
           onPressed: () {
-            option1TextController.text = "";
+            _option1TextController.text = "";
+            model.setUpdate();
           },
           icon: Icon(Icons.clear, size: 15),
         ),
       ),
+      controller: _option1TextController,
       onChanged: (text) {
         model.changeValue("option1", text);
+        model.setUpdate();
       },
     );
   }
 
-  Widget _option2(TargetModel model, option2TextController) {
+  Widget _option2(OrganizerModel model, _option2TextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      controller: option2TextController,
       decoration: InputDecoration(
         labelText: "option2:",
         labelStyle: TextStyle(fontSize: 10),
@@ -207,23 +220,25 @@ class TargetAdd extends StatelessWidget {
         hintStyle: TextStyle(fontSize: 12),
         suffixIcon: IconButton(
           onPressed: () {
-            option2TextController.text = "";
+            _option2TextController.text = "";
+            model.setUpdate();
           },
           icon: Icon(Icons.clear, size: 15),
         ),
       ),
+      controller: _option2TextController,
       onChanged: (text) {
         model.changeValue("option2", text);
+        model.setUpdate();
       },
     );
   }
 
-  Widget _option3(TargetModel model, option3TextController) {
+  Widget _option3(OrganizerModel model, _option3TextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      controller: option3TextController,
       decoration: InputDecoration(
         labelText: "option3:",
         labelStyle: TextStyle(fontSize: 10),
@@ -231,45 +246,29 @@ class TargetAdd extends StatelessWidget {
         hintStyle: TextStyle(fontSize: 12),
         suffixIcon: IconButton(
           onPressed: () {
-            option3TextController.text = "";
+            _option3TextController.text = "";
+            model.setUpdate();
           },
           icon: Icon(Icons.clear, size: 15),
         ),
       ),
+      controller: _option3TextController,
       onChanged: (text) {
         model.changeValue("option3", text);
+        model.setUpdate();
       },
     );
   }
 
-  Future<void> _addProcess(BuildContext context, TargetModel model) async {
-    DateTime _timeStamp = DateTime.now();
-    model.target.targetId = _timeStamp.toString();
-    // model.target.targetNo =
-    //     model.targets.length.toString().padLeft(4, "0"); //questionId
-    try {
-      model.startLoading();
-      await model.addTargetFs(groupName, _timeStamp);
-      model.stopLoading();
-      await okShowDialog(context, "登録完了しました");
-      Navigator.pop(context);
-    } catch (e) {
-      okShowDialog(context, e.toString());
-      model.stopLoading();
-    }
-  }
-
-  bool _checkValue(TargetModel model) {
-    bool _result = false;
-    _result = model.target.title.isNotEmpty ? true : _result;
-    _result = model.target.subTitle.isNotEmpty ? true : _result;
-    _result = model.target.option1.isNotEmpty ? true : _result;
-    _result = model.target.option2.isNotEmpty ? true : _result;
-    _result = model.target.option3.isNotEmpty ? true : _result;
-    return _result;
-  }
-
-  Widget _saveButton(BuildContext context, TargetModel model) {
+  Widget _saveButton(
+    BuildContext context,
+    OrganizerModel model,
+    TextEditingController titleTextController,
+    TextEditingController subTitleTextController,
+    TextEditingController option1TextController,
+    TextEditingController option2TextController,
+    TextEditingController option3TextController,
+  ) {
     return Container(
       height: 45,
       child: Row(
@@ -286,7 +285,15 @@ class TargetAdd extends StatelessWidget {
               shape: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
               ),
-              onPressed: () => _addProcess(context, model),
+              onPressed: () => _editProcess(
+                context,
+                model,
+                titleTextController,
+                subTitleTextController,
+                option1TextController,
+                option2TextController,
+                option3TextController,
+              ),
             ),
           ),
         ],
@@ -294,7 +301,7 @@ class TargetAdd extends StatelessWidget {
     );
   }
 
-  Widget _closeButton(BuildContext context, TargetModel model) {
+  Widget _closeButton(BuildContext context, OrganizerModel model) {
     return Container(
       height: 45,
       child: Row(
@@ -311,11 +318,96 @@ class TargetAdd extends StatelessWidget {
               shape: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
               ),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
             ),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _editProcess(
+    BuildContext context,
+    OrganizerModel model,
+    TextEditingController titleTextController,
+    TextEditingController subTitleTextController,
+    TextEditingController option1TextController,
+    TextEditingController option2TextController,
+    TextEditingController option3TextController,
+  ) async {
+    // グリグリを回す
+    model.startLoading();
+    // 更新処理
+    model.organizer.title = titleTextController.text;
+    model.organizer.subTitle = subTitleTextController.text;
+    model.organizer.option1 = option1TextController.text;
+    model.organizer.option2 = option2TextController.text;
+    model.organizer.option3 = option3TextController.text;
+    model.organizer.organizerId = _category.organizerId;
+    model.organizer.organizerNo = _category.organizerNo;
+    model.organizer.createAt = _category.createAt;
+    model.organizer.updateAt = _category.updateAt;
+    try {
+      await model.updateOrganizerFs(groupName, DateTime.now());
+      await model.fetchOrganizer(groupName);
+      model.stopLoading();
+      await okShowDialog(context, "更新しました");
+      Navigator.pop(context);
+    } catch (e) {
+      okShowDialog(context, e.toString());
+      model.stopLoading();
+    }
+    model.resetUpdate();
+  }
+
+  Widget _deleteButton(BuildContext context, OrganizerModel model) {
+    return FloatingActionButton(
+      elevation: 15,
+      child: Icon(FontAwesomeIcons.trashAlt),
+      // todo 削除
+      onPressed: () {
+        okShowDialogFunc(
+          context: context,
+          mainTitle: _category.title,
+          subTitle: "削除しますか？",
+          // delete
+          onPressed: () async {
+            Navigator.pop(context);
+            await _deleteSave(
+              context,
+              model,
+              _category.organizerId,
+            );
+            Navigator.pop(context);
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteSave(
+      BuildContext context, OrganizerModel model, _categoryId) async {
+    model.startLoading();
+    try {
+      //FsをTargetIdで削除
+      await model.deleteCategoryFs(groupName, _categoryId);
+      //配列を削除するのは無理だから再びFsをフェッチ
+      await model.fetchOrganizer(groupName);
+      //頭から順にtargetNoを振る
+      int _count = 1;
+      for (Organizer _data in model.organizers) {
+        _data.organizerNo = _count.toString().padLeft(4, "0");
+        //Fsにアップデート
+        await model.setOrganizerFs(false, groupName, _data, DateTime.now());
+        _count += 1;
+      }
+      //一通り終わったらFsから読み込んで再描画させる
+      await model.fetchOrganizer(groupName);
+    } catch (e) {
+      okShowDialog(context, e.toString());
+    }
+    model.stopLoading();
   }
 }

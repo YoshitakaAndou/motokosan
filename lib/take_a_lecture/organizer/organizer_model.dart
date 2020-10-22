@@ -35,6 +35,7 @@ class OrganizerModel extends ChangeNotifier {
   Organizer organizer = Organizer();
   bool isLoading = false;
   bool isUpdate = false;
+  bool isEditing = false;
 
   void initData() {
     organizer.organizerId = "";
@@ -48,14 +49,14 @@ class OrganizerModel extends ChangeNotifier {
     organizer.createAt = 0;
   }
 
+  void initProperties() {
+    isLoading = false;
+    isUpdate = false;
+    isEditing = false;
+  }
+
   void changeValue(String _arg, String _val) {
     switch (_arg) {
-      case "organizerId":
-        organizer.organizerId = _val;
-        break;
-      case "organizerNo":
-        organizer.organizerNo = _val;
-        break;
       case "title":
         organizer.title = _val;
         break;

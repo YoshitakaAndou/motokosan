@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../question/question_model.dart';
-import '../../widgets/ok_show_dialog.dart';
-import '../../constants.dart';
-import '../lecture/lecture_model.dart';
+import '../question_model.dart';
+import '../../../widgets/ok_show_dialog.dart';
+import '../../../constants.dart';
+import '../../lecture/lecture_model.dart';
 
 class QuestionEdit extends StatelessWidget {
   final String groupName;
@@ -33,48 +33,17 @@ class QuestionEdit extends StatelessWidget {
       return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
+          toolbarHeight: cToolBarH,
           centerTitle: true,
-          title: Text(
-            "確認問題の編集",
-            style: cTextTitleL,
-            textScaleFactor: 1,
-          ),
+          title: Text("確認テストの編集", style: cTextTitleL, textScaleFactor: 1),
           actions: [
             if (model.isUpdate)
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: RaisedButton(
-                  color: Colors.green,
-                  shape: StadiumBorder(
-                    side: BorderSide(color: Colors.white),
-                  ),
-                  onPressed: () async {
-                    // 更新処理（外だしは出来ません）
-                    model.question.question = qsTextController.text;
-                    model.question.choices1 = ch1TitleTextController.text;
-                    model.question.choices2 = ch2TitleTextController.text;
-                    model.question.choices3 = ch3TitleTextController.text;
-                    model.question.choices4 = ch4TitleTextController.text;
-                    model.question.answerDescription = adTextController.text;
-                    model.startLoading();
-                    try {
-                      model.inputCheck();
-                      await model.updateQuestionFs(groupName, DateTime.now());
-                      await model.fetchQuestion(
-                          groupName, _question.questionId);
-                      model.stopLoading();
-                      await okShowDialog(context, "更新しました");
-                      Navigator.pop(context);
-                    } catch (e) {
-                      Navigator.pop(context);
-                    }
-                    model.resetUpdate();
-                  },
-                  child: Text(
-                    "登　録",
-                    style: cTextUpBarL,
-                    textScaleFactor: 1,
-                  ),
+                child: Icon(
+                  FontAwesomeIcons.pencilAlt,
+                  color: Colors.orange.withOpacity(0.5),
+                  size: 20,
                 ),
               ),
           ],
@@ -84,7 +53,7 @@ class QuestionEdit extends StatelessWidget {
             SingleChildScrollView(
               child: Column(
                 children: [
-                  _infoArea(),
+                  _infoArea(model),
                   Container(
                     width: MediaQuery.of(context).size.width - 28,
                     // height: MediaQuery.of(context).size.height + 300,
@@ -93,7 +62,6 @@ class QuestionEdit extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        _number(model),
                         _questionTile(model, qsTextController),
                         _choices1(model, ch1TitleTextController),
                         _choices2(model, ch2TitleTextController),
@@ -115,6 +83,8 @@ class QuestionEdit extends StatelessWidget {
                   child: Center(child: CircularProgressIndicator())),
           ],
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.startDocked,
+        floatingActionButton: _deleteButton(context, model),
         bottomNavigationBar: BottomAppBar(
           color: Theme.of(context).primaryColor,
           notchMargin: 6.0,
@@ -124,57 +94,46 @@ class QuestionEdit extends StatelessWidget {
               side: BorderSide(),
             ),
           ),
-          child: Container(
-            height: 45,
-          ),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.startDocked,
-        floatingActionButton: FloatingActionButton(
-          elevation: 15,
-          child: Icon(FontAwesomeIcons.trashAlt),
-          onPressed: () {
-            okShowDialogFunc(
-              context: context,
-              mainTitle: _question.question,
-              subTitle: "削除しますか？",
-              // delete
-              onPressed: () async {
-                await _deleteSave(
+          child: model.isUpdate
+              ? _saveButton(
                   context,
                   model,
-                  _question.questionId,
-                );
-                Navigator.pop(context);
-                Navigator.pop(context);
-              },
-            );
-          },
+                  qsTextController,
+                  ch1TitleTextController,
+                  ch2TitleTextController,
+                  ch3TitleTextController,
+                  ch4TitleTextController,
+                  adTextController,
+                )
+              : _closeButton(context, model),
         ),
       );
     });
   }
 
-  Widget _infoArea() {
+  Widget _infoArea(QuestionModel model) {
     return Container(
       width: double.infinity,
-      height: 65,
+      height: cInfoAreaH,
       color: cContBg,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              flex: 3,
-              child: Text("＞${_lecture.title}",
-                  style: cTextUpBarS, textScaleFactor: 1),
+              child: Text("テスト番号：${_question.questionNo}",
+                  style: cTextUpBarL, textScaleFactor: 1),
             ),
             Expanded(
-              flex: 2,
-              child: Text(
-                  "情報を入力し、"
-                  "\n登録ボタンを押してください！",
-                  style: cTextUpBarS,
-                  textScaleFactor: 1),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("講義：${_lecture.title}",
+                      style: cTextUpBarS, textScaleFactor: 1),
+                ],
+              ),
             ),
           ],
         ),
@@ -182,20 +141,23 @@ class QuestionEdit extends StatelessWidget {
     );
   }
 
-  Widget _number(QuestionModel model) {
-    return Text("確認問題番号：${model.question.questionNo}");
-  }
-
   Widget _questionTile(QuestionModel model, qsTextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      decoration: const InputDecoration(
-          labelText: "問題文:",
-          labelStyle: TextStyle(fontSize: 10),
-          hintText: "問題文を入力してください",
-          hintStyle: TextStyle(fontSize: 12)),
+      decoration: InputDecoration(
+        labelText: "問題文:",
+        labelStyle: TextStyle(fontSize: 10),
+        hintText: "問題文を入力してください",
+        hintStyle: TextStyle(fontSize: 12),
+        suffixIcon: IconButton(
+          onPressed: () {
+            qsTextController.text = "";
+          },
+          icon: Icon(Icons.clear, size: 15),
+        ),
+      ),
       controller: qsTextController,
       onChanged: (text) {
         model.changeValue("question", text);
@@ -209,11 +171,18 @@ class QuestionEdit extends StatelessWidget {
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      decoration: const InputDecoration(
-          labelText: "選択肢 1",
-          labelStyle: TextStyle(fontSize: 10),
-          hintText: "選択肢 1 を入力してください",
-          hintStyle: TextStyle(fontSize: 12)),
+      decoration: InputDecoration(
+        labelText: "選択肢 1",
+        labelStyle: TextStyle(fontSize: 10),
+        hintText: "選択肢 1 を入力してください",
+        hintStyle: TextStyle(fontSize: 12),
+        suffixIcon: IconButton(
+          onPressed: () {
+            ch1TitleTextController.text = "";
+          },
+          icon: Icon(Icons.clear, size: 15),
+        ),
+      ),
       controller: ch1TitleTextController,
       onChanged: (text) {
         model.changeValue("choices1", text);
@@ -227,11 +196,18 @@ class QuestionEdit extends StatelessWidget {
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      decoration: const InputDecoration(
-          labelText: "選択肢 2",
-          labelStyle: TextStyle(fontSize: 10),
-          hintText: "選択肢 2 を入力してください",
-          hintStyle: TextStyle(fontSize: 12)),
+      decoration: InputDecoration(
+        labelText: "選択肢 2",
+        labelStyle: TextStyle(fontSize: 10),
+        hintText: "選択肢 2 を入力してください",
+        hintStyle: TextStyle(fontSize: 12),
+        suffixIcon: IconButton(
+          onPressed: () {
+            ch2TitleTextController.text = "";
+          },
+          icon: Icon(Icons.clear, size: 15),
+        ),
+      ),
       controller: ch2TitleTextController,
       onChanged: (text) {
         model.changeValue("choices2", text);
@@ -245,11 +221,18 @@ class QuestionEdit extends StatelessWidget {
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      decoration: const InputDecoration(
-          labelText: "選択肢 3",
-          labelStyle: TextStyle(fontSize: 10),
-          hintText: "選択肢 3 を入力してください",
-          hintStyle: TextStyle(fontSize: 12)),
+      decoration: InputDecoration(
+        labelText: "選択肢 3",
+        labelStyle: TextStyle(fontSize: 10),
+        hintText: "選択肢 3 を入力してください",
+        hintStyle: TextStyle(fontSize: 12),
+        suffixIcon: IconButton(
+          onPressed: () {
+            ch3TitleTextController.text = "";
+          },
+          icon: Icon(Icons.clear, size: 15),
+        ),
+      ),
       controller: ch3TitleTextController,
       onChanged: (text) {
         model.changeValue("choices3", text);
@@ -263,11 +246,18 @@ class QuestionEdit extends StatelessWidget {
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      decoration: const InputDecoration(
-          labelText: "選択肢 4",
-          labelStyle: TextStyle(fontSize: 10),
-          hintText: "選択肢 4 を入力してください",
-          hintStyle: TextStyle(fontSize: 12)),
+      decoration: InputDecoration(
+        labelText: "選択肢 4",
+        labelStyle: TextStyle(fontSize: 10),
+        hintText: "選択肢 4 を入力してください",
+        hintStyle: TextStyle(fontSize: 12),
+        suffixIcon: IconButton(
+          onPressed: () {
+            ch4TitleTextController.text = "";
+          },
+          icon: Icon(Icons.clear, size: 15),
+        ),
+      ),
       controller: ch4TitleTextController,
       onChanged: (text) {
         model.changeValue("choices4", text);
@@ -317,11 +307,18 @@ class QuestionEdit extends StatelessWidget {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
-      decoration: const InputDecoration(
-          labelText: "解答・説明:",
-          labelStyle: TextStyle(fontSize: 10),
-          hintText: "解答・説明を入力してください",
-          hintStyle: TextStyle(fontSize: 12)),
+      decoration: InputDecoration(
+        labelText: "解答・説明:",
+        labelStyle: TextStyle(fontSize: 10),
+        hintText: "解答・説明を入力してください",
+        hintStyle: TextStyle(fontSize: 12),
+        suffixIcon: IconButton(
+          onPressed: () {
+            adTextController.text = "";
+          },
+          icon: Icon(Icons.clear, size: 15),
+        ),
+      ),
       controller: adTextController,
       onChanged: (text) {
         model.changeValue("answerDescription", text);
@@ -357,25 +354,157 @@ class QuestionEdit extends StatelessWidget {
     );
   }
 
+  Widget _saveButton(
+    BuildContext context,
+    QuestionModel model,
+    TextEditingController qsTextController,
+    TextEditingController ch1TitleTextController,
+    TextEditingController ch2TitleTextController,
+    TextEditingController ch3TitleTextController,
+    TextEditingController ch4TitleTextController,
+    TextEditingController adTextController,
+  ) {
+    return Container(
+      height: 45,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            height: 35,
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            child: RaisedButton.icon(
+              icon: Icon(FontAwesomeIcons.solidSave, color: Colors.green),
+              label: Text("登録する", style: cTextListM, textScaleFactor: 1),
+              color: Colors.white,
+              shape: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              ),
+              onPressed: () => _editProcess(
+                context,
+                model,
+                qsTextController,
+                ch1TitleTextController,
+                ch2TitleTextController,
+                ch3TitleTextController,
+                ch4TitleTextController,
+                adTextController,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _closeButton(BuildContext context, QuestionModel model) {
+    return Container(
+      height: 45,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            height: 35,
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            child: RaisedButton.icon(
+              icon: Icon(FontAwesomeIcons.times, color: Colors.green),
+              label: Text("やめる", style: cTextListM, textScaleFactor: 1),
+              color: Colors.white,
+              shape: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _editProcess(
+    BuildContext context,
+    QuestionModel model,
+    TextEditingController qsTextController,
+    TextEditingController ch1TitleTextController,
+    TextEditingController ch2TitleTextController,
+    TextEditingController ch3TitleTextController,
+    TextEditingController ch4TitleTextController,
+    TextEditingController adTextController,
+  ) async {
+    // グリグリを回す
+    model.startLoading();
+    // 更新処理
+    model.question.question = qsTextController.text;
+    model.question.choices1 = ch1TitleTextController.text;
+    model.question.choices2 = ch2TitleTextController.text;
+    model.question.choices3 = ch3TitleTextController.text;
+    model.question.choices4 = ch4TitleTextController.text;
+    model.question.answerDescription = adTextController.text;
+    try {
+      model.inputCheck();
+      await model.updateQuestionFs(groupName, DateTime.now(), _lecture);
+      await model.fetchQuestion(groupName, _question.questionId);
+      model.stopLoading();
+      await okShowDialog(context, "更新しました");
+      Navigator.pop(context);
+    } catch (e) {
+      okShowDialog(context, e.toString());
+      model.stopLoading();
+    }
+    model.resetUpdate();
+  }
+
+  Widget _deleteButton(BuildContext context, QuestionModel model) {
+    return FloatingActionButton(
+      elevation: 15,
+      child: Icon(FontAwesomeIcons.trashAlt),
+      // todo 削除
+      onPressed: () {
+        okShowDialogFunc(
+          context: context,
+          mainTitle: _question.question,
+          subTitle: "削除しますか？",
+          // delete
+          onPressed: () async {
+            Navigator.pop(context);
+            await _deleteSave(
+              context,
+              model,
+              _question.questionId,
+            );
+            Navigator.pop(context);
+          },
+        );
+      },
+    );
+  }
+
   Future<void> _deleteSave(
       BuildContext context, QuestionModel model, _questionId) async {
+    model.startLoading();
     try {
       //FsをQuestionIdで削除
       await model.deleteQuestionFs(groupName, _questionId);
       //配列を削除するのは無理だから再びFsをフェッチ
       await model.fetchQuestion(groupName, _lecture.lectureId);
       //頭から順にquestionNoを振る
-      int _count = 0;
+      int _count = 1;
       for (Question _data in model.questions) {
         _data.questionNo = _count.toString().padLeft(4, "0");
         //Fsにアップデート
         await model.setQuestionFs(false, groupName, _data, DateTime.now());
         _count += 1;
       }
+      // LectureにQuestion.lengthを書き込む
+      await model.setLectureQSLength(groupName, _lecture);
       //一通り終わったらFsから読み込んで再描画させる
       await model.fetchQuestion(groupName, _lecture.lectureId);
     } catch (e) {
       okShowDialog(context, e.toString());
     }
+    model.stopLoading();
   }
 }

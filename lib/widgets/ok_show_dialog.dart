@@ -9,7 +9,7 @@ Future<Widget> okShowDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text(title ?? ""),
+        title: Text(title ?? "", style: cTextListM, textScaleFactor: 1),
         actions: [
           FlatButton(
             child: Text("OK"),

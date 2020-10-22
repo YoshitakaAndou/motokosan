@@ -137,9 +137,12 @@ class LoginPage extends StatelessWidget {
                                         flex: 5,
                                         child: TextField(
                                           keyboardType: TextInputType.text,
+                                          textInputAction: TextInputAction.done,
                                           controller: groupController,
                                           decoration: InputDecoration(
-                                              hintText: "グループ名"),
+                                            hintText: "グループ名",
+                                            hintStyle: TextStyle(fontSize: 12),
+                                          ),
                                           onChanged: (text) {
                                             if (beforeGroup != text) {
                                               model.setIsUpdate(true);
@@ -165,7 +168,9 @@ class LoginPage extends StatelessWidget {
                                               TextInputType.emailAddress,
                                           controller: emailController,
                                           decoration: InputDecoration(
-                                              hintText: "aaa@bbb.ccc"),
+                                            hintText: "aaa@bbb.ccc",
+                                            hintStyle: TextStyle(fontSize: 12),
+                                          ),
                                           onChanged: (text) {
                                             if (beforeEmail != text) {
                                               model.setIsUpdate(true);
@@ -193,7 +198,9 @@ class LoginPage extends StatelessWidget {
                                           keyboardType: TextInputType.text,
                                           controller: passwordController,
                                           decoration: InputDecoration(
-                                              hintText: "password"),
+                                            hintText: "password",
+                                            hintStyle: TextStyle(fontSize: 12),
+                                          ),
                                           obscureText: true,
                                           onChanged: (text) {
                                             if (beforePassword != text) {

@@ -84,9 +84,10 @@ class QuestionModel extends ChangeNotifier {
 
   bool isUpdate = false;
   bool isLoading = false;
+  bool isEditing = false;
   String correct = "";
   int answerNum = 0;
-  int questionsCount;
+  int questionsCount = 0;
 
   final _questionDatabase = QuestionDatabase();
 
@@ -107,6 +108,15 @@ class QuestionModel extends ChangeNotifier {
     question.organizerId = _lecture.organizerId;
     question.workshopId = _lecture.workshopId;
     question.lectureId = _lecture.lectureId;
+  }
+
+  void initProperties() {
+    isUpdate = false;
+    isLoading = false;
+    isEditing = false;
+    correct = "";
+    answerNum = 0;
+    questionsCount = 0;
   }
 
   void initQuestionResult() {
@@ -132,12 +142,6 @@ class QuestionModel extends ChangeNotifier {
 
   void changeValue(String _arg, String _val) {
     switch (_arg) {
-      case "questionId":
-        question.questionId = _val;
-        break;
-      case "questionNo":
-        question.questionNo = _val;
-        break;
       case "question":
         question.question = _val;
         break;
@@ -295,16 +299,51 @@ class QuestionModel extends ChangeNotifier {
     }
   }
 
-  Future<void> addQuestionFs(_groupName, _timeStamp) async {
-    // Firebaseへデータを新規登録
+  Future<void> addQuestionFs(_groupName, _timeStamp, _lecture) async {
     question.questionId = _timeStamp.toString();
     await setQuestionFs(true, _groupName, question, _timeStamp);
+    // LectureのquestionLengthにfetchして値を書き込む
+    setLectureQSLength(_groupName, _lecture);
     notifyListeners();
   }
 
-  Future<void> updateQuestionFs(_groupName, _timeStamp) async {
+  Future<void> updateQuestionFs(_groupName, _timeStamp, _lecture) async {
     await setQuestionFs(false, _groupName, question, _timeStamp);
+    // LectureのquestionLengthにfetchして値を書き込む
+    setLectureQSLength(_groupName, _lecture);
     notifyListeners();
+  }
+
+  Future<void> setLectureQSLength(String _groupName, Lecture _data) async {
+    final _questions = await _fetchQuestion(_groupName, _data.lectureId);
+    _data.questionLength = _questions.length;
+    final _lectureId = _data.lectureId;
+    await Firestore.instance
+        .collection("Groups")
+        .document(_groupName)
+        .collection("Lecture")
+        .document(_lectureId)
+        .setData({
+      "lectureId": _lectureId,
+      "lectureNo": _data.lectureNo,
+      "title": _data.title,
+      "subTitle": _data.subTitle,
+      "description": _data.description,
+      "videoUrl": _data.videoUrl,
+      "thumbnailUrl": _data.thumbnailUrl,
+      "videoDuration": _data.videoDuration,
+      "allAnswers": _data.allAnswers,
+      "passingScore": _data.passingScore,
+      "slideLength": _data.slideLength,
+      "questionLength": _data.questionLength,
+      "upDate": _data.updateAt,
+      "createAt": _data.createAt,
+      "targetId": _data.targetId,
+      "organizerId": _data.organizerId,
+      "workshopId": _data.workshopId,
+    }).catchError((onError) {
+      print(onError.toString());
+    });
   }
 
   Future<void> setQuestionFs(bool _isAdd, String _groupName, Question _data,

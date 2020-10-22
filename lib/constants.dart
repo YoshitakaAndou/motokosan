@@ -11,8 +11,39 @@ const String CATEGORY03 = "放射線診療の防護の最適化";
 const String CATEGORY04 = "放射線障害が生じた場合の対応";
 const String CATEGORY05 = "患者への情報提供";
 
+// toolBarの高さ
+const double cToolBarH = 40.0;
+// infoAreaの高さ
+const double cInfoAreaH = 50.0;
+// bottomAppBarのContainerの高さ
+const double cBottomAppBarH = 45.0;
+// listの高さ用offset値
+const double cListOffsetH = 220;
+// listの幅用offset値
+const double cListOffsetW = 10;
+// edit/add areaの高さ用offset値
+const double cEditOffsetH = 220;
+// edit/add areaの幅用offset値
+const double cEditOffsetW = 20;
+
 //リスト上部のコンテナ
 const cContBg = Colors.green;
+
+//Edit/AddのpopWindow
+const cPopWindow = Colors.black26;
+const cTextPopIcon = Colors.black54;
+const cTextPopM = TextStyle(
+  color: Colors.black54,
+  fontSize: 12,
+  fontWeight: FontWeight.w600,
+);
+const cTextPopS = TextStyle(
+  color: Colors.black54,
+  fontSize: 10,
+  fontWeight: FontWeight.w600,
+);
+
+//Text
 
 final TextStyle cTextTitleL = TextStyle(
   color: Colors.green[700],

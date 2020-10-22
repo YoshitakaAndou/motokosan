@@ -134,6 +134,7 @@ class _QuestionPlayState extends State<QuestionPlay> {
     }
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: cToolBarH,
         centerTitle: true,
         title: barTitle(context),
         leading: goBackWithArg(
@@ -198,7 +199,7 @@ class _QuestionPlayState extends State<QuestionPlay> {
 
   Widget _categoryTile() {
     return Container(
-      height: 30,
+      height: cInfoAreaH,
       width: double.infinity,
       color: cContBg,
       child: Padding(

@@ -7,9 +7,8 @@ import 'package:motokosan/take_a_lecture/target/target_page.dart';
 import 'package:provider/provider.dart';
 import 'auth/user_data.dart';
 import 'constants.dart';
-import 'take_a_lecture/organizer/organizer_page.dart';
+import 'take_a_lecture/organizer/make/organizer_page.dart';
 import 'widgets/bar_title.dart';
-import 'widgets/ok_show_dialog.dart';
 
 class Home extends StatelessWidget {
   final UserData userData;
@@ -119,7 +118,7 @@ class Home extends StatelessWidget {
                     children: [
                       _menuItem(
                         context: context,
-                        title: "対象者リストを編集",
+                        title: "対象を編集",
                         icon: Icon(FontAwesomeIcons.solidAddressCard,
                             color: Colors.green[800]),
                         onTap: () async {

@@ -60,6 +60,7 @@ class WorkshopModel extends ChangeNotifier {
   WorkshopList workshopList = WorkshopList();
   bool isLoading = false;
   bool isUpdate = false;
+  bool isEditing = false;
   String lectureMess = "";
 
   void initData(Organizer _organizer) {
@@ -76,14 +77,15 @@ class WorkshopModel extends ChangeNotifier {
     workshop.organizerId = _organizer.organizerId;
   }
 
+  void initProperties() {
+    isLoading = false;
+    isUpdate = false;
+    isEditing = false;
+    lectureMess = "";
+  }
+
   void changeValue(String _arg, String _val) {
     switch (_arg) {
-      case "workshopId":
-        workshop.workshopId = _val;
-        break;
-      case "workshopNo":
-        workshop.workshopNo = _val;
-        break;
       case "title":
         workshop.title = _val;
         break;

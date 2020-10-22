@@ -4,6 +4,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:motokosan/take_a_lecture/question/question_model.dart';
+import 'package:motokosan/widgets/ok_show_dialog.dart';
 import 'package:uuid/uuid.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../organizer/organizer_model.dart';
@@ -17,7 +19,12 @@ class Lecture {
   String subTitle;
   String description;
   String videoUrl;
+  String thumbnailUrl;
+  String videoDuration;
+  String allAnswers;
+  int passingScore;
   int slideLength;
+  int questionLength;
   int updateAt;
   int createAt;
   String targetId;
@@ -31,7 +38,12 @@ class Lecture {
     this.subTitle = "",
     this.description = "",
     this.videoUrl = "",
+    this.thumbnailUrl = "",
+    this.videoDuration = "",
+    this.allAnswers = "false",
+    this.passingScore = 0,
     this.slideLength = 0,
+    this.questionLength = 0,
     this.updateAt = 0,
     this.createAt = 0,
     this.targetId = "",
@@ -68,6 +80,44 @@ class LectureResult {
   }
 }
 
+class Video {
+  String id;
+  String url;
+  String title;
+  String description;
+  String thumbnailUrl;
+  String duration;
+
+  Video({
+    this.id,
+    this.url,
+    this.title,
+    this.description,
+    this.thumbnailUrl,
+    this.duration,
+  });
+
+  factory Video.fromMapSnippet(Map<String, dynamic> map) {
+    return Video(
+      id: map["id"],
+      title: map["snippet"]["title"],
+      description: map["snippet"]["description"],
+      thumbnailUrl: map["snippet"]["thumbnails"]["default"]["url"],
+      // duration: map["contentDetails"]["duration"],
+    );
+  }
+
+  factory Video.fromMapContentDetails(Map<String, dynamic> map) {
+    return Video(
+      // id: map["id"],
+      // title: map["snippet"]["title"],
+      // description: map["snippet"]["description"],
+      // thumbnailUrl: map["snippet"]["thumbnails"]["default"]["url"],
+      duration: map["contentDetails"]["duration"],
+    );
+  }
+}
+
 class Slide {
   String slideNo;
   String slideUrl;
@@ -94,14 +144,19 @@ class LectureModel extends ChangeNotifier {
   List<DeletedSlide> deletedSlides = [];
   List<LectureResult> lectureResults = [];
   LectureResult lectureResult = LectureResult();
+  Video video = Video();
 
   bool isLoading = false;
   bool isUpdate = false;
+  bool isEditing = false;
   bool isSlideUpdate = false;
   bool isVideoPlay = false;
+  bool isFlag0 = true;
+  bool isFlag1 = true;
+  bool isFlag2 = true;
 
-  String webCurrentUrl = "";
-  String webFavoriteUrl = "";
+  String webLastUrl = "";
+  String webBookmarkUrl = "";
 
   void initLecture(Organizer _organizer, Workshop _workshop) {
     lecture.lectureId = "";
@@ -110,7 +165,12 @@ class LectureModel extends ChangeNotifier {
     lecture.subTitle = "";
     lecture.description = "";
     lecture.videoUrl = "";
+    lecture.thumbnailUrl = "";
+    lecture.videoDuration = "";
+    lecture.allAnswers = "false";
+    lecture.passingScore = 0;
     lecture.slideLength = 0;
+    lecture.questionLength = 0;
     lecture.updateAt = 0;
     lecture.createAt = 0;
     lecture.targetId = "";
@@ -124,6 +184,14 @@ class LectureModel extends ChangeNotifier {
     slide.slideImage = null;
   }
 
+  void initVideo() {
+    video.id = "";
+    video.title = "";
+    video.description = "";
+    video.thumbnailUrl = "";
+    video.duration = "";
+  }
+
   void initProperties() {
     deletedSlides = List();
     slides = List();
@@ -131,18 +199,19 @@ class LectureModel extends ChangeNotifier {
     isUpdate = false;
     isSlideUpdate = false;
     isVideoPlay = false;
+    isEditing = false;
     // webCurrentUrl = "";
     // webFavoriteUrl = "";
   }
 
+  void initFlag(bool _key) {
+    isFlag0 = _key;
+    isFlag1 = _key;
+    isFlag2 = _key;
+  }
+
   void changeValue(String _arg, String _val) {
     switch (_arg) {
-      case "lectureId":
-        lecture.lectureId = _val;
-        break;
-      case "lectureNo":
-        lecture.lectureNo = _val;
-        break;
       case "title":
         lecture.title = _val;
         break;
@@ -179,6 +248,11 @@ class LectureModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setIsEditing() {
+    isEditing = true;
+    notifyListeners();
+  }
+
   void resetUpdate() {
     isUpdate = false;
     notifyListeners();
@@ -187,6 +261,56 @@ class LectureModel extends ChangeNotifier {
   void slideRemoveAt(int _index) {
     slides.removeAt(_index);
     notifyListeners();
+  }
+
+  bool videoSetLecture() {
+    bool _result = false;
+    if (isFlag0) {
+      lecture.thumbnailUrl = video.thumbnailUrl;
+      lecture.videoUrl = video.url;
+      lecture.videoDuration = video.duration;
+      _result = true;
+    }
+    if (isFlag1) {
+      lecture.title = video.title;
+      _result = true;
+    }
+    if (isFlag2) {
+      lecture.description = video.description;
+      _result = true;
+    }
+    notifyListeners();
+    return _result;
+  }
+
+  void setVideoPlay(bool _key) {
+    isVideoPlay = _key;
+    notifyListeners();
+  }
+
+  void setFlag0(bool _key) {
+    isFlag0 = _key;
+    notifyListeners();
+  }
+
+  void setFlag1(bool _key) {
+    isFlag1 = _key;
+    notifyListeners();
+  }
+
+  void setFlag2(bool _key) {
+    isFlag2 = _key;
+    notifyListeners();
+  }
+
+  void setAllAnswers(String _key) {
+    lecture.allAnswers = _key;
+    // notifyListeners();
+  }
+
+  void setPassingScore(int _key) {
+    lecture.passingScore = _key;
+    // notifyListeners();
   }
 
   Future<File> selectImage(File _imageFile) async {
@@ -227,7 +351,12 @@ class LectureModel extends ChangeNotifier {
               subTitle: doc["subTitle"] ?? "",
               description: doc["description"] ?? "",
               videoUrl: doc["videoUrl"] ?? "",
+              thumbnailUrl: doc["thumbnailUrl"] ?? "",
+              videoDuration: doc["videoDuration"] ?? "",
+              allAnswers: doc["allAnswers"] ?? "",
+              passingScore: doc["passingScore"],
               slideLength: doc["slideLength"],
+              questionLength: doc["questionLength"],
               updateAt: doc["upDate"],
               createAt: doc["createAt"],
               targetId: doc["targetId"],
@@ -247,6 +376,9 @@ class LectureModel extends ChangeNotifier {
     if (lecture.videoUrl.isEmpty) {
       throw "YouTube動画URL が入力されていません！";
     }
+    if (!isVideoUrl(lecture.videoUrl)) {
+      throw "YouTube動画URL が正しくありません！";
+    }
     if (lecture.description.isEmpty) {
       throw "説明 が入力されていません！";
     }
@@ -256,6 +388,7 @@ class LectureModel extends ChangeNotifier {
     final _result =
         YoutubePlayer.convertUrlToId(_videoUrl) == null ? false : true;
     isVideoPlay = _result;
+    notifyListeners();
     return _result;
   }
 
@@ -286,7 +419,12 @@ class LectureModel extends ChangeNotifier {
       "subTitle": _data.subTitle,
       "description": _data.description,
       "videoUrl": _data.videoUrl,
+      "thumbnailUrl": _data.thumbnailUrl,
+      "videoDuration": _data.videoDuration,
+      "allAnswers": _data.allAnswers,
+      "passingScore": _data.passingScore,
       "slideLength": _data.slideLength,
+      "questionLength": _data.questionLength,
       "upDate": convertDateToInt(_timeStamp),
       "createAt": _isAdd ? convertDateToInt(_timeStamp) : _data.createAt,
       "targetId": _data.targetId,
@@ -351,7 +489,7 @@ class LectureModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // 削除プロセス
+  // Slideデータdelete
   Future<void> deleteStorageImages(_groupName, _lectureId) async {
     final _slideLists = await fetchSlide(_groupName, _lectureId);
     for (Slide _slideList in _slideLists) {
@@ -359,6 +497,8 @@ class LectureModel extends ChangeNotifier {
       await deleteSlideFs(_groupName, _lectureId, _slideList.slideNo);
     }
   }
+
+  // Questionデータdelete
 
   Future<void> updateSlide(_groupName, _lectureId) async {
     // Fs上のSlideを削除
@@ -439,5 +579,45 @@ class LectureModel extends ChangeNotifier {
         .document(_lectureId)
         .delete();
     notifyListeners();
+  }
+
+  Future<List<Question>> fetchQuestion(_groupName, _lectureId) async {
+    final _docs = await Firestore.instance
+        .collection("Groups")
+        .document(_groupName)
+        .collection("Question")
+        .where("lectureId", isEqualTo: _lectureId)
+        .getDocuments();
+    final List<Question> _results = _docs.documents
+        .map((doc) => Question(
+              questionId: doc["questionId"],
+              questionNo: doc["questionNo"],
+              question: doc["question"],
+              choices1: doc["choices1"],
+              choices2: doc["choices2"],
+              choices3: doc["choices3"],
+              choices4: doc["choices4"],
+              correctChoices: doc["correctChoices"],
+              answerDescription: doc["answerDescription"],
+              updateAt: doc["upDate"],
+              createAt: doc["createAt"],
+              answeredAt: doc["answeredAt"],
+              answered: doc["answered"],
+              organizerId: doc["organizerId"],
+              workshopId: doc["workshopId"],
+              lectureId: doc["lectureId"],
+            ))
+        .toList();
+    _results.sort((a, b) => a.questionNo.compareTo(b.questionNo));
+    return _results;
+  }
+
+  Future<void> deleteQuestion(_groupName, _questionId) async {
+    await Firestore.instance
+        .collection("Groups")
+        .document(_groupName)
+        .collection("Question")
+        .document(_questionId)
+        .delete();
   }
 }

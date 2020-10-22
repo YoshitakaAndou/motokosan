@@ -3,36 +3,36 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/widgets/ok_show_dialog.dart';
 import 'package:provider/provider.dart';
 
-import '../../constants.dart';
-import 'target_model.dart';
+import '../../../constants.dart';
+import '../organizer_model.dart';
 
-class TargetAdd extends StatelessWidget {
+class OrganizerAdd extends StatelessWidget {
   final String groupName;
-  TargetAdd({this.groupName});
+  OrganizerAdd(this.groupName);
 
   @override
   Widget build(BuildContext context) {
-    final model = Provider.of<TargetModel>(context, listen: false);
+    final model = Provider.of<OrganizerModel>(context, listen: false);
     final titleTextController = TextEditingController();
     final subTitleTextController = TextEditingController();
     final option1TextController = TextEditingController();
     final option2TextController = TextEditingController();
     final option3TextController = TextEditingController();
-    titleTextController.text = model.target.title;
-    subTitleTextController.text = model.target.subTitle;
-    option1TextController.text = model.target.option1;
-    option2TextController.text = model.target.option2;
-    option3TextController.text = model.target.option3;
-    model.target.targetNo =
-        (model.targets.length + 1).toString().padLeft(4, "0");
-    return Consumer<TargetModel>(builder: (context, model, child) {
+    titleTextController.text = model.organizer.title;
+    subTitleTextController.text = model.organizer.subTitle;
+    option1TextController.text = model.organizer.option1;
+    option2TextController.text = model.organizer.option2;
+    option3TextController.text = model.organizer.option3;
+    model.organizer.organizerNo =
+        (model.organizers.length + 1).toString().padLeft(4, "0");
+    return Consumer<OrganizerModel>(builder: (context, model, child) {
       model.isEditing = _checkValue(model);
       return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
-          centerTitle: true,
           toolbarHeight: cToolBarH,
-          title: Text("対象者の新規登録", style: cTextTitleL, textScaleFactor: 1),
+          centerTitle: true,
+          title: Text("主催者情報の新規登録", style: cTextTitleL, textScaleFactor: 1),
           actions: [
             if (model.isEditing)
               Padding(
@@ -93,7 +93,7 @@ class TargetAdd extends StatelessWidget {
     });
   }
 
-  Widget _infoArea(TargetModel model) {
+  Widget _infoArea(OrganizerModel model) {
     return Container(
       width: double.infinity,
       height: 50,
@@ -104,7 +104,7 @@ class TargetAdd extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: Text("　番号：${model.target.targetNo}",
+              child: Text("　番号：${model.organizer.organizerNo}",
                   style: cTextUpBarL, textScaleFactor: 1),
             ),
             Expanded(
@@ -122,16 +122,16 @@ class TargetAdd extends StatelessWidget {
     );
   }
 
-  Widget _title(TargetModel model, titleTextController) {
+  Widget _title(OrganizerModel model, titleTextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
       controller: titleTextController,
       decoration: InputDecoration(
-        labelText: "対象者:",
+        labelText: "主催者:",
         labelStyle: TextStyle(fontSize: 10),
-        hintText: "対象者 を入力してください（必須）",
+        hintText: "主催者 を入力してください（必須）",
         hintStyle: TextStyle(fontSize: 12),
         suffixIcon: IconButton(
           onPressed: () {
@@ -146,7 +146,7 @@ class TargetAdd extends StatelessWidget {
     );
   }
 
-  Widget _subTitle(TargetModel model, subTitleTextController) {
+  Widget _subTitle(OrganizerModel model, subTitleTextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
@@ -170,7 +170,7 @@ class TargetAdd extends StatelessWidget {
     );
   }
 
-  Widget _option1(TargetModel model, option1TextController) {
+  Widget _option1(OrganizerModel model, option1TextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
@@ -194,7 +194,7 @@ class TargetAdd extends StatelessWidget {
     );
   }
 
-  Widget _option2(TargetModel model, option2TextController) {
+  Widget _option2(OrganizerModel model, option2TextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
@@ -218,7 +218,7 @@ class TargetAdd extends StatelessWidget {
     );
   }
 
-  Widget _option3(TargetModel model, option3TextController) {
+  Widget _option3(OrganizerModel model, option3TextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
@@ -242,14 +242,14 @@ class TargetAdd extends StatelessWidget {
     );
   }
 
-  Future<void> _addProcess(BuildContext context, TargetModel model) async {
+  Future<void> _addProcess(BuildContext context, OrganizerModel model) async {
     DateTime _timeStamp = DateTime.now();
-    model.target.targetId = _timeStamp.toString();
+    model.organizer.organizerId = _timeStamp.toString();
     // model.target.targetNo =
     //     model.targets.length.toString().padLeft(4, "0"); //questionId
     try {
       model.startLoading();
-      await model.addTargetFs(groupName, _timeStamp);
+      await model.addOrganizerFs(groupName, _timeStamp);
       model.stopLoading();
       await okShowDialog(context, "登録完了しました");
       Navigator.pop(context);
@@ -259,17 +259,17 @@ class TargetAdd extends StatelessWidget {
     }
   }
 
-  bool _checkValue(TargetModel model) {
+  bool _checkValue(OrganizerModel model) {
     bool _result = false;
-    _result = model.target.title.isNotEmpty ? true : _result;
-    _result = model.target.subTitle.isNotEmpty ? true : _result;
-    _result = model.target.option1.isNotEmpty ? true : _result;
-    _result = model.target.option2.isNotEmpty ? true : _result;
-    _result = model.target.option3.isNotEmpty ? true : _result;
+    _result = model.organizer.title.isNotEmpty ? true : _result;
+    _result = model.organizer.subTitle.isNotEmpty ? true : _result;
+    _result = model.organizer.option1.isNotEmpty ? true : _result;
+    _result = model.organizer.option2.isNotEmpty ? true : _result;
+    _result = model.organizer.option3.isNotEmpty ? true : _result;
     return _result;
   }
 
-  Widget _saveButton(BuildContext context, TargetModel model) {
+  Widget _saveButton(BuildContext context, OrganizerModel model) {
     return Container(
       height: 45,
       child: Row(
@@ -294,7 +294,7 @@ class TargetAdd extends StatelessWidget {
     );
   }
 
-  Widget _closeButton(BuildContext context, TargetModel model) {
+  Widget _closeButton(BuildContext context, OrganizerModel model) {
     return Container(
       height: 45,
       child: Row(

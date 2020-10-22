@@ -27,49 +27,17 @@ class TargetEdit extends StatelessWidget {
       return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
+          toolbarHeight: cToolBarH,
           centerTitle: true,
-          title: Text(
-            "対象名の編集",
-            style: cTextTitleL,
-            textScaleFactor: 1,
-          ),
+          title: Text("対象者情報の編集", style: cTextTitleL, textScaleFactor: 1),
           actions: [
             if (model.isUpdate)
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: RaisedButton(
-                  color: Colors.white,
-                  shape: StadiumBorder(
-                    side: BorderSide(color: Colors.green),
-                  ),
-                  onPressed: () async {
-                    // 更新処理（外だしは出来ません）
-                    model.target.title = titleTextController.text;
-                    model.target.subTitle = subTitleTextController.text;
-                    model.target.option1 = option1TextController.text;
-                    model.target.option2 = option2TextController.text;
-                    model.target.option3 = option3TextController.text;
-                    model.target.targetId = _target.targetId;
-                    model.target.targetNo = _target.targetNo;
-                    model.target.createAt = _target.createAt;
-                    model.target.updateAt = _target.updateAt;
-                    model.startLoading();
-                    try {
-                      await model.updateTargetFs(groupName, DateTime.now());
-                      await model.fetchTarget(groupName);
-                      model.stopLoading();
-                      await okShowDialog(context, "更新しました");
-                      Navigator.pop(context);
-                    } catch (e) {
-                      Navigator.pop(context);
-                    }
-                    model.resetUpdate();
-                  },
-                  child: Text(
-                    "登　録",
-                    style: cTextListL,
-                    textScaleFactor: 1,
-                  ),
+                child: Icon(
+                  FontAwesomeIcons.pencilAlt,
+                  color: Colors.orange.withOpacity(0.5),
+                  size: 20,
                 ),
               ),
           ],
@@ -79,7 +47,7 @@ class TargetEdit extends StatelessWidget {
             SingleChildScrollView(
               child: Column(
                 children: [
-                  _infoArea(),
+                  _infoArea(model),
                   Container(
                     width: MediaQuery.of(context).size.width - 28,
                     height: MediaQuery.of(context).size.height / 2,
@@ -88,10 +56,8 @@ class TargetEdit extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        _targetNumber(model),
                         _title(model, titleTextController),
                         _subTitle(model, subTitleTextController),
-                        Divider(height: 5, color: Colors.grey, thickness: 1),
                         _option1(model, option1TextController),
                         _option2(model, option2TextController),
                         _option3(model, option3TextController),
@@ -108,46 +74,60 @@ class TargetEdit extends StatelessWidget {
                   child: Center(child: CircularProgressIndicator())),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          elevation: 15,
-          child: Icon(FontAwesomeIcons.trashAlt),
-          onPressed: () {
-            okShowDialogFunc(
-              context: context,
-              mainTitle: _target.title,
-              subTitle: "削除しますか？",
-              // delete
-              onPressed: () async {
-                await _deleteSave(context, model, _target.targetId);
-                Navigator.pop(context);
-                Navigator.pop(context);
-              },
-            );
-          },
+        floatingActionButtonLocation: FloatingActionButtonLocation.startDocked,
+        floatingActionButton: _deleteButton(context, model),
+        bottomNavigationBar: BottomAppBar(
+          color: Theme.of(context).primaryColor,
+          notchMargin: 6.0,
+          shape: AutomaticNotchedShape(
+            RoundedRectangleBorder(),
+            StadiumBorder(
+              side: BorderSide(),
+            ),
+          ),
+          child: model.isUpdate
+              ? _saveButton(
+                  context,
+                  model,
+                  titleTextController,
+                  subTitleTextController,
+                  option1TextController,
+                  option2TextController,
+                  option3TextController,
+                )
+              : _closeButton(context, model),
         ),
       );
     });
   }
 
-  Widget _infoArea() {
+  Widget _infoArea(TargetModel model) {
     return Container(
       width: double.infinity,
       height: 50,
       color: cContBg,
-      child: Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 10.0),
-            child: Text("　対象名を情報を編集し、登録ボタンを押してください",
-                style: cTextUpBarM, textScaleFactor: 1),
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text("　番号：${_target.targetNo}",
+                  style: cTextUpBarL, textScaleFactor: 1),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(" ", style: cTextUpBarS, textScaleFactor: 1),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
-  }
-
-  Widget _targetNumber(TargetModel model) {
-    return Text("${_target.targetNo}");
   }
 
   Widget _title(TargetModel model, _titleTextController) {
@@ -155,11 +135,20 @@ class TargetEdit extends StatelessWidget {
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      decoration: const InputDecoration(
-          labelText: "Title:",
-          labelStyle: TextStyle(fontSize: 10),
-          hintText: "Title を入力してください",
-          hintStyle: TextStyle(fontSize: 12)),
+      decoration: InputDecoration(
+        labelText: "対象者:",
+        labelStyle: TextStyle(fontSize: 10),
+        hintText: "対象者 を入力してください",
+        hintStyle: TextStyle(fontSize: 12),
+        suffixIcon: IconButton(
+          onPressed: () {
+            _titleTextController.text = "";
+            model.setUpdate();
+            model.changeValue("title", "");
+          },
+          icon: Icon(Icons.clear, size: 15),
+        ),
+      ),
       controller: _titleTextController,
       onChanged: (text) {
         model.changeValue("title", text);
@@ -173,11 +162,19 @@ class TargetEdit extends StatelessWidget {
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      decoration: const InputDecoration(
-          labelText: "subTitle:",
-          labelStyle: TextStyle(fontSize: 10),
-          hintText: "subTitle を入力してください",
-          hintStyle: TextStyle(fontSize: 12)),
+      decoration: InputDecoration(
+        labelText: "subTitle:",
+        labelStyle: TextStyle(fontSize: 10),
+        hintText: "subTitle を入力してください",
+        hintStyle: TextStyle(fontSize: 12),
+        suffixIcon: IconButton(
+          onPressed: () {
+            _subTitleTextController.text = "";
+            model.setUpdate();
+          },
+          icon: Icon(Icons.clear, size: 15),
+        ),
+      ),
       controller: _subTitleTextController,
       onChanged: (text) {
         model.changeValue("subTitle", text);
@@ -191,11 +188,19 @@ class TargetEdit extends StatelessWidget {
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      decoration: const InputDecoration(
-          labelText: "option1:",
-          labelStyle: TextStyle(fontSize: 10),
-          hintText: "option1 を入力してください",
-          hintStyle: TextStyle(fontSize: 12)),
+      decoration: InputDecoration(
+        labelText: "option1:",
+        labelStyle: TextStyle(fontSize: 10),
+        hintText: "option1 を入力してください",
+        hintStyle: TextStyle(fontSize: 12),
+        suffixIcon: IconButton(
+          onPressed: () {
+            _option1TextController.text = "";
+            model.setUpdate();
+          },
+          icon: Icon(Icons.clear, size: 15),
+        ),
+      ),
       controller: _option1TextController,
       onChanged: (text) {
         model.changeValue("option1", text);
@@ -209,11 +214,19 @@ class TargetEdit extends StatelessWidget {
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      decoration: const InputDecoration(
-          labelText: "option2:",
-          labelStyle: TextStyle(fontSize: 10),
-          hintText: "option2 を入力してください",
-          hintStyle: TextStyle(fontSize: 12)),
+      decoration: InputDecoration(
+        labelText: "option2:",
+        labelStyle: TextStyle(fontSize: 10),
+        hintText: "option2 を入力してください",
+        hintStyle: TextStyle(fontSize: 12),
+        suffixIcon: IconButton(
+          onPressed: () {
+            _option2TextController.text = "";
+            model.setUpdate();
+          },
+          icon: Icon(Icons.clear, size: 15),
+        ),
+      ),
       controller: _option2TextController,
       onChanged: (text) {
         model.changeValue("option2", text);
@@ -227,11 +240,19 @@ class TargetEdit extends StatelessWidget {
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      decoration: const InputDecoration(
-          labelText: "option3:",
-          labelStyle: TextStyle(fontSize: 10),
-          hintText: "option3 を入力してください",
-          hintStyle: TextStyle(fontSize: 12)),
+      decoration: InputDecoration(
+        labelText: "option3:",
+        labelStyle: TextStyle(fontSize: 10),
+        hintText: "option3 を入力してください",
+        hintStyle: TextStyle(fontSize: 12),
+        suffixIcon: IconButton(
+          onPressed: () {
+            _option3TextController.text = "";
+            model.setUpdate();
+          },
+          icon: Icon(Icons.clear, size: 15),
+        ),
+      ),
       controller: _option3TextController,
       onChanged: (text) {
         model.changeValue("option3", text);
@@ -240,15 +261,143 @@ class TargetEdit extends StatelessWidget {
     );
   }
 
+  Widget _saveButton(
+    BuildContext context,
+    TargetModel model,
+    TextEditingController titleTextController,
+    TextEditingController subTitleTextController,
+    TextEditingController option1TextController,
+    TextEditingController option2TextController,
+    TextEditingController option3TextController,
+  ) {
+    return Container(
+      height: 45,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            height: 35,
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            child: RaisedButton.icon(
+              icon: Icon(FontAwesomeIcons.solidSave, color: Colors.green),
+              label: Text("登録する", style: cTextListM, textScaleFactor: 1),
+              color: Colors.white,
+              shape: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              ),
+              onPressed: () => _editProcess(
+                context,
+                model,
+                titleTextController,
+                subTitleTextController,
+                option1TextController,
+                option2TextController,
+                option3TextController,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _closeButton(BuildContext context, TargetModel model) {
+    return Container(
+      height: 45,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            height: 35,
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            child: RaisedButton.icon(
+              icon: Icon(FontAwesomeIcons.times, color: Colors.green),
+              label: Text("やめる", style: cTextListM, textScaleFactor: 1),
+              color: Colors.white,
+              shape: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _editProcess(
+    BuildContext context,
+    TargetModel model,
+    TextEditingController titleTextController,
+    TextEditingController subTitleTextController,
+    TextEditingController option1TextController,
+    TextEditingController option2TextController,
+    TextEditingController option3TextController,
+  ) async {
+    // グリグリを回す
+    model.startLoading();
+    // 更新処理
+    model.target.title = titleTextController.text;
+    model.target.subTitle = subTitleTextController.text;
+    model.target.option1 = option1TextController.text;
+    model.target.option2 = option2TextController.text;
+    model.target.option3 = option3TextController.text;
+    model.target.targetId = _target.targetId;
+    model.target.targetNo = _target.targetNo;
+    model.target.createAt = _target.createAt;
+    model.target.updateAt = _target.updateAt;
+    try {
+      await model.updateTargetFs(groupName, DateTime.now());
+      await model.fetchTarget(groupName);
+      model.stopLoading();
+      await okShowDialog(context, "更新しました");
+      Navigator.pop(context);
+    } catch (e) {
+      okShowDialog(context, e.toString());
+      model.stopLoading();
+    }
+    model.resetUpdate();
+  }
+
+  Widget _deleteButton(BuildContext context, TargetModel model) {
+    return FloatingActionButton(
+      elevation: 15,
+      child: Icon(FontAwesomeIcons.trashAlt),
+      // todo 削除
+      onPressed: () {
+        okShowDialogFunc(
+          context: context,
+          mainTitle: _target.title,
+          subTitle: "削除しますか？",
+          // delete
+          onPressed: () async {
+            Navigator.pop(context);
+            await _deleteSave(
+              context,
+              model,
+              _target.targetId,
+            );
+            Navigator.pop(context);
+          },
+        );
+      },
+    );
+  }
+
   Future<void> _deleteSave(
       BuildContext context, TargetModel model, _targetId) async {
+    model.startLoading();
     try {
       //FsをTargetIdで削除
       await model.deleteTargetFs(groupName, _targetId);
       //配列を削除するのは無理だから再びFsをフェッチ
       await model.fetchTarget(groupName);
       //頭から順にtargetNoを振る
-      int _count = 0;
+      int _count = 1;
       for (Target _data in model.targets) {
         print("${_data.title} [$_count]");
         _data.targetNo = _count.toString().padLeft(4, "0");
@@ -261,5 +410,6 @@ class TargetEdit extends StatelessWidget {
     } catch (e) {
       okShowDialog(context, e.toString());
     }
+    model.stopLoading();
   }
 }

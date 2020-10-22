@@ -83,7 +83,7 @@ class _LecturePlayState extends State<LecturePlay> {
     //サイズ
     final _mediaHeight = MediaQuery.of(context).size.height;
     final _mediaWidth = MediaQuery.of(context).size.width;
-    final _upHeight = _mediaWidth / 1.42;
+    final _upHeight = _mediaWidth / 1.42; //1.42
     final _bottomHeight = _mediaHeight - _upHeight - 100;
     //向き
     var isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
@@ -93,6 +93,7 @@ class _LecturePlayState extends State<LecturePlay> {
       appBar: isPortrait
           // 縦向きの時
           ? AppBar(
+              toolbarHeight: cToolBarH,
               centerTitle: true,
               title: barTitle(context),
               leading: isPopWind
@@ -207,7 +208,7 @@ class _LecturePlayState extends State<LecturePlay> {
   Widget _infoArea() {
     return Container(
       width: double.infinity,
-      height: 50,
+      height: cInfoAreaH,
       color: cContBg,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -252,9 +253,7 @@ class _LecturePlayState extends State<LecturePlay> {
           _controller.pause();
           // 画面の向き固定を元に戻す
           SystemChrome.setPreferredOrientations(
-            [
-              DeviceOrientation.portraitUp,
-            ],
+            [DeviceOrientation.portraitUp],
           );
           // 講義を見た証をDBに登録
           _lectureResult.lectureId = widget._lecture.lectureId;
@@ -266,8 +265,9 @@ class _LecturePlayState extends State<LecturePlay> {
             elevation: 15,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(18.0),
-                  topRight: Radius.circular(18.0)),
+                topLeft: Radius.circular(18.0),
+                topRight: Radius.circular(18.0),
+              ),
             ),
             builder: (BuildContext context) {
               return Column(
@@ -311,25 +311,26 @@ class _LecturePlayState extends State<LecturePlay> {
                       },
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListTile(
-                      leading: Icon(FontAwesomeIcons.school),
-                      title: Text('確認テストに進む'),
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => QuestionListPage(
-                              widget.groupName,
-                              widget._lecture,
+                  if (widget._lecture.questionLength != 0)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ListTile(
+                        leading: Icon(FontAwesomeIcons.school),
+                        title: Text('確認問題へ進む'),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => QuestionListPage(
+                                widget.groupName,
+                                widget._lecture,
+                              ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
-                  ),
                   SizedBox(
                     height: MediaQuery.of(context).size.height / 8,
                   )

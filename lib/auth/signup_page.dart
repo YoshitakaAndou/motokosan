@@ -99,8 +99,16 @@ class SignUpPage extends StatelessWidget {
                                       child: TextField(
                                         keyboardType: TextInputType.text,
                                         controller: groupController,
-                                        decoration:
-                                            InputDecoration(hintText: "グループ名"),
+                                        decoration: InputDecoration(
+                                          hintText: "グループ名",
+                                          hintStyle: TextStyle(fontSize: 12),
+                                          suffixIcon: IconButton(
+                                            onPressed: () {
+                                              groupController.text = "";
+                                            },
+                                            icon: Icon(Icons.clear, size: 15),
+                                          ),
+                                        ),
                                         onChanged: (text) {
                                           model.userData.userGroup = text;
                                         },
@@ -120,8 +128,16 @@ class SignUpPage extends StatelessWidget {
                                       child: TextField(
                                         keyboardType: TextInputType.text,
                                         controller: nameController,
-                                        decoration:
-                                            InputDecoration(hintText: "name"),
+                                        decoration: InputDecoration(
+                                          hintText: "name",
+                                          hintStyle: TextStyle(fontSize: 12),
+                                          suffixIcon: IconButton(
+                                            onPressed: () {
+                                              nameController.text = "";
+                                            },
+                                            icon: Icon(Icons.clear, size: 15),
+                                          ),
+                                        ),
                                         onChanged: (text) {
                                           model.userData.userName = text;
                                         },
@@ -143,7 +159,15 @@ class SignUpPage extends StatelessWidget {
                                             TextInputType.emailAddress,
                                         controller: emailController,
                                         decoration: InputDecoration(
-                                            hintText: "aaa@bbb.ccc"),
+                                          hintText: "aaa@bbb.ccc",
+                                          hintStyle: TextStyle(fontSize: 12),
+                                          suffixIcon: IconButton(
+                                            onPressed: () {
+                                              emailController.text = "";
+                                            },
+                                            icon: Icon(Icons.clear, size: 15),
+                                          ),
+                                        ),
                                         onChanged: (text) {
                                           model.userData.userEmail = text;
                                         },
@@ -166,7 +190,15 @@ class SignUpPage extends StatelessWidget {
                                         keyboardType: TextInputType.text,
                                         controller: passwordController,
                                         decoration: InputDecoration(
-                                            hintText: "password（６文字以上）"),
+                                          hintText: "password（６文字以上）",
+                                          hintStyle: TextStyle(fontSize: 12),
+                                          suffixIcon: IconButton(
+                                            onPressed: () {
+                                              passwordController.text = "";
+                                            },
+                                            icon: Icon(Icons.clear, size: 15),
+                                          ),
+                                        ),
                                         obscureText: true,
                                         onChanged: (text) {
                                           model.userData.userPassword = text;

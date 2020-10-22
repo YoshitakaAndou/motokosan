@@ -1,40 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:motokosan/widgets/ok_show_dialog.dart';
 import 'package:provider/provider.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../organizer/organizer_model.dart';
+import '../workshop_model.dart';
+import '../../../widgets/ok_show_dialog.dart';
+import '../../../constants.dart';
 
-import '../../constants.dart';
-import 'target_model.dart';
-
-class TargetAdd extends StatelessWidget {
+class WorkshopEdit extends StatelessWidget {
   final String groupName;
-  TargetAdd({this.groupName});
+  final Workshop _workshop;
+  final Organizer _organizer;
+  WorkshopEdit(this.groupName, this._workshop, this._organizer);
 
   @override
   Widget build(BuildContext context) {
-    final model = Provider.of<TargetModel>(context, listen: false);
     final titleTextController = TextEditingController();
     final subTitleTextController = TextEditingController();
     final option1TextController = TextEditingController();
     final option2TextController = TextEditingController();
     final option3TextController = TextEditingController();
-    titleTextController.text = model.target.title;
-    subTitleTextController.text = model.target.subTitle;
-    option1TextController.text = model.target.option1;
-    option2TextController.text = model.target.option2;
-    option3TextController.text = model.target.option3;
-    model.target.targetNo =
-        (model.targets.length + 1).toString().padLeft(4, "0");
-    return Consumer<TargetModel>(builder: (context, model, child) {
-      model.isEditing = _checkValue(model);
+    titleTextController.text = _workshop.title;
+    subTitleTextController.text = _workshop.subTitle;
+    option1TextController.text = _workshop.option1;
+    option2TextController.text = _workshop.option2;
+    option3TextController.text = _workshop.option3;
+
+    return Consumer<WorkshopModel>(builder: (context, model, child) {
       return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
-          centerTitle: true,
           toolbarHeight: cToolBarH,
-          title: Text("対象者の新規登録", style: cTextTitleL, textScaleFactor: 1),
+          centerTitle: true,
+          title: Text("分類名の編集", style: cTextTitleL, textScaleFactor: 1),
+          leading: IconButton(
+            icon: Icon(FontAwesomeIcons.times),
+            color: Colors.black87,
+            onPressed: () => Navigator.pop(context),
+          ),
           actions: [
-            if (model.isEditing)
+            if (model.isUpdate)
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Icon(
@@ -57,6 +61,7 @@ class TargetAdd extends StatelessWidget {
                     padding: EdgeInsets.all(10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         _title(model, titleTextController),
                         _subTitle(model, subTitleTextController),
@@ -76,6 +81,8 @@ class TargetAdd extends StatelessWidget {
                   child: Center(child: CircularProgressIndicator())),
           ],
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.startDocked,
+        floatingActionButton: _deleteButton(context, model),
         bottomNavigationBar: BottomAppBar(
           color: Theme.of(context).primaryColor,
           notchMargin: 6.0,
@@ -85,15 +92,23 @@ class TargetAdd extends StatelessWidget {
               side: BorderSide(),
             ),
           ),
-          child: model.isEditing
-              ? _saveButton(context, model)
+          child: model.isUpdate
+              ? _saveButton(
+                  context,
+                  model,
+                  titleTextController,
+                  subTitleTextController,
+                  option1TextController,
+                  option2TextController,
+                  option3TextController,
+                )
               : _closeButton(context, model),
         ),
       );
     });
   }
 
-  Widget _infoArea(TargetModel model) {
+  Widget _infoArea(WorkshopModel model) {
     return Container(
       width: double.infinity,
       height: 50,
@@ -104,7 +119,7 @@ class TargetAdd extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: Text("　番号：${model.target.targetNo}",
+              child: Text("　番号：${_workshop.workshopNo}",
                   style: cTextUpBarL, textScaleFactor: 1),
             ),
             Expanded(
@@ -112,7 +127,8 @@ class TargetAdd extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(" ", style: cTextUpBarS, textScaleFactor: 1),
+                  Text("主催：${_organizer.title}",
+                      style: cTextUpBarS, textScaleFactor: 1),
                 ],
               ),
             ),
@@ -122,36 +138,37 @@ class TargetAdd extends StatelessWidget {
     );
   }
 
-  Widget _title(TargetModel model, titleTextController) {
+  Widget _title(WorkshopModel model, _titleTextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      controller: titleTextController,
       decoration: InputDecoration(
-        labelText: "対象者:",
+        labelText: "研修会名:",
         labelStyle: TextStyle(fontSize: 10),
-        hintText: "対象者 を入力してください（必須）",
+        hintText: "研修会名 を入力してください",
         hintStyle: TextStyle(fontSize: 12),
         suffixIcon: IconButton(
           onPressed: () {
-            titleTextController.text = "";
+            _titleTextController.text = "";
+            model.setUpdate();
           },
           icon: Icon(Icons.clear, size: 15),
         ),
       ),
+      controller: _titleTextController,
       onChanged: (text) {
         model.changeValue("title", text);
+        model.setUpdate();
       },
     );
   }
 
-  Widget _subTitle(TargetModel model, subTitleTextController) {
+  Widget _subTitle(WorkshopModel model, _subTitleTextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      controller: subTitleTextController,
       decoration: InputDecoration(
         labelText: "subTitle:",
         labelStyle: TextStyle(fontSize: 10),
@@ -159,23 +176,25 @@ class TargetAdd extends StatelessWidget {
         hintStyle: TextStyle(fontSize: 12),
         suffixIcon: IconButton(
           onPressed: () {
-            subTitleTextController.text = "";
+            _subTitleTextController.text = "";
+            model.setUpdate();
           },
           icon: Icon(Icons.clear, size: 15),
         ),
       ),
+      controller: _subTitleTextController,
       onChanged: (text) {
         model.changeValue("subTitle", text);
+        model.setUpdate();
       },
     );
   }
 
-  Widget _option1(TargetModel model, option1TextController) {
+  Widget _option1(WorkshopModel model, _option1TextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      controller: option1TextController,
       decoration: InputDecoration(
         labelText: "option1:",
         labelStyle: TextStyle(fontSize: 10),
@@ -183,23 +202,25 @@ class TargetAdd extends StatelessWidget {
         hintStyle: TextStyle(fontSize: 12),
         suffixIcon: IconButton(
           onPressed: () {
-            option1TextController.text = "";
+            _option1TextController.text = "";
+            model.setUpdate();
           },
           icon: Icon(Icons.clear, size: 15),
         ),
       ),
+      controller: _option1TextController,
       onChanged: (text) {
         model.changeValue("option1", text);
+        model.setUpdate();
       },
     );
   }
 
-  Widget _option2(TargetModel model, option2TextController) {
+  Widget _option2(WorkshopModel model, _option2TextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      controller: option2TextController,
       decoration: InputDecoration(
         labelText: "option2:",
         labelStyle: TextStyle(fontSize: 10),
@@ -207,23 +228,25 @@ class TargetAdd extends StatelessWidget {
         hintStyle: TextStyle(fontSize: 12),
         suffixIcon: IconButton(
           onPressed: () {
-            option2TextController.text = "";
+            _option2TextController.text = "";
+            model.setUpdate();
           },
           icon: Icon(Icons.clear, size: 15),
         ),
       ),
+      controller: _option2TextController,
       onChanged: (text) {
         model.changeValue("option2", text);
+        model.setUpdate();
       },
     );
   }
 
-  Widget _option3(TargetModel model, option3TextController) {
+  Widget _option3(WorkshopModel model, _option3TextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
-      controller: option3TextController,
       decoration: InputDecoration(
         labelText: "option3:",
         labelStyle: TextStyle(fontSize: 10),
@@ -231,45 +254,29 @@ class TargetAdd extends StatelessWidget {
         hintStyle: TextStyle(fontSize: 12),
         suffixIcon: IconButton(
           onPressed: () {
-            option3TextController.text = "";
+            _option3TextController.text = "";
+            model.setUpdate();
           },
           icon: Icon(Icons.clear, size: 15),
         ),
       ),
+      controller: _option3TextController,
       onChanged: (text) {
         model.changeValue("option3", text);
+        model.setUpdate();
       },
     );
   }
 
-  Future<void> _addProcess(BuildContext context, TargetModel model) async {
-    DateTime _timeStamp = DateTime.now();
-    model.target.targetId = _timeStamp.toString();
-    // model.target.targetNo =
-    //     model.targets.length.toString().padLeft(4, "0"); //questionId
-    try {
-      model.startLoading();
-      await model.addTargetFs(groupName, _timeStamp);
-      model.stopLoading();
-      await okShowDialog(context, "登録完了しました");
-      Navigator.pop(context);
-    } catch (e) {
-      okShowDialog(context, e.toString());
-      model.stopLoading();
-    }
-  }
-
-  bool _checkValue(TargetModel model) {
-    bool _result = false;
-    _result = model.target.title.isNotEmpty ? true : _result;
-    _result = model.target.subTitle.isNotEmpty ? true : _result;
-    _result = model.target.option1.isNotEmpty ? true : _result;
-    _result = model.target.option2.isNotEmpty ? true : _result;
-    _result = model.target.option3.isNotEmpty ? true : _result;
-    return _result;
-  }
-
-  Widget _saveButton(BuildContext context, TargetModel model) {
+  Widget _saveButton(
+    BuildContext context,
+    WorkshopModel model,
+    TextEditingController titleTextController,
+    TextEditingController subTitleTextController,
+    TextEditingController option1TextController,
+    TextEditingController option2TextController,
+    TextEditingController option3TextController,
+  ) {
     return Container(
       height: 45,
       child: Row(
@@ -286,7 +293,15 @@ class TargetAdd extends StatelessWidget {
               shape: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
               ),
-              onPressed: () => _addProcess(context, model),
+              onPressed: () => _editProcess(
+                context,
+                model,
+                titleTextController,
+                subTitleTextController,
+                option1TextController,
+                option2TextController,
+                option3TextController,
+              ),
             ),
           ),
         ],
@@ -294,7 +309,7 @@ class TargetAdd extends StatelessWidget {
     );
   }
 
-  Widget _closeButton(BuildContext context, TargetModel model) {
+  Widget _closeButton(BuildContext context, WorkshopModel model) {
     return Container(
       height: 45,
       child: Row(
@@ -311,11 +326,101 @@ class TargetAdd extends StatelessWidget {
               shape: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
               ),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
             ),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _editProcess(
+    BuildContext context,
+    WorkshopModel model,
+    TextEditingController titleTextController,
+    TextEditingController subTitleTextController,
+    TextEditingController option1TextController,
+    TextEditingController option2TextController,
+    TextEditingController option3TextController,
+  ) async {
+    // グリグリを回す
+    model.startLoading();
+    // 更新処理
+    model.workshop.title = titleTextController.text;
+    model.workshop.subTitle = subTitleTextController.text;
+    model.workshop.option1 = option1TextController.text;
+    model.workshop.option2 = option2TextController.text;
+    model.workshop.option3 = option3TextController.text;
+    model.workshop.workshopId = _workshop.workshopId;
+    model.workshop.workshopNo = _workshop.workshopNo;
+    model.workshop.createAt = _workshop.createAt;
+    model.workshop.updateAt = _workshop.updateAt;
+    try {
+      await model.updateWorkshopFs(groupName, DateTime.now());
+      await model.fetchWorkshopByOrganizer(groupName, _organizer.organizerId);
+      model.stopLoading();
+      await okShowDialog(context, "更新しました");
+      Navigator.pop(context);
+    } catch (e) {
+      okShowDialog(context, e.toString());
+      model.stopLoading();
+    }
+    model.resetUpdate();
+  }
+
+  Widget _deleteButton(BuildContext context, WorkshopModel model) {
+    return FloatingActionButton(
+      elevation: 15,
+      child: Icon(FontAwesomeIcons.trashAlt),
+      // todo 削除
+      onPressed: () {
+        okShowDialogFunc(
+          context: context,
+          mainTitle: _workshop.title,
+          subTitle: "削除しますか？",
+          // delete
+          onPressed: () async {
+            Navigator.pop(context);
+            await _deleteSave(
+              context,
+              model,
+              _workshop.organizerId,
+              _workshop.workshopId,
+            );
+            Navigator.pop(context);
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteSave(
+    BuildContext context,
+    WorkshopModel model,
+    _categoryId,
+    _workshopId,
+  ) async {
+    model.startLoading();
+    try {
+      //FsをTargetIdで削除
+      await model.deleteWorkshopFs(groupName, _workshopId);
+      //配列を削除するのは無理だから再びFsをフェッチ
+      await model.fetchWorkshopByOrganizer(groupName, _organizer.organizerId);
+      //頭から順にtargetNoを振る
+      int _count = 1;
+      for (Workshop _data in model.workshops) {
+        _data.workshopNo = _count.toString().padLeft(4, "0");
+        //Fsにアップデート
+        await model.setWorkshopFs(false, groupName, _data, DateTime.now());
+        _count += 1;
+      }
+      //一通り終わったらFsから読み込んで再描画させる
+      await model.fetchWorkshopByOrganizer(groupName, _organizer.organizerId);
+    } catch (e) {
+      okShowDialog(context, e.toString());
+    }
+    model.stopLoading();
   }
 }

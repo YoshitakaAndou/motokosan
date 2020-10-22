@@ -47,6 +47,7 @@ class TargetModel extends ChangeNotifier {
   Target target = Target();
   bool isLoading = false;
   bool isUpdate = false;
+  bool isEditing = false;
 
   void initData() {
     target.targetId = "";
@@ -60,14 +61,14 @@ class TargetModel extends ChangeNotifier {
     target.createAt = 0;
   }
 
+  void initProperties() {
+    isLoading = false;
+    isUpdate = false;
+    isEditing = false;
+  }
+
   void changeValue(String _arg, String _val) {
     switch (_arg) {
-      case "targetId":
-        target.targetId = _val;
-        break;
-      case "targetNo":
-        target.targetNo = _val;
-        break;
       case "title":
         target.title = _val;
         break;

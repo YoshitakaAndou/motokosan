@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
@@ -29,6 +30,7 @@ class LectureListPage extends StatelessWidget {
       return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
+          toolbarHeight: cToolBarH,
           title: barTitle(context),
           leading: goBack(
               context: context,
@@ -38,166 +40,41 @@ class LectureListPage extends StatelessWidget {
             goBack(context: context, icon: Icon(FontAwesomeIcons.home), num: 3),
           ],
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              _infoArea(),
-              Stack(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    height: MediaQuery.of(context).size.height - 175,
-                    width: MediaQuery.of(context).size.width,
-                    child: ListView.builder(
-                      itemCount: model.lectures.length,
-                      itemBuilder: (context, index) {
-                        return Card(
-                          key: Key(model.lectures[index].workshopId),
-                          elevation: 15,
-                          child: ListTile(
-                            dense: true,
-                            title: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    "${model.lectures[index].title}",
-                                    style: cTextListL,
-                                    textScaleFactor: 1,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            subtitle: Padding(
-                              padding: EdgeInsets.only(left: 25),
-                              child: Text(
-                                "${model.lectures[index].subTitle}",
-                                style: cTextListS,
-                                textAlign: TextAlign.left,
-                                textScaleFactor: 1,
-                              ),
-                            ),
-                            trailing: Icon(
-                              FontAwesomeIcons.arrowRight,
-                              size: 20,
-                            ),
-                            onTap: () async {
-                              final _slides1 = await _preparationOfSlide(
-                                model,
-                                model.lectures[index].slideLength,
-                                model.lectures[index].lectureId,
-                              );
-                              if (model.lectures[index].videoUrl.isNotEmpty) {
-                                //スマホの向きを一時的に上固定から横も可能にする
-                                SystemChrome.setPreferredOrientations([
-                                  DeviceOrientation.landscapeRight,
-                                  DeviceOrientation.landscapeLeft,
-                                  DeviceOrientation.portraitUp,
-                                ]);
-                                print("スマホの向きを横向きも可能にする");
-                              }
-                              // Trainingへ 終わったら値を受け取る
-                              bool result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => LecturePlay(
-                                    groupName,
-                                    _organizer,
-                                    _workshopList,
-                                    model.lectures[index],
-                                    _slides1,
-                                  ),
-                                ),
-                              );
-                              if (model.lectures[index].videoUrl.isNotEmpty) {
-                                //スマホの向きを上のみに戻す
-                                SystemChrome.setPreferredOrientations([
-                                  DeviceOrientation.portraitUp,
-                                ]);
-                                print("スマホの向きを上むきのみに戻す");
-                              }
-                              int _index = index + 1;
-                              // リストの最後まで来たら終わり
-                              if (_index >= model.lectures.length) {
-                                result = false;
-                              }
-                              while (result) {
-                                final _slides = await _preparationOfSlide(
-                                  model,
-                                  model.lectures[_index].slideLength,
-                                  model.lectures[_index].lectureId,
-                                );
-                                if (model.lectures[index].videoUrl.isNotEmpty) {
-                                  //スマホの向きを一時的に上固定から横も可能にする
-                                  SystemChrome.setPreferredOrientations([
-                                    DeviceOrientation.landscapeRight,
-                                    DeviceOrientation.landscapeLeft,
-                                    DeviceOrientation.portraitUp,
-                                  ]);
-                                  print("スマホの向きを横向きも可能にする");
-                                }
-                                result = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => LecturePlay(
-                                      groupName,
-                                      _organizer,
-                                      _workshopList,
-                                      model.lectures[_index],
-                                      _slides,
-                                    ),
-                                  ),
-                                );
-                                if (model.lectures[index].videoUrl.isNotEmpty) {
-                                  //スマホの向きを上のみに戻す
-                                  SystemChrome.setPreferredOrientations([
-                                    DeviceOrientation.portraitUp,
-                                  ]);
-                                  print("スマホの向きを上むきのみに戻す");
-                                }
-                                _index += 1;
-                                // リストの最後まで来たら終わり
-                                if (_index >= model.lectures.length) {
-                                  result = false;
-                                }
-                              }
-                            },
-                          ),
-                        );
-                      },
-                    ),
+        body: Column(
+          children: [
+            _infoArea(),
+            Stack(
+              children: [
+                Container(
+                  // padding: EdgeInsets.all(8),
+                  height: MediaQuery.of(context).size.height - cListOffsetH,
+                  width: MediaQuery.of(context).size.width - cListOffsetW,
+                  child: ListView.builder(
+                    itemCount: model.lectures.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        key: Key(model.lectures[index].workshopId),
+                        elevation: 15,
+                        child: ListTile(
+                          contentPadding:
+                              EdgeInsets.symmetric(vertical: 1, horizontal: 5),
+                          // dense: true,
+                          leading: _leading(context, model, index),
+                          title: _title(context, model, index),
+                          subtitle: _subtitle(context, model, index),
+                          trailing: _trailing(context, model, index),
+                          onTap: () => _onTap(context, model, index),
+                        ),
+                      );
+                    },
                   ),
-                  if (model.isLoading)
-                    Container(
-                      height: MediaQuery.of(context).size.height - 175,
-                      width: MediaQuery.of(context).size.width,
-                      color: Colors.black87.withOpacity(0.8),
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        bottomNavigationBar: BottomAppBar(
-          color: Theme.of(context).primaryColor,
-          notchMargin: 6.0,
-          shape: AutomaticNotchedShape(
-            RoundedRectangleBorder(),
-            StadiumBorder(
-              side: BorderSide(),
+                ),
+                if (model.isLoading) guriguri(context),
+              ],
             ),
-          ),
-          child: Container(
-            height: 45,
-            padding: EdgeInsets.all(10),
-            child: Text(
-              "",
-              style: cTextUpBarL,
-              textScaleFactor: 1,
-            ),
-          ),
+          ],
         ),
+        bottomNavigationBar: _bottomNavigationBar(context),
       );
     });
   }
@@ -205,7 +82,7 @@ class LectureListPage extends StatelessWidget {
   Widget _infoArea() {
     return Container(
       width: double.infinity,
-      height: 50,
+      height: cInfoAreaH,
       color: cContBg,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -213,7 +90,7 @@ class LectureListPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(" 講義一覧", style: cTextUpBarLL, textScaleFactor: 1),
+            Text(" 講義一覧", style: cTextUpBarL, textScaleFactor: 1),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,17 +98,17 @@ class LectureListPage extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text("主催：", style: cTextUpBarM, textScaleFactor: 1),
+                    Text("主催：", style: cTextUpBarS, textScaleFactor: 1),
                     Text(_workshopList.organizerName,
-                        style: cTextUpBarM, textScaleFactor: 1),
+                        style: cTextUpBarS, textScaleFactor: 1),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text("研修会：", style: cTextUpBarM, textScaleFactor: 1),
+                    Text("研修会：", style: cTextUpBarS, textScaleFactor: 1),
                     Text(_workshopList.title,
-                        style: cTextUpBarM, textScaleFactor: 1),
+                        style: cTextUpBarS, textScaleFactor: 1),
                   ],
                 )
               ],
@@ -250,5 +127,190 @@ class LectureListPage extends StatelessWidget {
       _results = await model.fetchSlide(groupName, _lectureId);
     }
     return _results;
+  }
+
+  Widget _leading(BuildContext context, LectureModel model, int index) {
+    final _imageUrl = model.lectures[index].thumbnailUrl ?? "";
+    if (_imageUrl.isNotEmpty) {
+      return Stack(
+        children: [
+          Container(
+            width: 60,
+            height: 50,
+            color: Colors.black54.withOpacity(0.8),
+            child: Image.network(_imageUrl),
+          ),
+          if (model.lectures[index].videoDuration.isNotEmpty)
+            Container(
+              width: 60,
+              height: 50,
+              alignment: Alignment.bottomRight,
+              child: Container(
+                color: Colors.black54.withOpacity(0.8),
+                child: Text(
+                  "${model.lectures[index].videoDuration}",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textScaleFactor: 1,
+                ),
+              ),
+            ),
+        ],
+      );
+    } else {
+      return Container(
+        width: 60,
+        height: 50,
+        child: Image.asset(
+          "assets/images/noImage.png",
+          fit: BoxFit.cover,
+        ),
+      );
+    }
+  }
+
+  Widget _title(BuildContext context, LectureModel model, int index) {
+    return Text(
+      "${model.lectures[index].title}",
+      style: cTextListM,
+      textScaleFactor: 1,
+    );
+  }
+
+  Widget _subtitle(BuildContext context, LectureModel model, int index) {
+    return Padding(
+      padding: EdgeInsets.only(left: 25),
+      child: Text(
+        "${model.lectures[index].subTitle}",
+        style: cTextListSS,
+        textAlign: TextAlign.left,
+        textScaleFactor: 1,
+      ),
+    );
+  }
+
+  Widget _trailing(BuildContext context, LectureModel model, int index) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (model.lectures[index].questionLength != 0)
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 5),
+            color: Colors.greenAccent.withOpacity(0.2),
+            // decoration: BoxDecoration(
+            //   border: Border.all(width: 1.0, color: Colors.grey[600]),
+            //   borderRadius: const BorderRadius.all(const Radius.circular(4.0)),
+            //   color: Colors.greenAccent.withOpacity(0.2),
+            // ),
+            child: Text("問題:${model.lectures[index].questionLength}問",
+                style: cTextListS, textScaleFactor: 1),
+          ),
+      ],
+    );
+  }
+
+  Future<void> _onTap(
+      BuildContext context, LectureModel model, int index) async {
+    final _slides1 = await _preparationOfSlide(
+      model,
+      model.lectures[index].slideLength,
+      model.lectures[index].lectureId,
+    );
+    if (model.lectures[index].videoUrl.isNotEmpty) {
+      //スマホの向きを一時的に上固定から横も可能にする
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeRight,
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.portraitUp,
+      ]);
+      print("スマホの向きを横向きも可能にする");
+    }
+    // Trainingへ 終わったら値を受け取る
+    bool result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LecturePlay(
+          groupName,
+          _organizer,
+          _workshopList,
+          model.lectures[index],
+          _slides1,
+        ),
+      ),
+    );
+    if (model.lectures[index].videoUrl.isNotEmpty) {
+      //スマホの向きを上のみに戻す
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
+      print("スマホの向きを上むきのみに戻す");
+    }
+    int _index = index + 1;
+    // リストの最後まで来たら終わり
+    if (_index >= model.lectures.length) {
+      result = false;
+    }
+    while (result) {
+      final _slides = await _preparationOfSlide(
+        model,
+        model.lectures[_index].slideLength,
+        model.lectures[_index].lectureId,
+      );
+      if (model.lectures[index].videoUrl.isNotEmpty) {
+        //スマホの向きを一時的に上固定から横も可能にする
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.landscapeRight,
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.portraitUp,
+        ]);
+        print("スマホの向きを横向きも可能にする");
+      }
+      result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LecturePlay(
+            groupName,
+            _organizer,
+            _workshopList,
+            model.lectures[_index],
+            _slides,
+          ),
+        ),
+      );
+      if (model.lectures[index].videoUrl.isNotEmpty) {
+        //スマホの向きを上のみに戻す
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+        ]);
+        print("スマホの向きを上むきのみに戻す");
+      }
+      _index += 1;
+      // リストの最後まで来たら終わり
+      if (_index >= model.lectures.length) {
+        result = false;
+      }
+    }
+  }
+
+  Widget _bottomNavigationBar(BuildContext context) {
+    return BottomAppBar(
+      color: Theme.of(context).primaryColor,
+      notchMargin: 6.0,
+      shape: AutomaticNotchedShape(
+        RoundedRectangleBorder(),
+        StadiumBorder(
+          side: BorderSide(),
+        ),
+      ),
+      child: Container(
+        height: cBottomAppBarH,
+        padding: EdgeInsets.all(10),
+        child: Text("", style: cTextUpBarL, textScaleFactor: 1),
+      ),
+    );
   }
 }
