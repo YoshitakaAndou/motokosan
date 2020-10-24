@@ -5,7 +5,7 @@ import 'package:motokosan/take_a_lecture/organizer/organizer_list_page.dart';
 import 'package:motokosan/take_a_lecture/organizer/organizer_model.dart';
 import 'package:motokosan/take_a_lecture/target/target_page.dart';
 import 'package:provider/provider.dart';
-import 'auth/user_data.dart';
+import 'auth/signup_model.dart';
 import 'constants.dart';
 import 'take_a_lecture/organizer/make/organizer_page.dart';
 import 'widgets/bar_title.dart';

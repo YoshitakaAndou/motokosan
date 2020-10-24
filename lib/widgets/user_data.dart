@@ -1,4 +1,4 @@
-import '../auth/user_data.dart';
+import 'package:motokosan/auth/signup_model.dart';
 
 void userDataPrint(UserData _data, String _place) {
   print("----------------------------UserData:$_place");

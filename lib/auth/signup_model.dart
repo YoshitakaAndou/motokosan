@@ -1,17 +1,54 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../auth/user_data.dart';
 import '../widgets/datasave_widget.dart';
 
+class UserData {
+  String uid;
+  String userGroup;
+  String userName;
+  String userEmail;
+  String userPassword;
+
+  UserData({
+    this.uid = "",
+    this.userGroup = "",
+    this.userName = "",
+    this.userEmail = "",
+    this.userPassword = "",
+  });
+}
+
 class SignupModel extends ChangeNotifier {
-  // String group = "";
-  // String name = "";
-  // String email = "";
-  // String password = "";
   UserData userData = UserData();
+  bool isUpdate = false;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // void initUserData() {
+  //   userData.userGroup = "";
+  //   userData.userName = "";
+  //   userData.userEmail = "";
+  //   userData.userPassword = "";
+  // }
+
+  void changeValue(String _arg, String _val) {
+    switch (_arg) {
+      case "userGroup":
+        userData.userGroup = _val;
+        break;
+      case "userName":
+        userData.userName = _val;
+        break;
+      case "userEmail":
+        userData.userEmail = _val;
+        break;
+      case "userPassword":
+        userData.userPassword = _val;
+        break;
+    }
+    notifyListeners();
+  }
 
   Future signUp() async {
     if (userData.userGroup.isEmpty) {

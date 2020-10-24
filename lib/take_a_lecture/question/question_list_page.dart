@@ -283,14 +283,15 @@ class QuestionListPage extends StatelessWidget {
       height: 100,
       width: MediaQuery.of(context).size.width,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               children: [
-                Text("この講義の受講を完了するには", style: cTextListM, textScaleFactor: 1),
+                Text("この講義を受講完了するには", style: cTextListM, textScaleFactor: 1),
                 Text("${_lecture.allAnswers}",
-                    style: cTextListM, textScaleFactor: 1),
+                    style: cTextListMR, textScaleFactor: 1),
                 Text("です。", style: cTextListM, textScaleFactor: 1),
               ],
             ),
@@ -301,12 +302,23 @@ class QuestionListPage extends StatelessWidget {
               children: [
                 Text("合格点は", style: cTextListM, textScaleFactor: 1),
                 Text(
-                    _lecture.passingScore == 0
-                        ? "設けていません。"
-                        : "　${_lecture.passingScore}点です。",
-                    style: cTextListM,
-                    textScaleFactor: 1),
+                  _lecture.passingScore == 0
+                      ? "設けていません。"
+                      : "　${_lecture.passingScore}点です。",
+                  style: cTextListMR,
+                  textScaleFactor: 1,
+                ),
               ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              _lecture.passingScore == 0
+                  ? "気軽にチャレンジしてください。"
+                  : "クリア目指して頑張ってください。",
+              style: cTextListM,
+              textScaleFactor: 1,
             ),
           ),
         ],

@@ -160,8 +160,8 @@ class QuestionEdit extends StatelessWidget {
       ),
       controller: qsTextController,
       onChanged: (text) {
-        model.changeValue("question", text);
         model.isUpdate = true;
+        model.changeValue("question", text);
       },
     );
   }
@@ -185,8 +185,8 @@ class QuestionEdit extends StatelessWidget {
       ),
       controller: ch1TitleTextController,
       onChanged: (text) {
-        model.changeValue("choices1", text);
         model.isUpdate = true;
+        model.changeValue("choices1", text);
       },
     );
   }
@@ -210,8 +210,8 @@ class QuestionEdit extends StatelessWidget {
       ),
       controller: ch2TitleTextController,
       onChanged: (text) {
-        model.changeValue("choices2", text);
         model.isUpdate = true;
+        model.changeValue("choices2", text);
       },
     );
   }
@@ -235,8 +235,8 @@ class QuestionEdit extends StatelessWidget {
       ),
       controller: ch3TitleTextController,
       onChanged: (text) {
-        model.changeValue("choices3", text);
         model.isUpdate = true;
+        model.changeValue("choices3", text);
       },
     );
   }
@@ -260,8 +260,8 @@ class QuestionEdit extends StatelessWidget {
       ),
       controller: ch4TitleTextController,
       onChanged: (text) {
-        model.changeValue("choices4", text);
         model.isUpdate = true;
+        model.changeValue("choices4", text);
       },
     );
   }
@@ -321,8 +321,8 @@ class QuestionEdit extends StatelessWidget {
       ),
       controller: adTextController,
       onChanged: (text) {
-        model.changeValue("answerDescription", text);
         model.isUpdate = true;
+        model.changeValue("answerDescription", text);
       },
     );
   }
@@ -347,8 +347,8 @@ class QuestionEdit extends StatelessWidget {
         if (option.isEmpty) {
           MyDialog.instance.okShowDialog(context, "$choiceが入力されていません！");
         } else {
-          model.setCorrectChoices(choice);
           model.isUpdate = true;
+          model.setCorrectChoices(choice);
         }
       },
     );

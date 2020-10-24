@@ -238,6 +238,7 @@ class LectureListPage extends StatelessWidget {
           _workshopList,
           model.lectures[index],
           _slides1,
+          model.lectures.length - index == 1 ? true : false,
         ),
       ),
     );
@@ -277,6 +278,7 @@ class LectureListPage extends StatelessWidget {
             _workshopList,
             model.lectures[_index],
             _slides,
+            model.lectures.length - _index == 1 ? true : false,
           ),
         ),
       );

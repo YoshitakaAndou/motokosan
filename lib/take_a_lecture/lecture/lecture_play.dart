@@ -18,12 +18,14 @@ class LecturePlay extends StatefulWidget {
   final WorkshopList _workshopList;
   final Lecture _lecture;
   final List<Slide> _slides;
+  final bool _isLast;
   LecturePlay(
     this.groupName,
     this._organizer,
     this._workshopList,
     this._lecture,
     this._slides,
+    this._isLast,
   );
 
   @override
@@ -35,21 +37,9 @@ class _LecturePlayState extends State<LecturePlay> {
   final GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
   LectureResult _lectureResult = LectureResult();
   // 状態設定
-  int answerNum = 0;
-  bool isPopWind = false;
-  bool isPlaying = false;
-  bool isCorrect = false;
-  bool isAnswered = false;
-  bool isCorrectImage = false;
-  bool isDescription = false;
   bool isHelp = false;
-  bool isVideoPlay = false;
   bool isSlideButton = true;
   bool isSlide = false;
-  String testDesc = "";
-  String testQues = "";
-  String testAns = "";
-  String tapSlideUrl = "";
   YoutubePlayerController _controller;
 
   @override
@@ -73,19 +63,12 @@ class _LecturePlayState extends State<LecturePlay> {
     );
   }
 
-  // @override
-  // void dispose() {
-  //   _controller.dispose();
-  //   super.dispose();
-  // }
-
   @override
   Widget build(BuildContext context) {
     //サイズ
-    final _mediaHeight = MediaQuery.of(context).size.height;
-    final _mediaWidth = MediaQuery.of(context).size.width;
-    final _upHeight = _mediaWidth / 1.42; //1.42
-    final _bottomHeight = _mediaHeight - _upHeight - 100;
+    final Size _size = MediaQuery.of(context).size;
+    final _upHeight = _size.width / 1.42; //1.42
+    final _bottomHeight = _size.height - _upHeight - 100;
     //向き
     var isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
     //スマホの向きを一時的に上固定から横も可能にする
@@ -94,7 +77,6 @@ class _LecturePlayState extends State<LecturePlay> {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.portraitUp,
     ]);
-    print("スマホの向きを横向きも可能にする");
     return Scaffold(
       key: _scaffoldState,
       appBar: isPortrait
@@ -103,17 +85,15 @@ class _LecturePlayState extends State<LecturePlay> {
               toolbarHeight: cToolBarH,
               centerTitle: true,
               title: barTitle(context),
-              leading: isPopWind
-                  ? Container()
-                  : GoBack.instance.goBackWithArg(
-                      context: context,
-                      icon: Icon(FontAwesomeIcons.chevronLeft),
-                      arg: false,
-                      num: 1,
-                    ),
+              leading: GoBack.instance.goBackWithArg(
+                context: context,
+                icon: Icon(FontAwesomeIcons.listAlt),
+                arg: false,
+                num: 1,
+              ),
               actions: [
-                isPopWind
-                    ? _closeButton(context)
+                widget._isLast
+                    ? Container()
                     : GoBack.instance.goBackWithArg(
                         context: context,
                         icon: Icon(FontAwesomeIcons.chevronRight),
@@ -138,12 +118,13 @@ class _LecturePlayState extends State<LecturePlay> {
               // 縦向きの時の動画画面
               if (isPortrait)
                 Container(
-                  width: _mediaWidth,
+                  width: _size.width,
                   height: _upHeight,
-                  color: Colors.black,
+                  color: Colors.grey,
                   child: Column(
                     children: [
                       _infoArea(),
+                      SizedBox(height: 2),
                       if (widget._lecture.videoUrl.isNotEmpty)
                         _videoTile(isPortrait),
                     ],
@@ -152,8 +133,8 @@ class _LecturePlayState extends State<LecturePlay> {
               // 横向きの時の動画画面
               if (!isPortrait)
                 Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
+                  width: _size.width,
+                  height: _size.height,
                   color: Colors.black,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -167,12 +148,30 @@ class _LecturePlayState extends State<LecturePlay> {
               // 縦向きの時の残り画面
               if (isPortrait)
                 Container(
-                  width: _mediaWidth,
+                  width: _size.width,
                   height: _bottomHeight,
                   child: SingleChildScrollView(
                     controller: _homeController,
                     child: Column(
                       children: [
+                        if (widget._slides.length > 0 && isSlideButton)
+                          _slideButton(),
+                        if (widget._slides.length > 0 && isSlide)
+                          _gridView(context),
+                        Divider(height: 5, color: Colors.grey, thickness: 1),
+                        _descriptionTile(),
+                        Divider(height: 5, color: Colors.grey, thickness: 1),
+                        // _nextButton(),
+                        SizedBox(height: 30),
+                        if (widget._slides.length > 0 && isSlideButton)
+                          _slideButton(),
+                        if (widget._slides.length > 0 && isSlide)
+                          _gridView(context),
+                        Divider(height: 5, color: Colors.grey, thickness: 1),
+                        _descriptionTile(),
+                        Divider(height: 5, color: Colors.grey, thickness: 1),
+                        // _nextButton(),
+                        SizedBox(height: 30),
                         if (widget._slides.length > 0 && isSlideButton)
                           _slideButton(),
                         if (widget._slides.length > 0 && isSlide)
@@ -190,25 +189,6 @@ class _LecturePlayState extends State<LecturePlay> {
           ),
         ],
       ),
-      // bottomNavigationBar: BottomAppBar(
-      //   color: Theme.of(context).primaryColor,
-      //   notchMargin: 6.0,
-      //   shape: AutomaticNotchedShape(
-      //     RoundedRectangleBorder(),
-      //     StadiumBorder(
-      //       side: BorderSide(),
-      //     ),
-      //   ),
-      //   child: Container(
-      //     height: 45,
-      //     padding: EdgeInsets.all(10),
-      //     child: Text(
-      //       "",
-      //       style: cTextUpBarL,
-      //       textScaleFactor: 1,
-      //     ),
-      //   ),
-      // ),
     );
   }
 
@@ -263,113 +243,143 @@ class _LecturePlayState extends State<LecturePlay> {
   }
 
   Widget _videoTile(bool _isPortrait) {
-    // FullScreenボタンを隠してみる
+    final Size _size = MediaQuery.of(context).size;
     return Expanded(
-      child: YoutubePlayer(
-        controller: _controller,
-        // 動画の最後まで再生したら
-        onEnded: (data) async {
-          _controller.pause();
-          // 画面の向き固定を元に戻す
-          SystemChrome.setPreferredOrientations(
-            [DeviceOrientation.portraitUp],
-          );
-          // 講義を見た証をDBに登録
-          _lectureResult.lectureId = widget._lecture.lectureId;
-          _lectureResult.isTaken = "終了";
-          _lectureResult.isTakenAt =
-              ConvertItems.instance.dateToInt(DateTime.now());
-          // ボトムシートを表示して次の動作を選択してもらう
-          await showModalBottomSheet(
-            context: context,
-            elevation: 15,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(18.0),
-                topRight: Radius.circular(18.0),
+      child: Stack(
+        children: [
+          YoutubePlayer(
+            controller: _controller,
+            // 動画の最後まで再生したら
+            onEnded: (data) async {
+              _controller.pause();
+              // 画面の向き固定を元に戻す
+              SystemChrome.setPreferredOrientations(
+                [DeviceOrientation.portraitUp],
+              );
+              // 講義を見た証をDBに登録
+              _lectureResult.lectureId = widget._lecture.lectureId;
+              _lectureResult.isTaken = "終了";
+              _lectureResult.isTakenAt =
+                  ConvertItems.instance.dateToInt(DateTime.now());
+              // ボトムシートを表示して次の動作を選択してもらう
+              await _showModalBottomSheet(context);
+            },
+          ),
+
+          // FullScreenボタンを隠してみる
+          if (_isPortrait)
+            Container(
+              width: _size.width,
+              height: _size.width / 1.42,
+              alignment: Alignment.bottomRight,
+              child: Container(
+                width: _size.width / 8,
+                height: _size.height / 15,
+                color: Colors.red.withOpacity(0),
+              ),
+            )
+          else
+            Container(
+              width: _size.width,
+              height: _size.height,
+              alignment: Alignment.bottomRight,
+              child: Container(
+                width: 50,
+                height: 100,
+                color: Colors.red.withOpacity(0),
+              ),
+            )
+        ],
+      ),
+    );
+  }
+
+  Future<Widget> _showModalBottomSheet(BuildContext context) async {
+    return await showModalBottomSheet(
+      context: context,
+      isDismissible: false,
+      elevation: 15,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(18.0),
+          topRight: Radius.circular(18.0),
+        ),
+      ),
+      builder: (BuildContext context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: double.infinity,
+              height: 50,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+                color: Colors.green,
+              ),
+              child: Center(
+                child: Text(
+                  "この講義の動画再生が終了しました",
+                  style: cTextUpBarL,
+                  textScaleFactor: 1,
+                ),
               ),
             ),
-            builder: (BuildContext context) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: double.infinity,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(18)),
-                      color: Colors.green,
-                    ),
-                    child: Center(
-                      child: Text(
-                        "この講義の動画再生が終了しました",
-                        style: cTextUpBarL,
-                        textScaleFactor: 1,
-                      ),
-                    ),
+            if (!widget._isLast)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListTile(
+                  leading: Icon(FontAwesomeIcons.youtube),
+                  title: Text('次を見る', style: cTextListL, textScaleFactor: 1),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop(true);
+                  },
+                ),
+              ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ListTile(
+                leading: Icon(FontAwesomeIcons.undo),
+                title: Text('一覧へ戻る', style: cTextListL, textScaleFactor: 1),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop(false);
+                },
+              ),
+            ),
+            if (widget._lecture.questionLength != 0)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListTile(
+                  leading: Icon(FontAwesomeIcons.school),
+                  title: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('確認テストへ進む', style: cTextListL, textScaleFactor: 1),
+                      Text("受講完了には確認テストの全問解答が必要です",
+                          style: cTextListSR, textScaleFactor: 1)
+                    ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListTile(
-                      leading: Icon(FontAwesomeIcons.youtube),
-                      title:
-                          Text('次を見る', style: cTextListL, textScaleFactor: 1),
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pop(true);
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListTile(
-                      leading: Icon(FontAwesomeIcons.undo),
-                      title:
-                          Text('一覧へ戻る', style: cTextListL, textScaleFactor: 1),
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pop(false);
-                      },
-                    ),
-                  ),
-                  if (widget._lecture.questionLength != 0)
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ListTile(
-                        leading: Icon(FontAwesomeIcons.school),
-                        title: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('確認テストへ進む',
-                                style: cTextListL, textScaleFactor: 1),
-                            Text("受講完了には確認テストの全問解答が必要です",
-                                style: cTextListSR, textScaleFactor: 1)
-                          ],
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => QuestionListPage(
+                          widget.groupName,
+                          widget._lecture,
                         ),
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => QuestionListPage(
-                                widget.groupName,
-                                widget._lecture,
-                              ),
-                            ),
-                          );
-                        },
                       ),
-                    ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height / 8,
-                  )
-                ],
-              );
-            },
-          );
-        },
-      ),
+                    );
+                  },
+                ),
+              ),
+            SizedBox(
+              height: MediaQuery.of(context).size.height / 8,
+            )
+          ],
+        );
+      },
     );
   }
 
@@ -425,18 +435,6 @@ class _LecturePlayState extends State<LecturePlay> {
         width: MediaQuery.of(context).size.width,
         child: Image.network(_slide.slideUrl),
       ),
-    );
-  }
-
-  Widget _closeButton(BuildContext context) {
-    return IconButton(
-      icon: Icon(Icons.close),
-      iconSize: 35,
-      color: Colors.black54,
-      onPressed: () {
-        isPopWind = false;
-        setState(() {});
-      },
     );
   }
 

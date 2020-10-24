@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../widgets/datasave_widget.dart';
-import 'user_data.dart';
+import 'signup_model.dart';
 
 class LoginModel extends ChangeNotifier {
   UserData userData = UserData();

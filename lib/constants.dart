@@ -115,6 +115,11 @@ const cTextListM = TextStyle(
   fontSize: 13,
   fontWeight: FontWeight.w500,
 );
+const cTextListMR = TextStyle(
+  color: Colors.red,
+  fontSize: 13,
+  fontWeight: FontWeight.w500,
+);
 const cTextListS = TextStyle(
   color: Colors.black,
   fontSize: 10,
