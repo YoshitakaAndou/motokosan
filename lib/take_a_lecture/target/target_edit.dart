@@ -354,10 +354,10 @@ class TargetEdit extends StatelessWidget {
       await model.updateTargetFs(groupName, DateTime.now());
       await model.fetchTarget(groupName);
       model.stopLoading();
-      await okShowDialog(context, "更新しました");
+      await MyDialog.instance.okShowDialog(context, "更新しました");
       Navigator.pop(context);
     } catch (e) {
-      okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString());
       model.stopLoading();
     }
     model.resetUpdate();
@@ -369,7 +369,7 @@ class TargetEdit extends StatelessWidget {
       child: Icon(FontAwesomeIcons.trashAlt),
       // todo 削除
       onPressed: () {
-        okShowDialogFunc(
+        MyDialog.instance.okShowDialogFunc(
           context: context,
           mainTitle: _target.title,
           subTitle: "削除しますか？",
@@ -408,7 +408,7 @@ class TargetEdit extends StatelessWidget {
       //一通り終わったらFsから読み込んで再描画させる
       await model.fetchTarget(groupName);
     } catch (e) {
-      okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString());
     }
     model.stopLoading();
   }

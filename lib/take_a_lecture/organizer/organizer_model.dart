@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:motokosan/widgets/convert_date_to_int.dart';
+import 'package:motokosan/widgets/convert_items.dart';
 
 class Organizer {
   String organizerId;
@@ -97,12 +97,12 @@ class OrganizerModel extends ChangeNotifier {
   }
 
   Future<void> fetchOrganizer(String _groupName) async {
-    organizers = await _fetchOrganizer(_groupName);
+    organizers = await FSOrganizer.instance.fetchDates(_groupName);
     notifyListeners();
   }
 
   Future<void> fetchOrganizerList(String _groupName) async {
-    organizerList = await _fetchOrganizer(_groupName);
+    organizerList = await FSOrganizer.instance.fetchDates(_groupName);
     // 先頭に"指定無し"を追加
     final _organizer = Organizer(
       title: "指定無し",
@@ -111,7 +111,36 @@ class OrganizerModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<Organizer>> _fetchOrganizer(_groupName) async {
+  Future<void> addOrganizerFs(_groupName, _timeStamp) async {
+    if (organizer.title.isEmpty) {
+      throw "タイトル が入力されていません！";
+    }
+    organizer.organizerId = _timeStamp.toString();
+    await FSOrganizer.instance.setData(true, _groupName, organizer, _timeStamp);
+    notifyListeners();
+  }
+
+  Future<void> updateOrganizerFs(_groupName, _timeStamp) async {
+    if (organizer.title.isEmpty) {
+      throw "タイトル が入力されていません！";
+    }
+    await FSOrganizer.instance
+        .setData(false, _groupName, organizer, _timeStamp);
+    notifyListeners();
+  }
+
+  Future<void> deleteCategoryFs(_groupName, _organizerId) async {
+    await FSOrganizer.instance.deleteData(_groupName, _organizerId);
+    notifyListeners();
+  }
+}
+
+class FSOrganizer {
+  static final FSOrganizer instance = FSOrganizer();
+
+  Future<List<Organizer>> fetchDates(
+    String _groupName,
+  ) async {
     final _docs = await Firestore.instance
         .collection("Groups")
         .document(_groupName)
@@ -133,25 +162,12 @@ class OrganizerModel extends ChangeNotifier {
         .toList();
   }
 
-  Future<void> addOrganizerFs(_groupName, _timeStamp) async {
-    if (organizer.title.isEmpty) {
-      throw "タイトル が入力されていません！";
-    }
-    organizer.organizerId = _timeStamp.toString();
-    await setOrganizerFs(true, _groupName, organizer, _timeStamp);
-    notifyListeners();
-  }
-
-  Future<void> updateOrganizerFs(_groupName, _timeStamp) async {
-    if (organizer.title.isEmpty) {
-      throw "タイトル が入力されていません！";
-    }
-    await setOrganizerFs(false, _groupName, organizer, _timeStamp);
-    notifyListeners();
-  }
-
-  Future<void> setOrganizerFs(bool _isAdd, String _groupName, Organizer _data,
-      DateTime _timeStamp) async {
+  Future<void> setData(
+    bool _isAdd,
+    String _groupName,
+    Organizer _data,
+    DateTime _timeStamp,
+  ) async {
     final _organizerId = _isAdd ? _timeStamp.toString() : _data.organizerId;
     await Firestore.instance
         .collection("Groups")
@@ -166,58 +182,23 @@ class OrganizerModel extends ChangeNotifier {
       "option1": _data.option1,
       "option2": _data.option2,
       "option3": _data.option3,
-      "upDate": convertDateToInt(_timeStamp),
-      "createAt": _isAdd ? convertDateToInt(_timeStamp) : _data.createAt,
+      "upDate": ConvertItems.instance.dateToInt(_timeStamp),
+      "createAt":
+          _isAdd ? ConvertItems.instance.dateToInt(_timeStamp) : _data.createAt,
     }).catchError((onError) {
       print(onError.toString());
     });
   }
 
-  Future<void> deleteCategoryFs(_groupName, _organizerId) async {
+  Future<void> deleteData(
+    String _groupName,
+    String _organizerId,
+  ) async {
     await Firestore.instance
         .collection("Groups")
         .document(_groupName)
         .collection("Organizer")
         .document(_organizerId)
         .delete();
-    notifyListeners();
   }
-
-  // Future<void> setCategoryFs(bool _isAdd, String _groupName, Category _data,
-  //     DateTime _timeStamp) async {
-  //   final _categoryId = _isAdd ? _timeStamp.toString() : _data.categoryId;
-  //   await Firestore.instance
-  //       .collection("Groups")
-  //       .document(_groupName)
-  //       .collection("Target")
-  //       .document(category.targetId)
-  //       .collection("Category")
-  //       .document(_categoryId)
-  //       .setData({
-  //     "categoryId": _categoryId,
-  //     "categoryNo": _data.categoryNo,
-  //     "title": _data.title,
-  //     "subTitle": _data.subTitle,
-  //     "option1": _data.option1,
-  //     "option2": _data.option2,
-  //     "option3": _data.option3,
-  //     "upDate": convertDateToInt(_timeStamp),
-  //     "createAt": _isAdd ? convertDateToInt(_timeStamp) : _data.createAt,
-  //     "targetId": _data.targetId,
-  //   }).catchError((onError) {
-  //     print(onError.toString());
-  //   });
-  // }
-  //
-  // Future<void> deleteCategoryFs(_groupName, _targetId, _categoryId) async {
-  //   await Firestore.instance
-  //       .collection("Groups")
-  //       .document(_groupName)
-  //       .collection("Target")
-  //       .document(_targetId)
-  //       .collection("Category")
-  //       .document(_categoryId)
-  //       .delete();
-  //   notifyListeners();
-  // }
 }

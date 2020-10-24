@@ -65,7 +65,7 @@ class QaEdit extends StatelessWidget {
                       await _database.updateQaAtQId(model.datesFb);
                       model.setDatesDb(await _database.getQas());
                       model.stopLoading();
-                      await okShowDialog(context, "更新しました");
+                      await MyDialog.instance.okShowDialog(context, "更新しました");
                       Navigator.pop(context);
                     } catch (e) {
                       Navigator.pop(context);

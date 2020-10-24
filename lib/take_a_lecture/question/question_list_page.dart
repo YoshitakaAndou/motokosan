@@ -31,52 +31,53 @@ class QuestionListPage extends StatelessWidget {
         appBar: AppBar(
           toolbarHeight: cToolBarH,
           title: barTitle(context),
-          leading: goBackWithArg(
+          leading: GoBack.instance.goBackWithArg(
             context: context,
             icon: Icon(FontAwesomeIcons.chevronLeft),
             arg: false,
             num: 2,
           ),
-          actions: [
-            goBackWithArg(
-              context: context,
-              icon: Icon(FontAwesomeIcons.home),
-              num: 5,
-              arg: false,
-            ),
-          ],
+          actions: [],
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              _infoArea(),
-              Stack(
+        body: Column(
+          children: [
+            Expanded(
+              flex: 1,
+              child: _infoArea(),
+            ),
+            Expanded(
+              flex: 6,
+              child: Stack(
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    height: MediaQuery.of(context).size.height - 300,
-                    width: MediaQuery.of(context).size.width,
-                    child: ListView.builder(
-                      itemCount: model.questionLists.length,
-                      itemBuilder: (context, index) {
-                        return Card(
-                          elevation: 10,
-                          child: ListTile(
-                            dense: true,
-                            title: _title(context, model, index),
-                            onTap: () => _onTap(context, model, index),
-                          ),
-                        );
-                      },
-                    ),
+                  ListView.builder(
+                    itemCount: model.questionLists.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        elevation: 10,
+                        child: ListTile(
+                          dense: true,
+                          title: _title(context, model, index),
+                          onTap: () => _onTap(context, model, index),
+                        ),
+                      );
+                    },
                   ),
-                  if (model.isLoading) guriguri3(context),
+                  if (model.isLoading) GuriGuri.instance.guriguri3(context),
                 ],
               ),
-              _button(context, model),
-              SizedBox(height: 50),
-            ],
-          ),
+            ),
+            Expanded(
+              flex: 3,
+              child: Column(
+                children: [
+                  SizedBox(height: 10),
+                  _button(context, model),
+                  SizedBox(height: 30),
+                  _description(context, model, _lecture),
+                ],
+              ),
+            ),
+          ],
         ),
         bottomNavigationBar: _bottomNavigationBar(context),
       );
@@ -86,7 +87,7 @@ class QuestionListPage extends StatelessWidget {
   Widget _infoArea() {
     return Container(
       width: double.infinity,
-      height: cInfoAreaH,
+      // height: cInfoAreaH,
       color: cContBg,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -94,12 +95,14 @@ class QuestionListPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(" 確認問題", style: cTextUpBarLL, textScaleFactor: 1),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+            Text(" 確認テスト", style: cTextUpBarLL, textScaleFactor: 1),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("講義：", style: cTextUpBarM, textScaleFactor: 1),
-                Text(_lecture.title, style: cTextUpBarM, textScaleFactor: 1),
+                Text("講義：", style: cTextUpBarS, textScaleFactor: 1),
+                Text("  ${_lecture.title}",
+                    style: cTextUpBarM, textScaleFactor: 1),
               ],
             )
           ],
@@ -194,7 +197,7 @@ class QuestionListPage extends StatelessWidget {
           color: Colors.white,
         ),
         label: Text(
-          "　確認問題を解いてみる",
+          "　問題を解く　",
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -270,6 +273,43 @@ class QuestionListPage extends StatelessWidget {
           style: cTextUpBarL,
           textScaleFactor: 1,
         ),
+      ),
+    );
+  }
+
+  Widget _description(
+      BuildContext context, QuestionModel model, Lecture _lecture) {
+    return Container(
+      height: 100,
+      width: MediaQuery.of(context).size.width,
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              children: [
+                Text("この講義の受講を完了するには", style: cTextListM, textScaleFactor: 1),
+                Text("${_lecture.allAnswers}",
+                    style: cTextListM, textScaleFactor: 1),
+                Text("です。", style: cTextListM, textScaleFactor: 1),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              children: [
+                Text("合格点は", style: cTextListM, textScaleFactor: 1),
+                Text(
+                    _lecture.passingScore == 0
+                        ? "設けていません。"
+                        : "　${_lecture.passingScore}点です。",
+                    style: cTextListM,
+                    textScaleFactor: 1),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -328,7 +328,7 @@ class QuestionAdd extends StatelessWidget {
       ),
       onPressed: () {
         if (option.isEmpty) {
-          okShowDialog(context, "$choiceが入力されていません！");
+          MyDialog.instance.okShowDialog(context, "$choiceが入力されていません！");
         } else {
           model.setCorrectChoices(choice);
         }
@@ -344,10 +344,10 @@ class QuestionAdd extends StatelessWidget {
       model.inputCheck();
       await model.addQuestionFs(groupName, _timeStamp, _lecture);
       model.stopLoading();
-      await okShowDialog(context, "登録完了しました");
+      await MyDialog.instance.okShowDialog(context, "登録完了しました");
       Navigator.pop(context);
     } catch (e) {
-      okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString());
       model.stopLoading();
     }
   }

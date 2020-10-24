@@ -120,6 +120,11 @@ const cTextListS = TextStyle(
   fontSize: 10,
   fontWeight: FontWeight.w300,
 );
+const cTextListSR = TextStyle(
+  color: Colors.red,
+  fontSize: 10,
+  fontWeight: FontWeight.w300,
+);
 const cTextListSS = TextStyle(
   color: Colors.black,
   fontSize: 8,

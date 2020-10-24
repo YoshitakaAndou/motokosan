@@ -5,9 +5,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:motokosan/widgets/convert_items.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import '../widgets/convert_date_to_int.dart';
 import '../widgets/bar_title.dart';
 import '../widgets/go_back.dart';
 import 'lec_database_model.dart';
@@ -205,7 +205,7 @@ class _LecPlayState extends State<LecPlay> {
         title: barTitle(context),
         leading: isPopWind
             ? Container()
-            : goBack(
+            : GoBack.instance.goBack(
                 context: context, icon: Icon(Icons.arrow_back_ios), num: 1),
         actions: [
           isPopWind ? _closeButton(context) : Container(),
@@ -613,7 +613,8 @@ class _LecPlayState extends State<LecPlay> {
             _datesLec[widget.index + numberOfLecture - 1].answered = "○";
             _dataLec.answered = "○";
             _dataLec.viewed = "済み";
-            _dataLec.answeredDate = convertDateToInt(DateTime.now());
+            _dataLec.answeredDate =
+                ConvertItems.instance.dateToInt(DateTime.now());
             _database.updateLecAtId(_dataLec);
             if (numberOfRemaining == 1) {
               nextTitle = "閉じる";

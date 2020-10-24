@@ -62,7 +62,7 @@ class Home extends StatelessWidget {
                     ),
                     onPressed: () async {
                       await model.fetchOrganizerList(userData.userGroup);
-                      await Navigator.push(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => OrganizerListPage(

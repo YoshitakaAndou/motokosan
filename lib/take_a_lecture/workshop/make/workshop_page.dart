@@ -38,16 +38,15 @@ class WorkshopPage extends StatelessWidget {
         ),
         body: Column(
           children: [
-            _infoArea(),
-            Stack(
-              children: [
-                Container(
-                  height: MediaQuery.of(context).size.height - cListOffsetH,
-                  width: MediaQuery.of(context).size.width,
-                  child: _listBody(context, model),
-                ),
-                if (model.isLoading) guriguri(context),
-              ],
+            Expanded(flex: 1, child: _infoArea()),
+            Expanded(
+              flex: 10,
+              child: Stack(
+                children: [
+                  _listBody(context, model),
+                  if (model.isLoading) GuriGuri.instance.guriguri3(context),
+                ],
+              ),
             ),
           ],
         ),
@@ -91,13 +90,14 @@ class WorkshopPage extends StatelessWidget {
       for (Workshop _data in model.workshops) {
         _data.workshopNo = _count.toString().padLeft(4, "0");
         //Fsにアップデート
-        await model.setWorkshopFs(false, groupName, _data, DateTime.now());
+        await FSWorkshop.instance
+            .setData(false, groupName, _data, DateTime.now());
         _count += 1;
       }
       //一通り終わったらFsから読み込んで再描画させる
       await model.fetchWorkshopByOrganizer(groupName, _organizer.organizerId);
     } catch (e) {
-      okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString());
     }
   }
 

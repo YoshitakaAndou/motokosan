@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:motokosan/widgets/convert_date_to_int.dart';
+import 'package:motokosan/widgets/convert_items.dart';
 
 class Target {
   String targetId;
@@ -168,8 +168,9 @@ class TargetModel extends ChangeNotifier {
       "option1": _data.option1,
       "option2": _data.option2,
       "option3": _data.option3,
-      "upDate": convertDateToInt(_timeStamp),
-      "createAt": _isAdd ? convertDateToInt(_timeStamp) : _data.createAt,
+      "upDate": ConvertItems.instance.dateToInt(_timeStamp),
+      "createAt":
+          _isAdd ? ConvertItems.instance.dateToInt(_timeStamp) : _data.createAt,
     }).catchError((onError) {
       print(onError.toString());
     });

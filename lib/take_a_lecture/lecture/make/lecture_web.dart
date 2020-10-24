@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/constants.dart';
@@ -61,7 +60,7 @@ class _LectureWebState extends State<LectureWeb> {
                 _controller = controller;
               },
             ),
-            if (model.isLoading) guriguri2(context),
+            if (model.isLoading) GuriGuri.instance.guriguri2(context),
           ],
         ),
         floatingActionButton: floatingButton(model),
@@ -81,7 +80,7 @@ class _LectureWebState extends State<LectureWeb> {
           final _url = await _controller.currentUrl();
           final videoId = YoutubePlayer.convertUrlToId(_url);
           if (videoId == null) {
-            okShowDialog(context, "動画ページではありません");
+            MyDialog.instance.okShowDialog(context, "動画ページではありません");
           } else {
             final _videoSnippet =
                 await APIService.instance.fetchVideoSnippet(videoId: videoId);

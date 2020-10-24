@@ -35,10 +35,10 @@ Future<Widget> qaDownload(String qasId, BuildContext context) async {
               await _database.updateQaAtQId(model.datesFb);
               model.setDatesDb(await _database.getQas());
               model.stopLoading();
-              await okShowDialog(context, "登録完了しました");
+              await MyDialog.instance.okShowDialog(context, "登録完了しました");
               Navigator.pop(context);
             } catch (e) {
-              okShowDialog(context, e.toString());
+              MyDialog.instance.okShowDialog(context, e.toString());
             }
           },
         ),

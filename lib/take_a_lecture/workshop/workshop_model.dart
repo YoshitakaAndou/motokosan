@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:motokosan/take_a_lecture/organizer/organizer_model.dart';
-import 'package:motokosan/widgets/convert_date_to_int.dart';
+import 'package:motokosan/widgets/convert_items.dart';
 
 class Workshop {
   String workshopId;
@@ -130,7 +130,8 @@ class WorkshopModel extends ChangeNotifier {
   }
 
   Future<void> fetchLists(String _groupName, Organizer _organizer) async {
-    final List<Workshop> _workshops = await _fetchWorkshopAll(_groupName);
+    final List<Workshop> _workshops =
+        await FSWorkshop.instance._fetchDatesAll(_groupName);
     // workshopListを作成
     workshopLists = List();
     for (Workshop _workshop in _workshops) {
@@ -161,8 +162,8 @@ class WorkshopModel extends ChangeNotifier {
 
   Future<void> fetchListsByCategory(
       String _groupName, Organizer _organizer) async {
-    List<Workshop> _workshops =
-        await _fetchWorkshop(_groupName, _organizer.organizerId);
+    List<Workshop> _workshops = await FSWorkshop.instance
+        ._fetchDates(_groupName, _organizer.organizerId);
     // workshopListを作成
     workshopLists = List();
     for (Workshop _workshop in _workshops) {
@@ -183,16 +184,82 @@ class WorkshopModel extends ChangeNotifier {
 
   Future<void> fetchWorkshopByOrganizer(
       String _groupName, String _organizer) async {
-    workshops = await _fetchWorkshop(_groupName, _organizer);
+    workshops = await FSWorkshop.instance._fetchDates(_groupName, _organizer);
     notifyListeners();
   }
 
-  Future<void> fetchWorkshopAll(String _groupName) async {
-    workshops = await _fetchWorkshopAll(_groupName);
+  // Future<void> fetchWorkshopAll(String _groupName) async {
+  //   workshops = await _fetchWorkshopAll(_groupName);
+  //   notifyListeners();
+  // }
+
+  // Future<String> getOrganizerName(_groupName, _organizerId) async {
+  //   final _doc = await Firestore.instance
+  //       .collection("Groups")
+  //       .document(_groupName)
+  //       .collection("Organizer")
+  //       .document(_organizerId)
+  //       .get();
+  //   return _doc["title"];
+  // }
+
+  Future<void> addWorkshopFs(_groupName, _timeStamp) async {
+    if (workshop.title.isEmpty) {
+      throw "タイトル が入力されていません！";
+    }
+    workshop.workshopId = _timeStamp.toString();
+    await FSWorkshop.instance.setData(true, _groupName, workshop, _timeStamp);
     notifyListeners();
   }
 
-  Future<List<Workshop>> _fetchWorkshop(_groupName, _organizerId) async {
+  Future<void> updateWorkshopFs(_groupName, _timeStamp) async {
+    if (workshop.title.isEmpty) {
+      throw "タイトル が入力されていません！";
+    }
+    await FSWorkshop.instance.setData(false, _groupName, workshop, _timeStamp);
+    notifyListeners();
+  }
+}
+
+class FSWorkshop {
+  static final FSWorkshop instance = FSWorkshop();
+
+  Future<void> deleteData(_groupName, _workshopId) async {
+    await Firestore.instance
+        .collection("Groups")
+        .document(_groupName)
+        .collection("Workshop")
+        .document(_workshopId)
+        .delete();
+  }
+
+  Future<void> setData(bool _isAdd, String _groupName, Workshop _data,
+      DateTime _timeStamp) async {
+    final _workshopId = _isAdd ? _timeStamp.toString() : _data.workshopId;
+    await Firestore.instance
+        .collection("Groups")
+        .document(_groupName)
+        .collection("Workshop")
+        .document(_workshopId)
+        .setData({
+      "workshopId": _workshopId,
+      "workshopNo": _data.workshopNo,
+      "title": _data.title,
+      "subTitle": _data.subTitle,
+      "option1": _data.option1,
+      "option2": _data.option2,
+      "option3": _data.option3,
+      "upDate": ConvertItems.instance.dateToInt(_timeStamp),
+      "createAt":
+          _isAdd ? ConvertItems.instance.dateToInt(_timeStamp) : _data.createAt,
+      "targetId": _data.targetId,
+      "organizerId": _data.organizerId,
+    }).catchError((onError) {
+      print(onError.toString());
+    });
+  }
+
+  Future<List<Workshop>> _fetchDates(_groupName, _organizerId) async {
     final _docs = await Firestore.instance
         .collection("Groups")
         .document(_groupName)
@@ -207,7 +274,7 @@ class WorkshopModel extends ChangeNotifier {
     return _results;
   }
 
-  Future<List<Workshop>> _fetchWorkshopAll(_groupName) async {
+  Future<List<Workshop>> _fetchDatesAll(_groupName) async {
     final _docs = await Firestore.instance
         .collection("Groups")
         .document(_groupName)
@@ -234,67 +301,5 @@ class WorkshopModel extends ChangeNotifier {
               organizerId: doc["organizerId"],
             ))
         .toList();
-  }
-
-  Future<String> getOrganizerName(_groupName, _organizerId) async {
-    final _doc = await Firestore.instance
-        .collection("Groups")
-        .document(_groupName)
-        .collection("Organizer")
-        .document(_organizerId)
-        .get();
-    return _doc["title"];
-  }
-
-  Future<void> addWorkshopFs(_groupName, _timeStamp) async {
-    if (workshop.title.isEmpty) {
-      throw "タイトル が入力されていません！";
-    }
-    workshop.workshopId = _timeStamp.toString();
-    await setWorkshopFs(true, _groupName, workshop, _timeStamp);
-    notifyListeners();
-  }
-
-  Future<void> updateWorkshopFs(_groupName, _timeStamp) async {
-    if (workshop.title.isEmpty) {
-      throw "タイトル が入力されていません！";
-    }
-    await setWorkshopFs(false, _groupName, workshop, _timeStamp);
-    notifyListeners();
-  }
-
-  Future<void> setWorkshopFs(bool _isAdd, String _groupName, Workshop _data,
-      DateTime _timeStamp) async {
-    final _workshopId = _isAdd ? _timeStamp.toString() : _data.workshopId;
-    await Firestore.instance
-        .collection("Groups")
-        .document(_groupName)
-        .collection("Workshop")
-        .document(_workshopId)
-        .setData({
-      "workshopId": _workshopId,
-      "workshopNo": _data.workshopNo,
-      "title": _data.title,
-      "subTitle": _data.subTitle,
-      "option1": _data.option1,
-      "option2": _data.option2,
-      "option3": _data.option3,
-      "upDate": convertDateToInt(_timeStamp),
-      "createAt": _isAdd ? convertDateToInt(_timeStamp) : _data.createAt,
-      "targetId": _data.targetId,
-      "organizerId": _data.organizerId,
-    }).catchError((onError) {
-      print(onError.toString());
-    });
-  }
-
-  Future<void> deleteWorkshopFs(_groupName, _workshopId) async {
-    await Firestore.instance
-        .collection("Groups")
-        .document(_groupName)
-        .collection("Workshop")
-        .document(_workshopId)
-        .delete();
-    notifyListeners();
   }
 }

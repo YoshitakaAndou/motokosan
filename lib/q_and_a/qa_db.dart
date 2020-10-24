@@ -103,7 +103,7 @@ class QaDb extends StatelessWidget {
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.cloud_download),
           onPressed: () async {
-            okShowDialogFunc(
+            MyDialog.instance.okShowDialogFunc(
               context: context,
               mainTitle: "Cloudから\nデータをダウンロードします",
               subTitle: "実行しますか？",
@@ -114,10 +114,10 @@ class QaDb extends StatelessWidget {
                   await _database.updateQaAtQId(model.datesFb);
                   model.setDatesDb(await _database.getQas());
                   model.stopLoading();
-                  await okShowDialog(context, "登録完了しました");
+                  await MyDialog.instance.okShowDialog(context, "登録完了しました");
                   Navigator.pop(context);
                 } catch (e) {
-                  okShowDialog(context, e.toString());
+                  MyDialog.instance.okShowDialog(context, e.toString());
                 }
               },
             );

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:motokosan/widgets/convert_date_to_int.dart';
+import 'package:motokosan/widgets/convert_items.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:flutter/services.dart';
 import '../../constants.dart';
@@ -57,6 +57,7 @@ class _LecturePlayState extends State<LecturePlay> {
     super.initState();
     if (widget._lecture.videoUrl.isNotEmpty) {
       startVideo(widget._lecture.videoUrl, true);
+      print("${widget._organizer.title}");
     }
   }
 
@@ -87,7 +88,13 @@ class _LecturePlayState extends State<LecturePlay> {
     final _bottomHeight = _mediaHeight - _upHeight - 100;
     //向き
     var isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
-    print("slides:${widget._slides.length}件");
+    //スマホの向きを一時的に上固定から横も可能にする
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+    ]);
+    print("スマホの向きを横向きも可能にする");
     return Scaffold(
       key: _scaffoldState,
       appBar: isPortrait
@@ -98,7 +105,7 @@ class _LecturePlayState extends State<LecturePlay> {
               title: barTitle(context),
               leading: isPopWind
                   ? Container()
-                  : goBackWithArg(
+                  : GoBack.instance.goBackWithArg(
                       context: context,
                       icon: Icon(FontAwesomeIcons.chevronLeft),
                       arg: false,
@@ -107,7 +114,7 @@ class _LecturePlayState extends State<LecturePlay> {
               actions: [
                 isPopWind
                     ? _closeButton(context)
-                    : goBackWithArg(
+                    : GoBack.instance.goBackWithArg(
                         context: context,
                         icon: Icon(FontAwesomeIcons.chevronRight),
                         arg: true,
@@ -223,19 +230,31 @@ class _LecturePlayState extends State<LecturePlay> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text("主催者：", style: cTextUpBarS, textScaleFactor: 1),
+                    Text("主催者：", style: cTextUpBarSS, textScaleFactor: 1),
                     Text(widget._workshopList.organizerName,
-                        style: cTextUpBarS, textScaleFactor: 1),
+                        style: cTextUpBarSS, textScaleFactor: 1),
                   ],
                 ),
               ],
             ),
-            Container(
-              width: double.infinity,
-              child: Text(widget._lecture.title,
-                  style: cTextUpBarL,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "${widget._lecture.title}（${widget._lecture.videoDuration}）",
+                  style: cTextUpBarM,
                   textScaleFactor: 1,
-                  textAlign: TextAlign.start),
+                ),
+                Container(
+                  color: Colors.white.withOpacity(0.3),
+                  child: Text(
+                    widget._lecture.allAnswers == "全問解答が必要" ? "テスト解答必須" : "",
+                    style: cTextUpBarS,
+                    textAlign: TextAlign.center,
+                    textScaleFactor: 1,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -258,7 +277,8 @@ class _LecturePlayState extends State<LecturePlay> {
           // 講義を見た証をDBに登録
           _lectureResult.lectureId = widget._lecture.lectureId;
           _lectureResult.isTaken = "終了";
-          _lectureResult.isTakenAt = convertDateToInt(DateTime.now());
+          _lectureResult.isTakenAt =
+              ConvertItems.instance.dateToInt(DateTime.now());
           // ボトムシートを表示して次の動作を選択してもらう
           await showModalBottomSheet(
             context: context,
@@ -293,7 +313,8 @@ class _LecturePlayState extends State<LecturePlay> {
                     padding: const EdgeInsets.all(8.0),
                     child: ListTile(
                       leading: Icon(FontAwesomeIcons.youtube),
-                      title: Text('次を見る'),
+                      title:
+                          Text('次を見る', style: cTextListL, textScaleFactor: 1),
                       onTap: () {
                         Navigator.of(context).pop();
                         Navigator.of(context).pop(true);
@@ -304,7 +325,8 @@ class _LecturePlayState extends State<LecturePlay> {
                     padding: const EdgeInsets.all(8.0),
                     child: ListTile(
                       leading: Icon(FontAwesomeIcons.undo),
-                      title: Text('一覧へ戻る'),
+                      title:
+                          Text('一覧へ戻る', style: cTextListL, textScaleFactor: 1),
                       onTap: () {
                         Navigator.of(context).pop();
                         Navigator.of(context).pop(false);
@@ -316,7 +338,15 @@ class _LecturePlayState extends State<LecturePlay> {
                       padding: const EdgeInsets.all(8.0),
                       child: ListTile(
                         leading: Icon(FontAwesomeIcons.school),
-                        title: Text('確認問題へ進む'),
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('確認テストへ進む',
+                                style: cTextListL, textScaleFactor: 1),
+                            Text("受講完了には確認テストの全問解答が必要です",
+                                style: cTextListSR, textScaleFactor: 1)
+                          ],
+                        ),
                         onTap: () {
                           Navigator.of(context).pop();
                           Navigator.push(

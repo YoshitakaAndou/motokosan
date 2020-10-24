@@ -101,7 +101,7 @@ class _QaPlayState extends State<QaPlay> {
         title: barTitle(context),
         leading: isPopWind
             ? Container()
-            : goBack(
+            : GoBack.instance.goBack(
                 context: context, icon: Icon(Icons.arrow_back_ios), num: 1),
         actions: [
           isPopWind ? _closeButton(context) : Container(),

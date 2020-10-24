@@ -83,7 +83,7 @@ class LecEdit extends StatelessWidget {
                       await _database.updateLecAtLecId(model.datesFb);
                       model.setDatesDb(await _database.getLecs());
                       model.stopLoading();
-                      await okShowDialog(context, "更新しました");
+                      await MyDialog.instance.okShowDialog(context, "更新しました");
                       Navigator.pop(context);
                     } catch (e) {
                       Navigator.pop(context);

@@ -38,17 +38,15 @@ class QuestionPage extends StatelessWidget {
         ),
         body: Column(
           children: [
-            _infoArea(),
-            Stack(
-              children: [
-                Container(
-                  // padding: EdgeInsets.all(8),
-                  height: MediaQuery.of(context).size.height - cListOffsetH,
-                  width: MediaQuery.of(context).size.width,
-                  child: _listBody(context, model),
-                ),
-                if (model.isLoading) guriguri(context),
-              ],
+            Expanded(flex: 1, child: _infoArea()),
+            Expanded(
+              flex: 10,
+              child: Stack(
+                children: [
+                  _listBody(context, model),
+                  if (model.isLoading) GuriGuri.instance.guriguri3(context),
+                ],
+              ),
             ),
           ],
         ),
@@ -97,18 +95,19 @@ class QuestionPage extends StatelessWidget {
   }
 
   Future<void> _sortedSave(BuildContext context, QuestionModel model) async {
+    final FSQuestion fsQuestion = FSQuestion();
     try {
       int _count = 1;
       for (Question _data in model.questions) {
         _data.questionNo = _count.toString().padLeft(4, "0");
         //Fsにアップデート
-        await model.setQuestionFs(false, groupName, _data, DateTime.now());
+        await fsQuestion.setData(false, groupName, _data, DateTime.now());
         _count += 1;
       }
       //一通り終わったらFsから読み込んで再描画させる
       await model.fetchQuestion(groupName, _lecture.lectureId);
     } catch (e) {
-      okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString());
     }
   }
 

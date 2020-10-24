@@ -25,7 +25,8 @@ class QaList extends StatelessWidget {
         appBar: AppBar(
           title: barTitle(context),
           centerTitle: true,
-          leading: goBack(context: context, icon: Icon(Icons.home), num: 1),
+          leading: GoBack.instance
+              .goBack(context: context, icon: Icon(Icons.home), num: 1),
           actions: [
             GestureDetector(
               onTap: () {

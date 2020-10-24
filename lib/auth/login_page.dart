@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:motokosan/widgets/flare_actors.dart';
 import 'package:provider/provider.dart';
-import '../widgets/done.dart';
 import '../widgets/bar_title.dart';
 import '../widgets/user_data.dart';
 import '../widgets/ok_show_dialog.dart';
@@ -271,7 +271,7 @@ class LoginPage extends StatelessWidget {
       if (_uid != model.userData.uid) {
         model.userData = await model.getUserDataFromFs(_uid);
         //違っていたら本体に保存するか？
-        await okShowDialogFunc(
+        await MyDialog.instance.okShowDialogFunc(
             context: context,
             mainTitle: "本体情報と違うアカウントでログインしました！",
             subTitle: "\ngroup :${model.userData.userGroup}"
@@ -284,7 +284,7 @@ class LoginPage extends StatelessWidget {
             });
       }
       // await okShowDialog(context, "ログインしました");
-      await done(context);
+      await FlareActors.instance.done(context);
       // await firework(context);
       //DataBaseのチェック
       // final _databaseQuiz = DatabaseModel();
@@ -340,6 +340,6 @@ class LoginPage extends StatelessWidget {
     if (_error.contains("ERROR_OPERATION_NOT_ALLOWED")) {
       _error = "指定したユーザのログインが許されていません！";
     }
-    return await okShowDialog(context, _error);
+    return await MyDialog.instance.okShowDialog(context, _error);
   }
 }

@@ -313,6 +313,6 @@ class SignUpPage extends StatelessWidget {
       _error = "メールアドレスが別のアカウントですでに使用されています！"
           "\nメールアドレスを変えるか、ログイン画面でログインしてください！";
     }
-    return await okShowDialog(context, _error);
+    return await MyDialog.instance.okShowDialog(context, _error);
   }
 }

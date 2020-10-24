@@ -28,23 +28,17 @@ class TargetPage extends StatelessWidget {
           toolbarHeight: cToolBarH,
           title: barTitle(context),
         ),
-        body: Stack(
+        body: Column(
           children: [
-            Column(
-              children: [
-                _infoArea(),
-                Stack(
-                  children: [
-                    Container(
-                      // padding: EdgeInsets.all(8),
-                      height: MediaQuery.of(context).size.height - cListOffsetH,
-                      width: MediaQuery.of(context).size.width,
-                      child: _listBody(context, model),
-                    ),
-                    if (model.isLoading) guriguri(context),
-                  ],
-                ),
-              ],
+            Expanded(flex: 1, child: _infoArea()),
+            Expanded(
+              flex: 10,
+              child: Stack(
+                children: [
+                  _listBody(context, model),
+                  if (model.isLoading) GuriGuri.instance.guriguri3(context),
+                ],
+              ),
             ),
           ],
         ),
@@ -84,7 +78,7 @@ class TargetPage extends StatelessWidget {
       //一通り終わったらFsから読み込んで再描画させる
       await model.fetchTarget(groupName);
     } catch (e) {
-      okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString());
     }
   }
 

@@ -38,7 +38,8 @@ class _PdfState extends State<Pdf> {
           textScaleFactor: 1,
           style: cTextTitleL,
         ),
-        leading: goBack(context: context, icon: Icon(Icons.home), num: 1),
+        leading: GoBack.instance
+            .goBack(context: context, icon: Icon(Icons.home), num: 1),
       ),
       body: PdfView(
         documentLoader: Center(child: CircularProgressIndicator()),

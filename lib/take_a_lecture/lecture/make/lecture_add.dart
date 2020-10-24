@@ -236,7 +236,7 @@ class LectureAdd extends StatelessWidget {
         if (model.isVideoUrl(text)) {
           model.changeValue("videoUrl", text);
         } else {
-          okShowDialog(context, "YouTubeのURLを\n入力してください！");
+          MyDialog.instance.okShowDialog(context, "YouTubeのURLを\n入力してください！");
           // _videoUrlTextController.text = "";
           // model.changeValue("videoUrl", "");
         }
@@ -600,7 +600,8 @@ class LectureAdd extends StatelessWidget {
         _testTitle(context, model),
         _testAllAnswers(context, model),
         SizedBox(height: 10),
-        _testPassingScore(context, model),
+        if (model.lecture.allAnswers == "全問解答が必要")
+          _testPassingScore(context, model),
       ],
     );
   }
@@ -650,7 +651,7 @@ class LectureAdd extends StatelessWidget {
           RadioListTile(
             title: Text('全問解答が必要', style: cTextListM, textScaleFactor: 1),
             activeColor: Colors.black45,
-            value: "true",
+            value: "全問解答が必要",
             groupValue: model.lecture.allAnswers,
             onChanged: (value) {
               model.setAllAnswers(value);
@@ -660,7 +661,7 @@ class LectureAdd extends StatelessWidget {
           RadioListTile(
             title: Text('全問解答は不要', style: cTextListM, textScaleFactor: 1),
             activeColor: Colors.black45,
-            value: "false",
+            value: "全問解答は不要",
             groupValue: model.lecture.allAnswers,
             onChanged: (value) {
               model.setAllAnswers(value);
@@ -745,10 +746,10 @@ class LectureAdd extends StatelessWidget {
       await model.addLectureFs(groupName, _timeStamp);
       // グリグリを止める
       model.stopLoading();
-      await okShowDialog(context, "登録完了しました");
+      await MyDialog.instance.okShowDialog(context, "登録完了しました");
       Navigator.pop(context);
     } catch (e) {
-      okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString());
       model.stopLoading();
     }
   }

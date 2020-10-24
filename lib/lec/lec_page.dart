@@ -36,7 +36,7 @@ class _LecPageState extends State<LecPage> {
       return Scaffold(
         appBar: AppBar(
           title: barTitle(context),
-          leading: goBack(
+          leading: GoBack.instance.goBack(
               context: context, icon: Icon(Icons.arrow_back_ios), num: 1),
           actions: [
             GestureDetector(

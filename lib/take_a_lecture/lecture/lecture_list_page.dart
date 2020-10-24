@@ -32,24 +32,23 @@ class LectureListPage extends StatelessWidget {
         appBar: AppBar(
           toolbarHeight: cToolBarH,
           title: barTitle(context),
-          leading: goBack(
+          leading: GoBack.instance.goBack(
               context: context,
               icon: Icon(FontAwesomeIcons.chevronLeft),
               num: 1),
           actions: [
-            goBack(context: context, icon: Icon(FontAwesomeIcons.home), num: 3),
+            GoBack.instance.goBack(
+                context: context, icon: Icon(FontAwesomeIcons.home), num: 3),
           ],
         ),
         body: Column(
           children: [
-            _infoArea(),
-            Stack(
-              children: [
-                Container(
-                  // padding: EdgeInsets.all(8),
-                  height: MediaQuery.of(context).size.height - cListOffsetH,
-                  width: MediaQuery.of(context).size.width - cListOffsetW,
-                  child: ListView.builder(
+            Expanded(flex: 1, child: _infoArea()),
+            Expanded(
+              flex: 10,
+              child: Stack(
+                children: [
+                  ListView.builder(
                     itemCount: model.lectures.length,
                     itemBuilder: (context, index) {
                       return Card(
@@ -68,9 +67,9 @@ class LectureListPage extends StatelessWidget {
                       );
                     },
                   ),
-                ),
-                if (model.isLoading) guriguri(context),
-              ],
+                  if (model.isLoading) GuriGuri.instance.guriguri3(context),
+                ],
+              ),
             ),
           ],
         ),
@@ -124,7 +123,7 @@ class LectureListPage extends StatelessWidget {
     List<Slide> _results = List();
     // スライドが登録されていたら準備をする
     if (_slideLength > 0) {
-      _results = await model.fetchSlide(groupName, _lectureId);
+      _results = await FSSlide.instance.fetchDates(groupName, _lectureId);
     }
     return _results;
   }
@@ -206,7 +205,7 @@ class LectureListPage extends StatelessWidget {
             //   borderRadius: const BorderRadius.all(const Radius.circular(4.0)),
             //   color: Colors.greenAccent.withOpacity(0.2),
             // ),
-            child: Text("問題:${model.lectures[index].questionLength}問",
+            child: Text("テスト:${model.lectures[index].questionLength}問",
                 style: cTextListS, textScaleFactor: 1),
           ),
       ],

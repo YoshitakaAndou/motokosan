@@ -345,7 +345,7 @@ class QuestionEdit extends StatelessWidget {
       onPressed: () {
         print("$choice:$option");
         if (option.isEmpty) {
-          okShowDialog(context, "$choiceが入力されていません！");
+          MyDialog.instance.okShowDialog(context, "$choiceが入力されていません！");
         } else {
           model.setCorrectChoices(choice);
           model.isUpdate = true;
@@ -448,10 +448,10 @@ class QuestionEdit extends StatelessWidget {
       await model.updateQuestionFs(groupName, DateTime.now(), _lecture);
       await model.fetchQuestion(groupName, _question.questionId);
       model.stopLoading();
-      await okShowDialog(context, "更新しました");
+      await MyDialog.instance.okShowDialog(context, "更新しました");
       Navigator.pop(context);
     } catch (e) {
-      okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString());
       model.stopLoading();
     }
     model.resetUpdate();
@@ -463,7 +463,7 @@ class QuestionEdit extends StatelessWidget {
       child: Icon(FontAwesomeIcons.trashAlt),
       // todo 削除
       onPressed: () {
-        okShowDialogFunc(
+        MyDialog.instance.okShowDialogFunc(
           context: context,
           mainTitle: _question.question,
           subTitle: "削除しますか？",
@@ -495,15 +495,16 @@ class QuestionEdit extends StatelessWidget {
       for (Question _data in model.questions) {
         _data.questionNo = _count.toString().padLeft(4, "0");
         //Fsにアップデート
-        await model.setQuestionFs(false, groupName, _data, DateTime.now());
+        await FSQuestion.instance
+            .setData(false, groupName, _data, DateTime.now());
         _count += 1;
       }
       // LectureにQuestion.lengthを書き込む
-      await model.setLectureQSLength(groupName, _lecture);
+      await model.setQSLengthToLecture(groupName, _lecture);
       //一通り終わったらFsから読み込んで再描画させる
       await model.fetchQuestion(groupName, _lecture.lectureId);
     } catch (e) {
-      okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString());
     }
     model.stopLoading();
   }

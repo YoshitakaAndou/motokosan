@@ -4,13 +4,11 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:motokosan/take_a_lecture/question/question_model.dart';
-import 'package:motokosan/widgets/ok_show_dialog.dart';
+import 'package:motokosan/widgets/convert_items.dart';
 import 'package:uuid/uuid.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../organizer/organizer_model.dart';
 import '../workshop/workshop_model.dart';
-import '../../widgets/convert_date_to_int.dart';
 
 class Lecture {
   String lectureId;
@@ -40,7 +38,7 @@ class Lecture {
     this.videoUrl = "",
     this.thumbnailUrl = "",
     this.videoDuration = "",
-    this.allAnswers = "false",
+    this.allAnswers = "全問解答は不要",
     this.passingScore = 0,
     this.slideLength = 0,
     this.questionLength = 0,
@@ -167,7 +165,7 @@ class LectureModel extends ChangeNotifier {
     lecture.videoUrl = "";
     lecture.thumbnailUrl = "";
     lecture.videoDuration = "";
-    lecture.allAnswers = "false";
+    lecture.allAnswers = "全問解答は不要";
     lecture.passingScore = 0;
     lecture.slideLength = 0;
     lecture.questionLength = 0;
@@ -313,6 +311,21 @@ class LectureModel extends ChangeNotifier {
     // notifyListeners();
   }
 
+  void inputCheck() {
+    if (lecture.title.isEmpty) {
+      throw "タイトル が入力されていません！";
+    }
+    if (lecture.videoUrl.isEmpty) {
+      throw "YouTube動画URL が入力されていません！";
+    }
+    if (!isVideoUrl(lecture.videoUrl)) {
+      throw "YouTube動画URL が正しくありません！";
+    }
+    if (lecture.description.isEmpty) {
+      throw "説明 が入力されていません！";
+    }
+  }
+
   Future<File> selectImage(File _imageFile) async {
     try {
       final picker = ImagePicker();
@@ -331,11 +344,107 @@ class LectureModel extends ChangeNotifier {
   }
 
   Future<void> fetchLecture(String _groupName, _workshopId) async {
-    lectures = await _fetchLecture(_groupName, _workshopId);
+    lectures = await FSLecture.instance.fetchDates(_groupName, _workshopId);
     notifyListeners();
   }
 
-  Future<List<Lecture>> _fetchLecture(_groupName, _workshopId) async {
+  bool isVideoUrl(String _videoUrl) {
+    final _result =
+        YoutubePlayer.convertUrlToId(_videoUrl) == null ? false : true;
+    isVideoPlay = _result;
+    notifyListeners();
+    return _result;
+  }
+
+  Future<void> addLectureFs(_groupName, _timeStamp) async {
+    lecture.lectureId = _timeStamp.toString();
+    await FSLecture.instance.setData(true, _groupName, lecture, _timeStamp);
+    notifyListeners();
+  }
+
+  Future<void> updateLectureFs(_groupName, _timeStamp) async {
+    await FSLecture.instance.setData(false, _groupName, lecture, _timeStamp);
+    notifyListeners();
+  }
+
+  Future<void> addSlide(_groupName, _lectureId) async {
+    if (slides.length > 1) {
+      for (int i = 0; i < slides.length - 1; i++) {
+        final _stFileName = Uuid().v1(); // ランダム数の取得
+        slides[i].slideNo = "${i.toString().padLeft(4, "0")}";
+        slides[i].slideUrl = await FSStorage.instance
+            .uploadFile(_stFileName, slides[i].slideImage);
+        await FSSlide.instance.setData(
+            _groupName, _lectureId, slides[i].slideNo, slides[i].slideUrl);
+      }
+    }
+    lecture.slideLength = slides.length - 1;
+  }
+
+  // Edit起動時のSlideデータ取得
+  Future<void> getSlideUrls(_groupName, _lectureId) async {
+    // SlideデータをFetch
+    slides = await FSSlide.instance.fetchDates(_groupName, _lectureId);
+    notifyListeners();
+  }
+
+  Future<void> deleteStorageImages(_groupName, _lectureId) async {
+    final _slideLists =
+        await FSSlide.instance.fetchDates(_groupName, _lectureId);
+    for (Slide _slideList in _slideLists) {
+      await FSStorage.instance.deleteFile(_slideList.slideUrl);
+      await FSSlide.instance
+          .deleteData(_groupName, _lectureId, _slideList.slideNo);
+    }
+  }
+
+  Future<void> updateSlide(_groupName, _lectureId) async {
+    // Fs上のSlideを削除
+    final _slideLists =
+        await FSSlide.instance.fetchDates(_groupName, _lectureId);
+    for (Slide _slideList in _slideLists) {
+      await FSSlide.instance
+          .deleteData(_groupName, _lectureId, _slideList.slideNo);
+    }
+    // deletedSlide[]に入っていたimageを削除
+    if (deletedSlides.length > 0) {
+      for (DeletedSlide _slide in deletedSlides) {
+        await FSStorage.instance.deleteFile(_slide.slideUrl);
+      }
+    }
+    // 変更のあったslideのみ削除（slideImage != null）
+    if (slides.length > 1) {
+      for (int i = 0; i < slides.length - 1; i++) {
+        if (slides[i].slideImage != null) {
+          await FSStorage.instance.deleteFile(slides[i].slideUrl);
+        }
+      }
+    }
+    // Slideを登録
+    if (slides.length > 1) {
+      for (int i = 0; i < slides.length - 1; i++) {
+        final _stFileName = Uuid().v1();
+        slides[i].slideNo = "${i.toString().padLeft(4, "0")}";
+        slides[i].slideUrl = slides[i].slideImage == null
+            ? slides[i].slideUrl
+            : await FSStorage.instance
+                .uploadFile(_stFileName, slides[i].slideImage);
+        await FSSlide.instance.setData(
+            _groupName, _lectureId, slides[i].slideNo, slides[i].slideUrl);
+      }
+    }
+    // 配列の最後は「＋」で不要なので数えません
+    lecture.slideLength = slides.length - 1;
+  }
+}
+
+class FSLecture {
+  static final FSLecture instance = FSLecture();
+
+  Future<List<Lecture>> fetchDates(
+    String _groupName,
+    String _workshopId,
+  ) async {
     final _docs = await Firestore.instance
         .collection("Groups")
         .document(_groupName)
@@ -369,43 +478,12 @@ class LectureModel extends ChangeNotifier {
     return _results;
   }
 
-  void inputCheck() {
-    if (lecture.title.isEmpty) {
-      throw "タイトル が入力されていません！";
-    }
-    if (lecture.videoUrl.isEmpty) {
-      throw "YouTube動画URL が入力されていません！";
-    }
-    if (!isVideoUrl(lecture.videoUrl)) {
-      throw "YouTube動画URL が正しくありません！";
-    }
-    if (lecture.description.isEmpty) {
-      throw "説明 が入力されていません！";
-    }
-  }
-
-  bool isVideoUrl(String _videoUrl) {
-    final _result =
-        YoutubePlayer.convertUrlToId(_videoUrl) == null ? false : true;
-    isVideoPlay = _result;
-    notifyListeners();
-    return _result;
-  }
-
-  Future<void> addLectureFs(_groupName, _timeStamp) async {
-    // Firebaseへデータを新規登録
-    lecture.lectureId = _timeStamp.toString();
-    await setLectureFs(true, _groupName, lecture, _timeStamp);
-    notifyListeners();
-  }
-
-  Future<void> updateLectureFs(_groupName, _timeStamp) async {
-    await setLectureFs(false, _groupName, lecture, _timeStamp);
-    notifyListeners();
-  }
-
-  Future<void> setLectureFs(bool _isAdd, String _groupName, Lecture _data,
-      DateTime _timeStamp) async {
+  Future<void> setData(
+    bool _isAdd,
+    String _groupName,
+    Lecture _data,
+    DateTime _timeStamp,
+  ) async {
     final _lectureId = _isAdd ? _timeStamp.toString() : _data.lectureId;
     await Firestore.instance
         .collection("Groups")
@@ -425,8 +503,9 @@ class LectureModel extends ChangeNotifier {
       "passingScore": _data.passingScore,
       "slideLength": _data.slideLength,
       "questionLength": _data.questionLength,
-      "upDate": convertDateToInt(_timeStamp),
-      "createAt": _isAdd ? convertDateToInt(_timeStamp) : _data.createAt,
+      "upDate": ConvertItems.instance.dateToInt(_timeStamp),
+      "createAt":
+          _isAdd ? ConvertItems.instance.dateToInt(_timeStamp) : _data.createAt,
       "targetId": _data.targetId,
       "organizerId": _data.organizerId,
       "workshopId": _data.workshopId,
@@ -435,38 +514,26 @@ class LectureModel extends ChangeNotifier {
     });
   }
 
-  Future<void> setSlideFs(String _groupName, String _lectureId, String _slideNo,
-      String _slideUrl) async {
+  Future<void> deleteData(
+    String _groupName,
+    String _lectureId,
+  ) async {
     await Firestore.instance
         .collection("Groups")
         .document(_groupName)
         .collection("Lecture")
         .document(_lectureId)
-        .collection("Slide")
-        .document(_slideNo)
-        .setData({
-      "slideNo": _slideNo,
-      "slideUrl": _slideUrl,
-    }).catchError((onError) {
-      print(onError.toString());
-    });
+        .delete();
   }
+}
 
-  Future<void> addSlide(_groupName, _lectureId) async {
-    if (slides.length > 1) {
-      for (int i = 0; i < slides.length - 1; i++) {
-        final _stFileName = Uuid().v1();
-        slides[i].slideNo = "${i.toString().padLeft(4, "0")}";
-        slides[i].slideUrl =
-            await uploadStorage(_stFileName, slides[i].slideImage);
-        await setSlideFs(
-            _groupName, _lectureId, slides[i].slideNo, slides[i].slideUrl);
-      }
-    }
-    lecture.slideLength = slides.length - 1;
-  }
+class FSStorage {
+  static final FSStorage instance = FSStorage();
 
-  Future<String> uploadStorage(String _fileName, File _imageFile) async {
+  Future<String> uploadFile(
+    String _fileName,
+    File _imageFile,
+  ) async {
     if (_imageFile == null) {
       return "";
     }
@@ -482,62 +549,23 @@ class LectureModel extends ChangeNotifier {
     }
   }
 
-  // Edit起動時のSlideデータ取得
-  Future<void> getSlideUrls(_groupName, _lectureId) async {
-    // SlideデータをFetch
-    slides = await fetchSlide(_groupName, _lectureId);
-    notifyListeners();
-  }
-
-  // Slideデータdelete
-  Future<void> deleteStorageImages(_groupName, _lectureId) async {
-    final _slideLists = await fetchSlide(_groupName, _lectureId);
-    for (Slide _slideList in _slideLists) {
-      await deleteStorage(_slideList.slideUrl);
-      await deleteSlideFs(_groupName, _lectureId, _slideList.slideNo);
+  Future<void> deleteFile(
+    String url,
+  ) async {
+    if (url != "") {
+      final ref = await FirebaseStorage.instance.getReferenceFromUrl(url);
+      await ref.delete();
     }
   }
+}
 
-  // Questionデータdelete
+class FSSlide {
+  static final FSSlide instance = FSSlide();
 
-  Future<void> updateSlide(_groupName, _lectureId) async {
-    // Fs上のSlideを削除
-    final _slideLists = await fetchSlide(_groupName, _lectureId);
-    for (Slide _slideList in _slideLists) {
-      await deleteSlideFs(_groupName, _lectureId, _slideList.slideNo);
-    }
-    // deletedSlide[]に入っていたimageを削除
-    if (deletedSlides.length > 0) {
-      for (DeletedSlide _slide in deletedSlides) {
-        await deleteStorage(_slide.slideUrl);
-      }
-    }
-    // 変更のあったslideのみ削除（slideImage != null）
-    if (slides.length > 1) {
-      for (int i = 0; i < slides.length - 1; i++) {
-        if (slides[i].slideImage != null) {
-          await deleteStorage(slides[i].slideUrl);
-        }
-      }
-    }
-    // Slideを登録
-    if (slides.length > 1) {
-      for (int i = 0; i < slides.length - 1; i++) {
-        final _stFileName = Uuid().v1();
-        slides[i].slideNo = "${i.toString().padLeft(4, "0")}";
-        slides[i].slideUrl = slides[i].slideImage == null
-            ? slides[i].slideUrl
-            : await uploadStorage(_stFileName, slides[i].slideImage);
-        await setSlideFs(
-            _groupName, _lectureId, slides[i].slideNo, slides[i].slideUrl);
-      }
-    }
-    // 配列の最後は「＋」で不要なので数えません
-    lecture.slideLength = slides.length - 1;
-  }
-
-  // FSからSlideのデータを取得
-  Future<List<Slide>> fetchSlide(_groupName, _lectureId) async {
+  Future<List<Slide>> fetchDates(
+    String _groupName,
+    String _lectureId,
+  ) async {
     final _docs = await Firestore.instance
         .collection("Groups")
         .document(_groupName)
@@ -553,14 +581,12 @@ class LectureModel extends ChangeNotifier {
         .toList();
   }
 
-  Future<void> deleteStorage(String url) async {
-    if (url != "") {
-      final ref = await FirebaseStorage.instance.getReferenceFromUrl(url);
-      await ref.delete();
-    }
-  }
-
-  Future<void> deleteSlideFs(_groupName, _lectureId, _slideNo) async {
+  Future<void> setData(
+    String _groupName,
+    String _lectureId,
+    String _slideNo,
+    String _slideUrl,
+  ) async {
     await Firestore.instance
         .collection("Groups")
         .document(_groupName)
@@ -568,56 +594,26 @@ class LectureModel extends ChangeNotifier {
         .document(_lectureId)
         .collection("Slide")
         .document(_slideNo)
-        .delete();
+        .setData({
+      "slideNo": _slideNo,
+      "slideUrl": _slideUrl,
+    }).catchError((onError) {
+      print(onError.toString());
+    });
   }
 
-  Future<void> deleteLectureFs(_groupName, _lectureId) async {
+  Future<void> deleteData(
+    String _groupName,
+    String _lectureId,
+    String _slideNo,
+  ) async {
     await Firestore.instance
         .collection("Groups")
         .document(_groupName)
         .collection("Lecture")
         .document(_lectureId)
-        .delete();
-    notifyListeners();
-  }
-
-  Future<List<Question>> fetchQuestion(_groupName, _lectureId) async {
-    final _docs = await Firestore.instance
-        .collection("Groups")
-        .document(_groupName)
-        .collection("Question")
-        .where("lectureId", isEqualTo: _lectureId)
-        .getDocuments();
-    final List<Question> _results = _docs.documents
-        .map((doc) => Question(
-              questionId: doc["questionId"],
-              questionNo: doc["questionNo"],
-              question: doc["question"],
-              choices1: doc["choices1"],
-              choices2: doc["choices2"],
-              choices3: doc["choices3"],
-              choices4: doc["choices4"],
-              correctChoices: doc["correctChoices"],
-              answerDescription: doc["answerDescription"],
-              updateAt: doc["upDate"],
-              createAt: doc["createAt"],
-              answeredAt: doc["answeredAt"],
-              answered: doc["answered"],
-              organizerId: doc["organizerId"],
-              workshopId: doc["workshopId"],
-              lectureId: doc["lectureId"],
-            ))
-        .toList();
-    _results.sort((a, b) => a.questionNo.compareTo(b.questionNo));
-    return _results;
-  }
-
-  Future<void> deleteQuestion(_groupName, _questionId) async {
-    await Firestore.instance
-        .collection("Groups")
-        .document(_groupName)
-        .collection("Question")
-        .document(_questionId)
+        .collection("Slide")
+        .document(_slideNo)
         .delete();
   }
 }

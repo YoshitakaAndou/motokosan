@@ -361,10 +361,10 @@ class WorkshopEdit extends StatelessWidget {
       await model.updateWorkshopFs(groupName, DateTime.now());
       await model.fetchWorkshopByOrganizer(groupName, _organizer.organizerId);
       model.stopLoading();
-      await okShowDialog(context, "更新しました");
+      await MyDialog.instance.okShowDialog(context, "更新しました");
       Navigator.pop(context);
     } catch (e) {
-      okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString());
       model.stopLoading();
     }
     model.resetUpdate();
@@ -376,7 +376,7 @@ class WorkshopEdit extends StatelessWidget {
       child: Icon(FontAwesomeIcons.trashAlt),
       // todo 削除
       onPressed: () {
-        okShowDialogFunc(
+        MyDialog.instance.okShowDialogFunc(
           context: context,
           mainTitle: _workshop.title,
           subTitle: "削除しますか？",
@@ -405,7 +405,7 @@ class WorkshopEdit extends StatelessWidget {
     model.startLoading();
     try {
       //FsをTargetIdで削除
-      await model.deleteWorkshopFs(groupName, _workshopId);
+      await FSWorkshop.instance.deleteData(groupName, _workshopId);
       //配列を削除するのは無理だから再びFsをフェッチ
       await model.fetchWorkshopByOrganizer(groupName, _organizer.organizerId);
       //頭から順にtargetNoを振る
@@ -413,13 +413,14 @@ class WorkshopEdit extends StatelessWidget {
       for (Workshop _data in model.workshops) {
         _data.workshopNo = _count.toString().padLeft(4, "0");
         //Fsにアップデート
-        await model.setWorkshopFs(false, groupName, _data, DateTime.now());
+        await FSWorkshop.instance
+            .setData(false, groupName, _data, DateTime.now());
         _count += 1;
       }
       //一通り終わったらFsから読み込んで再描画させる
       await model.fetchWorkshopByOrganizer(groupName, _organizer.organizerId);
     } catch (e) {
-      okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString());
     }
     model.stopLoading();
   }

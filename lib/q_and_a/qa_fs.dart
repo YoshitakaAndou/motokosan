@@ -31,7 +31,8 @@ class QaFs extends StatelessWidget {
             style: cTextTitleL,
             textScaleFactor: 1,
           ),
-          leading: goBack(context: context, icon: Icon(Icons.home), num: 1),
+          leading: GoBack.instance
+              .goBack(context: context, icon: Icon(Icons.home), num: 1),
           actions: [
             Container(
               padding: EdgeInsets.symmetric(horizontal: 10),
@@ -74,7 +75,7 @@ class QaFs extends StatelessWidget {
                         },
                         // delete
                         onLongPress: () {
-                          okShowDialogFunc(
+                          MyDialog.instance.okShowDialogFunc(
                             context: context,
                             mainTitle: model.datesFb[index].question,
                             subTitle: "削除しますか？",
@@ -94,7 +95,8 @@ class QaFs extends StatelessWidget {
                                 model.stopLoading();
                                 Navigator.pop(context);
                               } catch (e) {
-                                okShowDialog(context, e.toString());
+                                MyDialog.instance
+                                    .okShowDialog(context, e.toString());
                               }
                             },
                           );

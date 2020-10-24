@@ -353,10 +353,10 @@ class OrganizerEdit extends StatelessWidget {
       await model.updateOrganizerFs(groupName, DateTime.now());
       await model.fetchOrganizer(groupName);
       model.stopLoading();
-      await okShowDialog(context, "更新しました");
+      await MyDialog.instance.okShowDialog(context, "更新しました");
       Navigator.pop(context);
     } catch (e) {
-      okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString());
       model.stopLoading();
     }
     model.resetUpdate();
@@ -368,7 +368,7 @@ class OrganizerEdit extends StatelessWidget {
       child: Icon(FontAwesomeIcons.trashAlt),
       // todo 削除
       onPressed: () {
-        okShowDialogFunc(
+        MyDialog.instance.okShowDialogFunc(
           context: context,
           mainTitle: _category.title,
           subTitle: "削除しますか？",
@@ -389,6 +389,7 @@ class OrganizerEdit extends StatelessWidget {
 
   Future<void> _deleteSave(
       BuildContext context, OrganizerModel model, _categoryId) async {
+    final FSOrganizer fsOrganizer = FSOrganizer();
     model.startLoading();
     try {
       //FsをTargetIdで削除
@@ -400,13 +401,13 @@ class OrganizerEdit extends StatelessWidget {
       for (Organizer _data in model.organizers) {
         _data.organizerNo = _count.toString().padLeft(4, "0");
         //Fsにアップデート
-        await model.setOrganizerFs(false, groupName, _data, DateTime.now());
+        await fsOrganizer.setData(false, groupName, _data, DateTime.now());
         _count += 1;
       }
       //一通り終わったらFsから読み込んで再描画させる
       await model.fetchOrganizer(groupName);
     } catch (e) {
-      okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString());
     }
     model.stopLoading();
   }

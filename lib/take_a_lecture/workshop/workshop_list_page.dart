@@ -33,23 +33,23 @@ class WorkshopListPage extends StatelessWidget {
         appBar: AppBar(
           toolbarHeight: cToolBarH,
           title: barTitle(context),
-          leading: goBack(
+          leading: GoBack.instance.goBack(
               context: context,
               icon: Icon(FontAwesomeIcons.chevronLeft),
               num: 1),
           actions: [
-            goBack(context: context, icon: Icon(FontAwesomeIcons.home), num: 2),
+            GoBack.instance.goBack(
+                context: context, icon: Icon(FontAwesomeIcons.home), num: 2),
           ],
         ),
         body: Column(
           children: [
-            _infoArea(),
-            Stack(
-              children: [
-                Container(
-                  height: MediaQuery.of(context).size.height - cListOffsetH,
-                  width: MediaQuery.of(context).size.width - cListOffsetW,
-                  child: ListView.builder(
+            Expanded(flex: 1, child: _infoArea()),
+            Expanded(
+              flex: 10,
+              child: Stack(
+                children: [
+                  ListView.builder(
                     itemCount: model.workshopLists.length,
                     itemBuilder: (context, index) {
                       return Card(
@@ -65,9 +65,9 @@ class WorkshopListPage extends StatelessWidget {
                       );
                     },
                   ),
-                ),
-                if (model.isLoading) guriguri(context),
-              ],
+                  if (model.isLoading) GuriGuri.instance.guriguri3(context),
+                ],
+              ),
             ),
           ],
         ),

@@ -55,19 +55,17 @@ class _OrganizerListPageState extends State<OrganizerListPage> {
         appBar: AppBar(
           toolbarHeight: cToolBarH,
           title: barTitle(context),
-          leading: goBack(
+          leading: GoBack.instance.goBack(
               context: context, icon: Icon(FontAwesomeIcons.home), num: 1),
         ),
         body: Column(
           children: [
-            _infoArea(),
-            Stack(
-              children: [
-                Container(
-                  // padding: EdgeInsets.all(8),
-                  height: MediaQuery.of(context).size.height - cListOffsetH,
-                  width: MediaQuery.of(context).size.width - cListOffsetW,
-                  child: ListView.builder(
+            Expanded(flex: 1, child: _infoArea()),
+            Expanded(
+              flex: 10,
+              child: Stack(
+                children: [
+                  ListView.builder(
                     itemCount: model.organizerList.length,
                     itemBuilder: (context, index) {
                       return Card(
@@ -98,9 +96,9 @@ class _OrganizerListPageState extends State<OrganizerListPage> {
                       );
                     },
                   ),
-                ),
-                if (model.isLoading) guriguri(context),
-              ],
+                  if (model.isLoading) GuriGuri.instance.guriguri3(context),
+                ],
+              ),
             ),
           ],
         ),

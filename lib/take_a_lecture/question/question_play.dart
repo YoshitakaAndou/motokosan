@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:motokosan/take_a_lecture/question/question_database.dart';
+import 'package:motokosan/widgets/convert_items.dart';
 import '../lecture/lecture_model.dart';
 import '../../widgets/bar_title.dart';
-import '../../widgets/convert_date_to_int.dart';
 import '../../widgets/go_back.dart';
 import 'package:soundpool/soundpool.dart';
 import '../../constants.dart';
@@ -27,7 +27,6 @@ class QuestionPlay extends StatefulWidget {
 
 class _QuestionPlayState extends State<QuestionPlay> {
   final ScrollController _homeController = ScrollController();
-  final _database = QuestionDatabase();
   List<String> choices = List();
   Question _dataQs;
   Lecture _lecture;
@@ -137,7 +136,7 @@ class _QuestionPlayState extends State<QuestionPlay> {
         toolbarHeight: cToolBarH,
         centerTitle: true,
         title: barTitle(context),
-        leading: goBackWithArg(
+        leading: GoBack.instance.goBackWithArg(
           context: context,
           icon: Icon(Icons.arrow_back_ios),
           arg: false,
@@ -340,10 +339,11 @@ class _QuestionPlayState extends State<QuestionPlay> {
             await soundpool.play(soundIdCorrect);
             _questionResult.questionId = _dataQs.questionId;
             _questionResult.answerResult = "○";
-            _questionResult.answerAt = convertDateToInt(DateTime.now());
-            await _database.saveValue(_questionResult);
-            final result =
-                await _database.getAnswerResult(_questionResult.questionId);
+            _questionResult.answerAt =
+                ConvertItems.instance.dateToInt(DateTime.now());
+            await QuestionDatabase.instance.saveValue(_questionResult);
+            final result = await QuestionDatabase.instance
+                .getAnswerResult(_questionResult.questionId);
             print("dbの値：${result[0].answerResult}");
           } else {
             // 不正解
@@ -352,11 +352,12 @@ class _QuestionPlayState extends State<QuestionPlay> {
             await soundpool.play(soundIdInCorrect);
             _questionResult.questionId = _dataQs.questionId;
             _questionResult.answerResult = "×";
-            _questionResult.answerAt = convertDateToInt(DateTime.now());
-            await _database.saveValue(_questionResult);
+            _questionResult.answerAt =
+                ConvertItems.instance.dateToInt(DateTime.now());
+            await QuestionDatabase.instance.saveValue(_questionResult);
 
-            final result =
-                await _database.getAnswerResult(_questionResult.questionId);
+            final result = await QuestionDatabase.instance
+                .getAnswerResult(_questionResult.questionId);
             print("dbの値：${result[0].answerResult}");
           }
           if (numberOfRemaining == 1) {

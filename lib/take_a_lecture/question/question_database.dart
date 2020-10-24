@@ -4,6 +4,8 @@ import 'package:path/path.dart';
 import 'question_model.dart';
 
 class QuestionDatabase {
+  static final QuestionDatabase instance = QuestionDatabase();
+
   Future<Database> dbQuestion() async {
     return openDatabase(
       join(await getDatabasesPath(), 'motoko.db'),
@@ -48,6 +50,15 @@ class QuestionDatabase {
       'question_result',
       _data.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> deleteQuestionResult(String _questionId) async {
+    final Database db = await dbQuestion();
+    await db.delete(
+      'question_result',
+      where: "questionId = ?",
+      whereArgs: [_questionId],
     );
   }
 

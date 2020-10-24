@@ -33,7 +33,8 @@ class LecFs extends StatelessWidget {
             style: cTextTitleL,
             textScaleFactor: 1,
           ),
-          leading: goBack(context: context, icon: Icon(Icons.home), num: 1),
+          leading: GoBack.instance
+              .goBack(context: context, icon: Icon(Icons.home), num: 1),
           actions: [
             if (!model.isSorting)
               Container(
@@ -80,7 +81,7 @@ class LecFs extends StatelessWidget {
                             icon: Icon(Icons.delete),
                             iconSize: 25,
                             onPressed: () {
-                              okShowDialogFunc(
+                              MyDialog.instance.okShowDialogFunc(
                                 context: context,
                                 mainTitle: _lecture.lecTitle,
                                 subTitle: "削除しますか？",
@@ -197,7 +198,7 @@ class LecFs extends StatelessWidget {
       await model.fetchLecsFsCloud(lecsId);
       model.setDatesDb(await database.getLecs());
     } catch (e) {
-      okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString());
     }
     //datesDbに読み込んで、同じカテゴリー内のlecNoを書き換える
   }
@@ -235,7 +236,7 @@ class LecFs extends StatelessWidget {
       model.stopLoading();
       Navigator.pop(context);
     } catch (e) {
-      okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString());
     }
   }
 }

@@ -244,7 +244,7 @@ class LectureEdit extends StatelessWidget {
           model.changeValue("videoUrl", text);
           model.setUpdate();
         } else {
-          okShowDialog(context, "YouTubeのURLを\n入力してください！");
+          MyDialog.instance.okShowDialog(context, "YouTubeのURLを\n入力してください！");
           _videoUrlTextController.text = "";
         }
       },
@@ -359,7 +359,7 @@ class LectureEdit extends StatelessWidget {
           if (model.isVideoUrl(model.lecture.videoUrl)) {
             await _checkVideoSheet(context, model.lecture.videoUrl);
           } else {
-            okShowDialog(context, "URL が変です！");
+            MyDialog.instance.okShowDialog(context, "URL が変です！");
           }
         },
       ),
@@ -625,14 +625,14 @@ class LectureEdit extends StatelessWidget {
       child: Icon(FontAwesomeIcons.trashAlt),
       // todo 削除
       onPressed: () {
-        okShowDialogFunc(
+        MyDialog.instance.okShowDialogFunc(
           context: context,
           mainTitle: _lecture.title,
           subTitle: "削除しますか？",
           // delete
           onPressed: () async {
             Navigator.pop(context);
-            await _deleteSave(context, model, _lecture.lectureId);
+            await _deleteAndSave(context, model, _lecture.lectureId);
             Navigator.pop(context);
           },
         );
@@ -647,7 +647,8 @@ class LectureEdit extends StatelessWidget {
         _testTitle(context, model),
         _testAllAnswers(context, model),
         SizedBox(height: 10),
-        _testPassingScore(context, model),
+        if (model.lecture.allAnswers == "全問解答が必要")
+          _testPassingScore(context, model),
       ],
     );
   }
@@ -697,7 +698,7 @@ class LectureEdit extends StatelessWidget {
           RadioListTile(
             title: Text('全問解答が必要', style: cTextListM, textScaleFactor: 1),
             activeColor: Colors.black45,
-            value: "true",
+            value: "全問解答が必要",
             groupValue: model.lecture.allAnswers,
             onChanged: (value) {
               model.setAllAnswers(value);
@@ -707,7 +708,7 @@ class LectureEdit extends StatelessWidget {
           RadioListTile(
             title: Text('全問解答は不要', style: cTextListM, textScaleFactor: 1),
             activeColor: Colors.black45,
-            value: "false",
+            value: "全問解答は不要",
             groupValue: model.lecture.allAnswers,
             onChanged: (value) {
               model.setAllAnswers(value);
@@ -811,35 +812,37 @@ class LectureEdit extends StatelessWidget {
       await model.updateLectureFs(groupName, DateTime.now());
       await model.fetchLecture(groupName, _workshop.workshopId);
       model.stopLoading();
-      await okShowDialog(context, "更新しました");
+      await MyDialog.instance.okShowDialog(context, "更新しました");
       Navigator.pop(context);
     } catch (e) {
-      okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString());
       model.stopLoading();
     }
     model.resetUpdate();
   }
 
-  Future<void> _deleteSave(
+  Future<void> _deleteAndSave(
     BuildContext context,
     LectureModel model,
     _lectureId,
   ) async {
     model.startLoading();
     try {
-      //Questionの削除
+      //QuestionとQuestionResultの削除
       // fetchして削除対象のListを作成
-      final _questions = await model.fetchQuestion(groupName, _lectureId);
+      final _questions =
+          await FSQuestion.instance.fetchDates(groupName, _lectureId);
       if (_questions.length > 0) {
         for (Question _data in _questions) {
-          print("削除したQuestion:${_data.question}");
-          await model.deleteQuestion(groupName, _data.questionId);
+          await FSQuestion.instance.deleteData(groupName, _data.questionId);
+          // await QuestionDatabase.instance
+          //     .deleteQuestionResult(_data.questionId);
         }
       }
       //StorageのImageとFSのSlideを削除
       await model.deleteStorageImages(groupName, _lectureId);
       //FsをLectureIdで削除
-      await model.deleteLectureFs(groupName, _lectureId);
+      await FSLecture.instance.deleteData(groupName, _lectureId);
       //配列を削除するのは無理だから再びFsをフェッチ
       await model.fetchLecture(groupName, _workshop.workshopId);
       //頭から順にlectureNoを振る
@@ -847,13 +850,14 @@ class LectureEdit extends StatelessWidget {
       for (Lecture _data in model.lectures) {
         _data.lectureNo = _count.toString().padLeft(4, "0");
         //Fsにアップデート
-        await model.setLectureFs(false, groupName, _data, DateTime.now());
+        await FSLecture.instance
+            .setData(false, groupName, _data, DateTime.now());
         _count += 1;
       }
       //一通り終わったらFsから読み込んで再描画させる
       await model.fetchLecture(groupName, _workshop.workshopId);
     } catch (e) {
-      okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString());
     }
     model.stopLoading();
   }

@@ -251,10 +251,10 @@ class OrganizerAdd extends StatelessWidget {
       model.startLoading();
       await model.addOrganizerFs(groupName, _timeStamp);
       model.stopLoading();
-      await okShowDialog(context, "登録完了しました");
+      await MyDialog.instance.okShowDialog(context, "登録完了しました");
       Navigator.pop(context);
     } catch (e) {
-      okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString());
       model.stopLoading();
     }
   }
