@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_argument.dart';
 import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -23,7 +24,7 @@ class LectureListPage extends StatelessWidget {
     final model = Provider.of<LectureModel>(context, listen: false);
     Future(() async {
       model.startLoading();
-      await model.fetchLecture(groupName, _workshopList.workshopId);
+      await model.generateLectureList(groupName, _workshopList.workshopId);
       model.stopLoading();
     });
     return Consumer<LectureModel>(builder: (context, model, child) {
@@ -42,6 +43,7 @@ class LectureListPage extends StatelessWidget {
           ],
         ),
         body: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Expanded(flex: 1, child: _infoArea()),
             Expanded(
@@ -49,10 +51,10 @@ class LectureListPage extends StatelessWidget {
               child: Stack(
                 children: [
                   ListView.builder(
-                    itemCount: model.lectures.length,
+                    itemCount: model.lectureLists.length,
                     itemBuilder: (context, index) {
                       return Card(
-                        key: Key(model.lectures[index].workshopId),
+                        key: Key(model.lectureLists[index].lecture.lectureId),
                         elevation: 15,
                         child: ListTile(
                           contentPadding:
@@ -129,7 +131,7 @@ class LectureListPage extends StatelessWidget {
   }
 
   Widget _leading(BuildContext context, LectureModel model, int index) {
-    final _imageUrl = model.lectures[index].thumbnailUrl ?? "";
+    final _imageUrl = model.lectureLists[index].lecture.thumbnailUrl ?? "";
     if (_imageUrl.isNotEmpty) {
       return Stack(
         children: [
@@ -147,7 +149,7 @@ class LectureListPage extends StatelessWidget {
               child: Container(
                 color: Colors.black54.withOpacity(0.8),
                 child: Text(
-                  "${model.lectures[index].videoDuration}",
+                  "${model.lectureLists[index].lecture.videoDuration}",
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.white,
@@ -173,7 +175,7 @@ class LectureListPage extends StatelessWidget {
 
   Widget _title(BuildContext context, LectureModel model, int index) {
     return Text(
-      "${model.lectures[index].title}",
+      "${model.lectureLists[index].lecture.title}",
       style: cTextListM,
       textScaleFactor: 1,
     );
@@ -183,7 +185,7 @@ class LectureListPage extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(left: 25),
       child: Text(
-        "${model.lectures[index].subTitle}",
+        "${model.lectureLists[index].lecture.subTitle}",
         style: cTextListSS,
         textAlign: TextAlign.left,
         textScaleFactor: 1,
@@ -196,7 +198,7 @@ class LectureListPage extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (model.lectures[index].questionLength != 0)
+        if (model.lectureLists[index].lecture.questionLength != 0)
           Container(
             padding: EdgeInsets.symmetric(horizontal: 5),
             color: Colors.greenAccent.withOpacity(0.2),
@@ -205,60 +207,28 @@ class LectureListPage extends StatelessWidget {
             //   borderRadius: const BorderRadius.all(const Radius.circular(4.0)),
             //   color: Colors.greenAccent.withOpacity(0.2),
             // ),
-            child: Text("テスト:${model.lectures[index].questionLength}問",
-                style: cTextListS, textScaleFactor: 1),
+            child: Text(
+                "テスト:${model.lectureLists[index].lecture.questionLength}問",
+                style: cTextListS,
+                textScaleFactor: 1),
           ),
       ],
     );
   }
 
   Future<void> _onTap(
-      BuildContext context, LectureModel model, int index) async {
-    final _slides1 = await _preparationOfSlide(
-      model,
-      model.lectures[index].slideLength,
-      model.lectures[index].lectureId,
-    );
-    if (model.lectures[index].videoUrl.isNotEmpty) {
-      //スマホの向きを一時的に上固定から横も可能にする
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.landscapeRight,
-        DeviceOrientation.landscapeLeft,
-        DeviceOrientation.portraitUp,
-      ]);
-      print("スマホの向きを横向きも可能にする");
-    }
-    // Trainingへ 終わったら値を受け取る
-    bool result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => LecturePlay(
-          groupName,
-          _organizer,
-          _workshopList,
-          model.lectures[index],
-          _slides1,
-          model.lectures.length - index == 1 ? true : false,
-        ),
-      ),
-    );
-    if (model.lectures[index].videoUrl.isNotEmpty) {
-      //スマホの向きを上のみに戻す
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-      ]);
-      print("スマホの向きを上むきのみに戻す");
-    }
-    int _index = index + 1;
-    // リストの最後まで来たら終わり
-    if (_index >= model.lectures.length) {
-      result = false;
-    }
-    while (result) {
-      final _slides = await _preparationOfSlide(
+    BuildContext context,
+    LectureModel model,
+    int index,
+  ) async {
+    LectureArgument lectureArgument = LectureArgument();
+    lectureArgument.isNextQuestion = true;
+
+    while (lectureArgument.isNextQuestion) {
+      final _slides1 = await _preparationOfSlide(
         model,
-        model.lectures[_index].slideLength,
-        model.lectures[_index].lectureId,
+        model.lectureLists[index].lecture.slideLength,
+        model.lectureLists[index].lecture.lectureId,
       );
       if (model.lectures[index].videoUrl.isNotEmpty) {
         //スマホの向きを一時的に上固定から横も可能にする
@@ -267,32 +237,32 @@ class LectureListPage extends StatelessWidget {
           DeviceOrientation.landscapeLeft,
           DeviceOrientation.portraitUp,
         ]);
-        print("スマホの向きを横向きも可能にする");
       }
-      result = await Navigator.push(
+      // Trainingへ 終わったら値を受け取る
+      lectureArgument = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => LecturePlay(
             groupName,
             _organizer,
             _workshopList,
-            model.lectures[_index],
-            _slides,
-            model.lectures.length - _index == 1 ? true : false,
+            model.lectureLists[index],
+            _slides1,
+            model.lectureLists.length - index == 1 ? true : false,
           ),
         ),
       );
-      if (model.lectures[index].videoUrl.isNotEmpty) {
+
+      if (model.lectureLists[index].lecture.videoUrl.isNotEmpty) {
         //スマホの向きを上のみに戻す
         SystemChrome.setPreferredOrientations([
           DeviceOrientation.portraitUp,
         ]);
-        print("スマホの向きを上むきのみに戻す");
       }
-      _index += 1;
+      index = index + 1;
       // リストの最後まで来たら終わり
-      if (_index >= model.lectures.length) {
-        result = false;
+      if (index >= model.lectureLists.length) {
+        lectureArgument.isNextQuestion = false;
       }
     }
   }

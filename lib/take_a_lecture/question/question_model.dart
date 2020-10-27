@@ -57,12 +57,16 @@ class QuestionResult {
   String questionId;
   String answerResult;
   int answerAt;
+  String lectureId;
+  String flag1;
 
   QuestionResult({
     this.id,
     this.questionId = "",
     this.answerResult = "",
     this.answerAt = 0,
+    this.lectureId = "",
+    this.flag1 = "",
   });
   Map<String, dynamic> toMap() {
     return {
@@ -70,8 +74,20 @@ class QuestionResult {
       'questionId': questionId,
       'answerResult': answerResult,
       'answerAt': answerAt,
+      'lectureId': lectureId,
+      'flag1': flag1,
     };
   }
+}
+
+class QuestionResultBody {
+  String questionId;
+  bool isExists;
+
+  QuestionResultBody({
+    this.questionId = "",
+    this.isExists = false,
+  });
 }
 
 class QuestionModel extends ChangeNotifier {
@@ -85,9 +101,11 @@ class QuestionModel extends ChangeNotifier {
   bool isUpdate = false;
   bool isLoading = false;
   bool isEditing = false;
+  bool isClear = false;
   String correct = "";
   int answerNum = 0;
   int questionsCount = 0;
+  int correctCount = 0;
 
   void initQuestion(Lecture _lecture) {
     question.questionId = "";
@@ -112,30 +130,18 @@ class QuestionModel extends ChangeNotifier {
     isUpdate = false;
     isLoading = false;
     isEditing = false;
+    isClear = false;
     correct = "";
     answerNum = 0;
     questionsCount = 0;
+    correctCount = 0;
   }
 
   void initQuestionResult() {
     questionResult.questionId = "";
     questionResult.answerResult = "";
     questionResult.answerAt = 0;
-  }
-
-  void changeQRValue({String arg, String valS, int valI}) {
-    switch (arg) {
-      case "questionId":
-        questionResult.questionId = valS;
-        break;
-      case "answerResult":
-        questionResult.answerResult = valS;
-        break;
-      case "answerAt":
-        questionResult.answerAt = valI;
-        break;
-    }
-    notifyListeners();
+    questionResult.lectureId = "";
   }
 
   void changeValue(String _arg, String _val) {
@@ -182,6 +188,16 @@ class QuestionModel extends ChangeNotifier {
 
   void resetUpdate() {
     isUpdate = false;
+    notifyListeners();
+  }
+
+  void setClear() {
+    isClear = true;
+    notifyListeners();
+  }
+
+  void resetClear() {
+    isClear = false;
     notifyListeners();
   }
 
@@ -235,9 +251,11 @@ class QuestionModel extends ChangeNotifier {
   Future<void> generateQuestionList(
       String _groupName, String _lectureId) async {
     questionLists = List();
+    correctCount = 0;
+    await QuestionDatabase.instance.flag1Reset("");
     for (Question _question in questions) {
-      final _questionResults =
-          await QuestionDatabase.instance.getAnswerResult(_question.questionId);
+      final _questionResults = await QuestionDatabase.instance
+          .getAnswerResultQuestionId(_question.questionId);
       if (_questionResults.length < 1) {
         questionLists.add(
           QuestionList(
@@ -245,17 +263,30 @@ class QuestionModel extends ChangeNotifier {
             questionResult: QuestionResult(
               questionId: _question.questionId,
               answerResult: "未解答",
+              lectureId: _question.lectureId,
             ),
           ),
         );
       } else {
+        // 本体のQRとクラウドのQuestionの整合性を保つための処理
+        if (_questionResults[0].answerResult.isNotEmpty) {
+          QuestionResult _saveData = _questionResults[0];
+          // flag1に存在したマークをつけてDBに戻す
+          _saveData.flag1 = "true";
+          await QuestionDatabase.instance.saveValue(_saveData);
+          // 正解の個数を求める
+          if (_questionResults[0].answerResult == "○") {
+            correctCount += 1;
+          }
+        }
         questionLists.add(
           QuestionList(
-              question: _question, questionResult: _questionResults[0]),
+            question: _question,
+            questionResult: _questionResults[0],
+          ),
         );
       }
     }
-    // final currentCount = await _questionDatabase.countAnswerResult("○");
     notifyListeners();
   }
 
@@ -287,6 +318,10 @@ class QuestionModel extends ChangeNotifier {
   Future<void> deleteQuestionFs(_groupName, _questionId) async {
     await FSQuestion.instance.deleteData(_groupName, _questionId);
     notifyListeners();
+  }
+
+  Future<void> checkQRInBody(_lectureId) async {
+    for (Question _question in questions) {}
   }
 }
 

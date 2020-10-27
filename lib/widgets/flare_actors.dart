@@ -29,9 +29,10 @@ class FlareActors {
     return await showDialog(
       context: context,
       builder: (BuildContext context) {
+        final Size _size = MediaQuery.of(context).size;
         return Container(
-          width: 450,
-          height: 300,
+          width: _size.width,
+          height: _size.height,
           child: FlareActor(
             'assets/flr/fireworks.flr',
             animation: 'fireworks',

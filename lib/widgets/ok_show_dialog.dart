@@ -14,8 +14,9 @@ class MyDialog {
         return AlertDialog(
           title: Text(title ?? "", style: cTextListM, textScaleFactor: 1),
           actions: [
-            FlatButton(
+            MaterialButton(
               child: Text("OK"),
+              elevation: 10,
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -38,12 +39,14 @@ class MyDialog {
         title: Text("$mainTitle" ?? "", textScaleFactor: 1, style: cTextAlertL),
         content: Text("$subTitle", textScaleFactor: 1, style: cTextAlertMes),
         actions: <Widget>[
-          FlatButton(
+          MaterialButton(
             child: Text("はい", textScaleFactor: 1, style: cTextAlertYes),
+            elevation: 10,
             onPressed: onPressed,
           ),
-          FlatButton(
+          MaterialButton(
             child: Text("いいえ", textScaleFactor: 1, style: cTextAlertNo),
+            elevation: 10,
             onPressed: () {
               Navigator.pop(context);
             },

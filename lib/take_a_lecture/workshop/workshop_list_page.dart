@@ -43,27 +43,31 @@ class WorkshopListPage extends StatelessWidget {
           ],
         ),
         body: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Expanded(flex: 1, child: _infoArea()),
             Expanded(
               flex: 10,
               child: Stack(
                 children: [
-                  ListView.builder(
-                    itemCount: model.workshopLists.length,
-                    itemBuilder: (context, index) {
-                      return Card(
-                        key: Key(model.workshopLists[index].workshopId),
-                        elevation: 15,
-                        child: ListTile(
-                          dense: true,
-                          leading: _leading(context, model, index),
-                          title: _title(context, model, index),
-                          // trailing: Icon(FontAwesomeIcons.arrowRight, size: 20),
-                          onTap: () => _onTap(context, model, index),
-                        ),
-                      );
-                    },
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListView.builder(
+                      itemCount: model.workshopLists.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          key: Key(model.workshopLists[index].workshopId),
+                          elevation: 15,
+                          child: ListTile(
+                            dense: true,
+                            leading: _leading(context, model, index),
+                            title: _title(context, model, index),
+                            // trailing: Icon(FontAwesomeIcons.arrowRight, size: 20),
+                            onTap: () => _onTap(context, model, index),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                   if (model.isLoading) GuriGuri.instance.guriguri3(context),
                 ],

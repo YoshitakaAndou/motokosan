@@ -4,6 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_database.dart';
 import 'package:motokosan/widgets/convert_items.dart';
 import 'package:uuid/uuid.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
@@ -47,6 +48,16 @@ class Lecture {
     this.targetId = "",
     this.organizerId = "",
     this.workshopId = "",
+  });
+}
+
+class LectureList {
+  Lecture lecture;
+  LectureResult lectureResult;
+
+  LectureList({
+    this.lecture,
+    this.lectureResult,
   });
 }
 
@@ -143,6 +154,7 @@ class LectureModel extends ChangeNotifier {
   List<LectureResult> lectureResults = [];
   LectureResult lectureResult = LectureResult();
   Video video = Video();
+  List<LectureList> lectureLists = List();
 
   bool isLoading = false;
   bool isUpdate = false;
@@ -324,6 +336,27 @@ class LectureModel extends ChangeNotifier {
     if (lecture.description.isEmpty) {
       throw "説明 が入力されていません！";
     }
+  }
+
+  Future<void> generateLectureList(String _groupName, _workshopId) async {
+    lectureLists = List();
+    lectures = await FSLecture.instance.fetchDates(_groupName, _workshopId);
+    for (Lecture _lecture in lectures) {
+      final _lectureResults =
+          await LectureDatabase.instance.getLectureResult(_lecture.lectureId);
+      if (_lectureResults.length < 1) {
+        lectureLists.add(LectureList(
+          lecture: _lecture,
+          lectureResult: LectureResult(),
+        ));
+      } else {
+        lectureLists.add(LectureList(
+          lecture: _lecture,
+          lectureResult: _lectureResults[0],
+        ));
+      }
+    }
+    notifyListeners();
   }
 
   Future<File> selectImage(File _imageFile) async {

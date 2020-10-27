@@ -27,6 +27,7 @@ class LectureEdit extends StatelessWidget {
     final subTitleTextController = TextEditingController();
     final descTextController = TextEditingController();
     final videoUrlTextController = TextEditingController();
+    final Size _size = MediaQuery.of(context).size;
     titleTextController.text = _lecture.title;
     subTitleTextController.text = _lecture.subTitle;
     descTextController.text = _lecture.description;
@@ -57,37 +58,45 @@ class LectureEdit extends StatelessWidget {
         ),
         body: Stack(
           children: [
-            Column(
-              children: [
-                _infoArea(model),
-                Container(
-                  height: MediaQuery.of(context).size.height - cEditOffsetH,
-                  width: MediaQuery.of(context).size.width - cEditOffsetW,
-                  // padding: EdgeInsets.symmetric(horizontal: 5),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        _title(model, titleTextController),
-                        _subTitle(model, subTitleTextController),
-                        _videoUrl(model, videoUrlTextController, context),
-                        if (model.lecture.videoUrl.isNotEmpty &&
-                            model.isVideoPlay)
-                          _videoButton(model, context, titleTextController,
-                              videoUrlTextController, descTextController),
-                        Divider(height: 5, color: Colors.grey, thickness: 1),
-                        SizedBox(height: 5),
-                        _gridSlide(model, context),
-                        Divider(height: 5, color: Colors.grey, thickness: 1),
-                        _description(model, descTextController),
-                        _testTile(context, model),
-                        SizedBox(height: 50),
-                      ],
-                    ),
+            Container(
+              height: _size.height - cEditOffsetH,
+              child: ListView(
+                children: [
+                  _infoArea(model),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: _title(model, titleTextController),
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: _subTitle(model, subTitleTextController),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: _videoUrl(model, videoUrlTextController, context),
+                  ),
+                  if (model.lecture.videoUrl.isNotEmpty && model.isVideoPlay)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: _videoButton(model, context, titleTextController,
+                          videoUrlTextController, descTextController),
+                    ),
+                  SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: _gridSlide(model, context),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: _description(model, descTextController),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: _testTile(context, model),
+                  ),
+                  SizedBox(height: 50),
+                ],
+              ),
             ),
             if (model.isLoading)
               Container(
@@ -125,7 +134,7 @@ class LectureEdit extends StatelessWidget {
   Widget _infoArea(LectureModel model) {
     return Container(
       width: double.infinity,
-      height: 50,
+      height: cInfoAreaH,
       color: cContBg,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -133,10 +142,12 @@ class LectureEdit extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
+              flex: 2,
               child: Text("　番号：${_lecture.lectureNo}",
                   style: cTextUpBarL, textScaleFactor: 1),
             ),
             Expanded(
+              flex: 3,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -643,7 +654,6 @@ class LectureEdit extends StatelessWidget {
   Widget _testTile(BuildContext context, LectureModel model) {
     return Column(
       children: [
-        Divider(height: 5, color: Colors.grey, thickness: 1),
         _testTitle(context, model),
         _testAllAnswers(context, model),
         SizedBox(height: 10),

@@ -65,36 +65,39 @@ class _OrganizerListPageState extends State<OrganizerListPage> {
               flex: 10,
               child: Stack(
                 children: [
-                  ListView.builder(
-                    itemCount: model.organizerList.length,
-                    itemBuilder: (context, index) {
-                      return Card(
-                        key: Key(model.organizerList[index].organizerId),
-                        elevation: 15,
-                        child: ListTile(
-                          dense: true,
-                          title: Text(
-                            "${model.organizerList[index].title}",
-                            style: cTextListL,
-                            textScaleFactor: 1,
-                          ),
-                          // trailing: Icon(FontAwesomeIcons.arrowRight, size: 20),
-                          onTap: () {
-                            // Workshopへ
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => WorkshopListPage(
-                                  widget.groupName,
-                                  model.organizerList[index],
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListView.builder(
+                      itemCount: model.organizerList.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          key: Key(model.organizerList[index].organizerId),
+                          elevation: 15,
+                          child: ListTile(
+                            dense: true,
+                            title: Text(
+                              "${model.organizerList[index].title}",
+                              style: cTextListL,
+                              textScaleFactor: 1,
+                            ),
+                            // trailing: Icon(FontAwesomeIcons.arrowRight, size: 20),
+                            onTap: () {
+                              // Workshopへ
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => WorkshopListPage(
+                                    widget.groupName,
+                                    model.organizerList[index],
+                                  ),
                                 ),
-                              ),
-                            );
-                            // await model.fetchTarget(groupName);
-                          },
-                        ),
-                      );
-                    },
+                              );
+                              // await model.fetchTarget(groupName);
+                            },
+                          ),
+                        );
+                      },
+                    ),
                   ),
                   if (model.isLoading) GuriGuri.instance.guriguri3(context),
                 ],

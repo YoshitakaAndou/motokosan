@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_argument.dart';
 
 class GoBack {
   static final GoBack instance = GoBack();
@@ -10,64 +11,68 @@ class GoBack {
       color: Colors.black54,
       onPressed: () {
         if (num == 1) {
-          Navigator.pop(context);
+          Navigator.of(context).pop();
         }
         if (num == 2) {
-          Navigator.pop(context);
-          Navigator.pop(context);
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
         }
         if (num == 3) {
-          Navigator.pop(context);
-          Navigator.pop(context);
-          Navigator.pop(context);
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
         }
         if (num == 4) {
-          Navigator.pop(context);
-          Navigator.pop(context);
-          Navigator.pop(context);
-          Navigator.pop(context);
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
         }
         if (num == 5) {
-          Navigator.pop(context);
-          Navigator.pop(context);
-          Navigator.pop(context);
-          Navigator.pop(context);
-          Navigator.pop(context);
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
         }
       },
     );
   }
 
-  Widget goBackWithArg({BuildContext context, Icon icon, int num, bool arg}) {
+  Widget goBackWithLecture(
+      {BuildContext context,
+      Icon icon,
+      int num,
+      LectureArgument lectureArgument}) {
     return IconButton(
       icon: icon,
       iconSize: 20,
       color: Colors.black54,
       onPressed: () {
         if (num == 1) {
-          Navigator.pop(context, arg);
+          Navigator.of(context).pop(lectureArgument);
         }
         if (num == 2) {
-          Navigator.pop(context, arg);
-          Navigator.pop(context, arg);
+          Navigator.of(context).pop(lectureArgument);
+          Navigator.of(context).pop(lectureArgument);
         }
         if (num == 3) {
-          Navigator.pop(context, arg);
-          Navigator.pop(context, arg);
-          Navigator.pop(context, arg);
+          Navigator.of(context).pop(lectureArgument);
+          Navigator.of(context).pop(lectureArgument);
+          Navigator.of(context).pop(lectureArgument);
         }
         if (num == 4) {
-          Navigator.pop(context, arg);
-          Navigator.pop(context, arg);
-          Navigator.pop(context, arg);
-          Navigator.pop(context, arg);
+          Navigator.of(context).pop(lectureArgument);
+          Navigator.of(context).pop(lectureArgument);
+          Navigator.of(context).pop(lectureArgument);
+          Navigator.of(context).pop(lectureArgument);
         }
         if (num == 5) {
-          Navigator.pop(context, arg);
-          Navigator.pop(context, arg);
-          Navigator.pop(context, arg);
-          Navigator.pop(context, arg);
-          Navigator.pop(context, arg);
+          Navigator.of(context).pop(lectureArgument);
+          Navigator.of(context).pop(lectureArgument);
+          Navigator.of(context).pop(lectureArgument);
+          Navigator.of(context).pop(lectureArgument);
+          Navigator.of(context).pop(lectureArgument);
         }
       },
     );

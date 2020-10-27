@@ -8,17 +8,15 @@ class LectureDatabase {
 
   Future<Database> dbLecture() async {
     return openDatabase(
-      join(await getDatabasesPath(), 'motoko.db'),
+      join(await getDatabasesPath(), 'motoko1.db'),
       onCreate: (db, version) {
         return db.execute('''CREATE TABLE IF NOT EXISTS lecture_result (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           lectureId TEXT,
           isTaken TEXT,
-          isQuestioned TEXT,
           questionCount INTEGER,
           correctCount INTEGER,
-          isTakenAt INTEGER,
-          isQuestionedAt INTEGER
+          isTakenAt INTEGER
           )''');
       },
       version: 1,
@@ -28,7 +26,7 @@ class LectureDatabase {
   Future<void> saveValue(LectureResult _data) async {
     final Database db = await dbLecture();
     final List<Map<String, dynamic>> maps = await db.rawQuery(
-        'SELECT * FROM lecture_result WHERE questionId = ?', [_data.lectureId]);
+        'SELECT * FROM lecture_result WHERE lectureId = ?', [_data.lectureId]);
     if (maps.length == 0) {
       await _insert(_data);
     } else {
@@ -65,7 +63,7 @@ class LectureDatabase {
     );
   }
 
-  Future<List<LectureResult>> getAnswerResult(String _lectureId) async {
+  Future<List<LectureResult>> getLectureResult(String _lectureId) async {
     final Database db = await dbLecture();
     final maps = await db.query(
       'lecture_result',

@@ -22,7 +22,7 @@ const double cListOffsetH = 220;
 // listの幅用offset値
 const double cListOffsetW = 10;
 // edit/add areaの高さ用offset値
-const double cEditOffsetH = 220;
+const double cEditOffsetH = 170;
 // edit/add areaの幅用offset値
 const double cEditOffsetW = 20;
 

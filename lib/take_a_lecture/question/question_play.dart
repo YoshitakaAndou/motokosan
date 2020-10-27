@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_argument.dart';
 import 'package:motokosan/take_a_lecture/question/question_database.dart';
 import 'package:motokosan/widgets/convert_items.dart';
 import '../lecture/lecture_model.dart';
@@ -14,11 +15,11 @@ import 'question_model.dart';
 class QuestionPlay extends StatefulWidget {
   final String groupName;
   final Question dataQs;
-  final Lecture lecture;
+  final LectureList lectureList;
   final int _remains;
   final bool isShowOnly;
 
-  QuestionPlay(this.groupName, this.dataQs, this.lecture, this._remains,
+  QuestionPlay(this.groupName, this.dataQs, this.lectureList, this._remains,
       this.isShowOnly);
 
   @override
@@ -29,11 +30,9 @@ class _QuestionPlayState extends State<QuestionPlay> {
   final ScrollController _homeController = ScrollController();
   List<String> choices = List();
   Question _dataQs;
-  Lecture _lecture;
+  LectureList _lectureList;
   QuestionResult _questionResult = QuestionResult();
   int numberOfRemaining;
-  // int numberOfCorrect = 0;
-  // int numberOfQuestion = 1;
   Soundpool soundpool;
   int soundIdCorrect = 0;
   int soundIdInCorrect = 0;
@@ -55,7 +54,7 @@ class _QuestionPlayState extends State<QuestionPlay> {
     super.initState();
     isPlaying = !widget.isShowOnly;
     _dataQs = widget.dataQs;
-    _lecture = widget.lecture;
+    _lectureList = widget.lectureList;
     numberOfRemaining = widget._remains;
     //todo
     initSounds();
@@ -136,10 +135,10 @@ class _QuestionPlayState extends State<QuestionPlay> {
         toolbarHeight: cToolBarH,
         centerTitle: true,
         title: barTitle(context),
-        leading: GoBack.instance.goBackWithArg(
+        leading: GoBack.instance.goBackWithLecture(
           context: context,
           icon: Icon(Icons.arrow_back_ios),
-          arg: false,
+          lectureArgument: LectureArgument(isNextQuestion: true),
           num: 1,
         ),
         actions: [
@@ -208,7 +207,7 @@ class _QuestionPlayState extends State<QuestionPlay> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "${_lecture.title}",
+              "${_lectureList.lecture.title}",
               style: cTextUpBarM,
               textScaleFactor: 1,
             ),
@@ -341,9 +340,11 @@ class _QuestionPlayState extends State<QuestionPlay> {
             _questionResult.answerResult = "○";
             _questionResult.answerAt =
                 ConvertItems.instance.dateToInt(DateTime.now());
+            _questionResult.lectureId = _dataQs.lectureId;
+            _questionResult.flag1 = "";
             await QuestionDatabase.instance.saveValue(_questionResult);
             final result = await QuestionDatabase.instance
-                .getAnswerResult(_questionResult.questionId);
+                .getAnswerResultQuestionId(_questionResult.questionId);
             print("dbの値：${result[0].answerResult}");
           } else {
             // 不正解
@@ -354,10 +355,11 @@ class _QuestionPlayState extends State<QuestionPlay> {
             _questionResult.answerResult = "×";
             _questionResult.answerAt =
                 ConvertItems.instance.dateToInt(DateTime.now());
+            _questionResult.lectureId = _dataQs.lectureId;
+            _questionResult.flag1 = "";
             await QuestionDatabase.instance.saveValue(_questionResult);
-
             final result = await QuestionDatabase.instance
-                .getAnswerResult(_questionResult.questionId);
+                .getAnswerResultQuestionId(_questionResult.questionId);
             print("dbの値：${result[0].answerResult}");
           }
           if (numberOfRemaining == 1) {
@@ -438,9 +440,11 @@ class _QuestionPlayState extends State<QuestionPlay> {
               } else {
                 // 問題を閉じる動作
                 if (nextTitle == "閉じる") {
-                  Navigator.of(context).pop(false);
+                  Navigator.of(context)
+                      .pop(LectureArgument(isNextQuestion: false));
                 } else {
-                  Navigator.of(context).pop(true);
+                  Navigator.of(context)
+                      .pop(LectureArgument(isNextQuestion: true));
                 }
               }
               setState(() {});

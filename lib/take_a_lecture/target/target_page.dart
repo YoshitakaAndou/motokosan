@@ -35,7 +35,10 @@ class TargetPage extends StatelessWidget {
               flex: 10,
               child: Stack(
                 children: [
-                  _listBody(context, model),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: _listBody(context, model),
+                  ),
                   if (model.isLoading) GuriGuri.instance.guriguri3(context),
                 ],
               ),
