@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:motokosan/take_a_lecture/lecture/lecture_argument.dart';
+import 'package:motokosan/take_a_lecture/return_argument.dart';
 
 class GoBack {
   static final GoBack instance = GoBack();
@@ -39,11 +39,11 @@ class GoBack {
     );
   }
 
-  Widget goBackWithLecture(
+  Widget goBackWithReturArg(
       {BuildContext context,
       Icon icon,
       int num,
-      LectureArgument lectureArgument}) {
+      ReturnArgument lectureArgument}) {
     return IconButton(
       icon: icon,
       iconSize: 20,

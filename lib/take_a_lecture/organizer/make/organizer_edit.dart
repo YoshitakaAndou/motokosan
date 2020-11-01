@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:motokosan/take_a_lecture/organizer/play/organizer_class.dart';
+import 'package:motokosan/take_a_lecture/organizer/play/organizer_firebase.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../widgets/ok_show_dialog.dart';
 import '../../../constants.dart';
-import '../organizer_model.dart';
+import '../play/organizer_model.dart';
 
 class OrganizerEdit extends StatelessWidget {
   final String groupName;
-  final Organizer _category;
-  OrganizerEdit(this.groupName, this._category);
+  final Organizer _organizer;
+  OrganizerEdit(this.groupName, this._organizer);
 
   @override
   Widget build(BuildContext context) {
@@ -17,11 +19,11 @@ class OrganizerEdit extends StatelessWidget {
     final option1TextController = TextEditingController();
     final option2TextController = TextEditingController();
     final option3TextController = TextEditingController();
-    titleTextController.text = _category.title;
-    subTitleTextController.text = _category.subTitle;
-    option1TextController.text = _category.option1;
-    option2TextController.text = _category.option2;
-    option3TextController.text = _category.option3;
+    titleTextController.text = _organizer.title;
+    subTitleTextController.text = _organizer.subTitle;
+    option1TextController.text = _organizer.option1;
+    option2TextController.text = _organizer.option2;
+    option3TextController.text = _organizer.option3;
 
     return Consumer<OrganizerModel>(builder: (context, model, child) {
       return Scaffold(
@@ -112,7 +114,7 @@ class OrganizerEdit extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: Text("　番号：${_category.organizerNo}",
+              child: Text("　番号：${_organizer.organizerNo}",
                   style: cTextUpBarL, textScaleFactor: 1),
             ),
             Expanded(
@@ -345,10 +347,10 @@ class OrganizerEdit extends StatelessWidget {
     model.organizer.option1 = option1TextController.text;
     model.organizer.option2 = option2TextController.text;
     model.organizer.option3 = option3TextController.text;
-    model.organizer.organizerId = _category.organizerId;
-    model.organizer.organizerNo = _category.organizerNo;
-    model.organizer.createAt = _category.createAt;
-    model.organizer.updateAt = _category.updateAt;
+    model.organizer.organizerId = _organizer.organizerId;
+    model.organizer.organizerNo = _organizer.organizerNo;
+    model.organizer.createAt = _organizer.createAt;
+    model.organizer.updateAt = _organizer.updateAt;
     try {
       await model.updateOrganizerFs(groupName, DateTime.now());
       await model.fetchOrganizer(groupName);
@@ -370,7 +372,7 @@ class OrganizerEdit extends StatelessWidget {
       onPressed: () {
         MyDialog.instance.okShowDialogFunc(
           context: context,
-          mainTitle: _category.title,
+          mainTitle: _organizer.title,
           subTitle: "削除しますか？",
           // delete
           onPressed: () async {
@@ -378,7 +380,7 @@ class OrganizerEdit extends StatelessWidget {
             await _deleteSave(
               context,
               model,
-              _category.organizerId,
+              _organizer.organizerId,
             );
             Navigator.pop(context);
           },

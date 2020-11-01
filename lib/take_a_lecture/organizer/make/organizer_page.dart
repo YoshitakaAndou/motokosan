@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:motokosan/take_a_lecture/organizer/play/organizer_class.dart';
+import 'package:motokosan/take_a_lecture/organizer/play/organizer_firebase.dart';
+import 'package:motokosan/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/bar_title.dart';
 import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
@@ -9,18 +12,18 @@ import '../../../widgets/ok_show_dialog.dart';
 import '../../../constants.dart';
 import 'organizer_add.dart';
 import 'organizer_edit.dart';
-import '../organizer_model.dart';
+import '../play/organizer_model.dart';
 
 class OrganizerPage extends StatelessWidget {
-  final String groupName;
-  OrganizerPage(this.groupName);
+  final UserData _userData;
+  OrganizerPage(this._userData);
 
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<OrganizerModel>(context, listen: false);
     Future(() async {
       model.startLoading();
-      await model.fetchOrganizer(groupName);
+      await model.fetchOrganizer(_userData.userGroup);
       model.stopLoading();
     });
     return Consumer<OrganizerModel>(builder: (context, model, child) {
@@ -85,11 +88,12 @@ class OrganizerPage extends StatelessWidget {
       for (Organizer _data in model.organizers) {
         _data.organizerNo = _count.toString().padLeft(4, "0");
         //Fsにアップデート
-        await fsOrganizer.setData(false, groupName, _data, DateTime.now());
+        await fsOrganizer.setData(
+            false, _userData.userGroup, _data, DateTime.now());
         _count += 1;
       }
       //一通り終わったらFsから読み込んで再描画させる
-      await model.fetchOrganizer(groupName);
+      await model.fetchOrganizer(_userData.userGroup);
     } catch (e) {
       MyDialog.instance.okShowDialog(context, e.toString());
     }
@@ -98,8 +102,8 @@ class OrganizerPage extends StatelessWidget {
   Widget _listBody(BuildContext context, OrganizerModel model) {
     return ReorderableListView(
       children: model.organizers.map(
-        (_category) {
-          return _listItem(context, model, _category);
+        (_organizer) {
+          return _listItem(context, model, _organizer);
         },
       ).toList(),
       onReorder: (oldIndex, newIndex) {
@@ -115,46 +119,70 @@ class OrganizerPage extends StatelessWidget {
     );
   }
 
-  Widget _listItem(BuildContext context, OrganizerModel model, _category) {
+  Widget _listItem(BuildContext context, OrganizerModel model, _organizer) {
     return Card(
-      key: Key(_category.organizerId),
+      key: Key(_organizer.organizerId),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
       elevation: 15,
-      child: ListTile(
-        dense: true,
-        title:
-            Text("${_category.title}", style: cTextListL, textScaleFactor: 1),
-        subtitle: Text("${_category.subTitle}",
-            style: cTextListS, textAlign: TextAlign.center, textScaleFactor: 1),
-        trailing: InkWell(
-          onTap: () {
-            // 次へ
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => WorkshopPage(groupName, _category),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            stops: [0.03, 0.03],
+            colors: [cCardLeft, Colors.white],
+          ),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: ListTile(
+          // dense: true,
+          title: Text("${_organizer.title}",
+              style: cTextListL, textScaleFactor: 1),
+          subtitle: Text("${_organizer.subTitle}",
+              style: cTextListS,
+              textAlign: TextAlign.center,
+              textScaleFactor: 1),
+          trailing: InkWell(
+            onTap: () {
+              // 次へ
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      WorkshopPage(_userData.userGroup, _organizer),
+                ),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(3.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.withOpacity(0.3)),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                padding: EdgeInsets.all(3),
+                child: Column(
+                  children: [
+                    Text("研修会を編集", style: cTextListSS, textScaleFactor: 1),
+                    Icon(FontAwesomeIcons.arrowRight),
+                  ],
+                ),
               ),
-            );
-          },
-          child: Container(
-            child: Column(
-              children: [
-                Text("研修会を編集", style: cTextListS, textScaleFactor: 1),
-                Icon(FontAwesomeIcons.arrowRight),
-              ],
             ),
           ),
+          onTap: () async {
+            // Edit
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    OrganizerEdit(_userData.userGroup, _organizer),
+                fullscreenDialog: true,
+              ),
+            );
+            await model.fetchOrganizer(_userData.userGroup);
+          },
         ),
-        onTap: () async {
-          // Edit
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => OrganizerEdit(groupName, _category),
-              fullscreenDialog: true,
-            ),
-          );
-          await model.fetchOrganizer(groupName);
-        },
       ),
     );
   }
@@ -168,11 +196,11 @@ class OrganizerPage extends StatelessWidget {
         await Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => OrganizerAdd(groupName),
+            builder: (context) => OrganizerAdd(_userData.userGroup),
             fullscreenDialog: true,
           ),
         );
-        await model.fetchOrganizer(groupName);
+        await model.fetchOrganizer(_userData.userGroup);
       },
     );
   }

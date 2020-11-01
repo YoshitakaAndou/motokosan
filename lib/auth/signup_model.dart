@@ -2,22 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../widgets/datasave_widget.dart';
-
-class UserData {
-  String uid;
-  String userGroup;
-  String userName;
-  String userEmail;
-  String userPassword;
-
-  UserData({
-    this.uid = "",
-    this.userGroup = "",
-    this.userName = "",
-    this.userEmail = "",
-    this.userPassword = "",
-  });
-}
+import '../user_data/userdata_class.dart';
 
 class SignupModel extends ChangeNotifier {
   UserData userData = UserData();
@@ -70,7 +55,7 @@ class SignupModel extends ChangeNotifier {
     if (userData.userPassword.length < 6) {
       throw ("パスワードは６文字以上で入力してください");
     }
-    final FirebaseUser user = (await _auth.createUserWithEmailAndPassword(
+    final User user = (await _auth.createUserWithEmailAndPassword(
       email: userData.userEmail,
       password: userData.userPassword,
     ))
@@ -85,12 +70,12 @@ class SignupModel extends ChangeNotifier {
     DataSave.saveString("_password", userData.userPassword);
 
     // Authへ登録した際に発行されたUIDを元にデータベースUsersに登録する
-    Firestore.instance
+    FirebaseFirestore.instance
         .collection("Groups")
-        .document(userData.userGroup)
+        .doc(userData.userGroup)
         .collection("Users")
-        .document(userData.uid)
-        .setData({
+        .doc(userData.uid)
+        .set({
       "uid": userData.uid,
       "group": userData.userGroup,
       "name": userData.userName,

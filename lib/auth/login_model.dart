@@ -1,10 +1,9 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../widgets/datasave_widget.dart';
-import 'signup_model.dart';
+import '../user_data/userdata_class.dart';
 
 class LoginModel extends ChangeNotifier {
   UserData userData = UserData();
@@ -23,32 +22,12 @@ class LoginModel extends ChangeNotifier {
     if (userData.userPassword.isEmpty) {
       throw ("パスワードを入力してください");
     }
-    final FirebaseUser user = (await _auth.signInWithEmailAndPassword(
+    final User user = (await _auth.signInWithEmailAndPassword(
       email: userData.userEmail,
       password: userData.userPassword,
     ))
         .user;
     return user.uid;
-  }
-
-  Future<UserData> getUserDataFromFs(_uid) async {
-    final doc = await Firestore.instance
-        .collection("Groups")
-        .document(userData.userGroup)
-        .collection("Users")
-        .document(_uid)
-        .get();
-    return Future.value(convert(doc));
-  }
-
-  UserData convert(DocumentSnapshot doc) {
-    return UserData(
-      uid: doc["uid"],
-      userGroup: doc["group"],
-      userName: doc["name"],
-      userEmail: doc["email"],
-      userPassword: doc["password"],
-    );
   }
 
   Future<void> saveDataToPhone(UserData _data) async {

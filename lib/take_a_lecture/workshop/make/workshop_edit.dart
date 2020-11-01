@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:motokosan/take_a_lecture/organizer/play/organizer_class.dart';
+import 'package:motokosan/take_a_lecture/workshop/play/workshop_firebase.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../organizer/organizer_model.dart';
-import '../workshop_model.dart';
+import '../play/workshop_model.dart';
 import '../../../widgets/ok_show_dialog.dart';
 import '../../../constants.dart';
+import 'package:motokosan/take_a_lecture/workshop/play/workshop_class.dart';
 
 class WorkshopEdit extends StatelessWidget {
   final String groupName;
@@ -24,14 +26,13 @@ class WorkshopEdit extends StatelessWidget {
     option1TextController.text = _workshop.option1;
     option2TextController.text = _workshop.option2;
     option3TextController.text = _workshop.option3;
-
     return Consumer<WorkshopModel>(builder: (context, model, child) {
       return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
           toolbarHeight: cToolBarH,
           centerTitle: true,
-          title: Text("分類名の編集", style: cTextTitleL, textScaleFactor: 1),
+          title: Text("研修会の編集", style: cTextTitleL, textScaleFactor: 1),
           leading: IconButton(
             icon: Icon(FontAwesomeIcons.times),
             color: Colors.black87,
@@ -63,6 +64,7 @@ class WorkshopEdit extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
+                        _switch(model, context),
                         _title(model, titleTextController),
                         _subTitle(model, subTitleTextController),
                         _option1(model, option1TextController),
@@ -135,6 +137,31 @@ class WorkshopEdit extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _switch(WorkshopModel model, BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Switch(
+          value: _workshop.isRelease,
+          activeColor: Colors.green,
+          activeTrackColor: Colors.grey,
+          inactiveThumbColor: Colors.white,
+          inactiveTrackColor: Colors.grey,
+          onChanged: (value) {
+            _workshop.isRelease = value;
+            model.setUpdate();
+          },
+        ),
+        SizedBox(width: 20),
+        Text(_workshop.isRelease ? '公開する' : '非公開',
+            style: TextStyle(
+                fontSize: 15,
+                color: _workshop.isRelease ? Colors.black87 : Colors.black26),
+            textScaleFactor: 1),
+      ],
     );
   }
 
@@ -353,6 +380,7 @@ class WorkshopEdit extends StatelessWidget {
     model.workshop.option1 = option1TextController.text;
     model.workshop.option2 = option2TextController.text;
     model.workshop.option3 = option3TextController.text;
+    model.workshop.isRelease = _workshop.isRelease;
     model.workshop.workshopId = _workshop.workshopId;
     model.workshop.workshopNo = _workshop.workshopNo;
     model.workshop.createAt = _workshop.createAt;
@@ -404,7 +432,8 @@ class WorkshopEdit extends StatelessWidget {
   ) async {
     model.startLoading();
     try {
-      //FsをTargetIdで削除
+      // todo workShop以下のデータは消せていないから消す様にする
+      //Fsを_workshopIdで削除
       await FSWorkshop.instance.deleteData(groupName, _workshopId);
       //配列を削除するのは無理だから再びFsをフェッチ
       await model.fetchWorkshopByOrganizer(groupName, _organizer.organizerId);

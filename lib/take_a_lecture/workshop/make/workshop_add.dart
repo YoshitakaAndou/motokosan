@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:motokosan/take_a_lecture/organizer/organizer_model.dart';
+import 'package:motokosan/take_a_lecture/organizer/play/organizer_class.dart';
 import 'package:motokosan/widgets/ok_show_dialog.dart';
 import 'package:provider/provider.dart';
 
 import '../../../constants.dart';
-import '../workshop_model.dart';
+import '../play/workshop_model.dart';
 
 class WorkshopAdd extends StatelessWidget {
   final String groupName;
@@ -29,6 +29,7 @@ class WorkshopAdd extends StatelessWidget {
         (model.workshops.length + 1).toString().padLeft(4, "0");
     return Consumer<WorkshopModel>(builder: (context, model, child) {
       model.isEditing = _checkValue(model);
+      bool _isRelease = model.workshop.isRelease;
       return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
@@ -60,6 +61,7 @@ class WorkshopAdd extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        _switch(model, context, _isRelease),
                         _title(model, titleTextController),
                         _subTitle(model, subTitleTextController),
                         _option1(model, option1TextController),
@@ -122,6 +124,30 @@ class WorkshopAdd extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _switch(WorkshopModel model, BuildContext context, _isRelease) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Switch(
+          value: _isRelease,
+          activeColor: Colors.green,
+          activeTrackColor: Colors.grey,
+          inactiveThumbColor: Colors.white,
+          inactiveTrackColor: Colors.grey,
+          onChanged: (value) {
+            model.changeIsRelease(value);
+          },
+        ),
+        SizedBox(width: 20),
+        Text(_isRelease ? '公開する' : '非公開',
+            style: TextStyle(
+                fontSize: 15,
+                color: _isRelease ? Colors.black87 : Colors.black26),
+            textScaleFactor: 1),
+      ],
     );
   }
 

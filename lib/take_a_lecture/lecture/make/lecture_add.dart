@@ -1,14 +1,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:motokosan/take_a_lecture/lecture/play/lecture_class.dart';
+import 'package:motokosan/take_a_lecture/organizer/play/organizer_class.dart';
+import 'package:motokosan/take_a_lecture/workshop/play/workshop_class.dart';
 import 'package:motokosan/widgets/datasave_widget.dart';
 import 'package:provider/provider.dart';
 import 'lecture_video.dart';
-import '../../organizer/organizer_model.dart';
-import '../../workshop/workshop_model.dart';
 import '../../../widgets/ok_show_dialog.dart';
 import '../../../constants.dart';
-import '../lecture_model.dart';
+import '../play/lecture_model.dart';
 import 'lecture_web.dart';
 
 class LectureAdd extends StatelessWidget {

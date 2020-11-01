@@ -323,7 +323,7 @@ class SignUpPage extends StatelessWidget {
       await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => Home(userData: model.userData),
+          builder: (context) => Home(model.userData),
         ),
       );
     } catch (e) {

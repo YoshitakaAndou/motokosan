@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:motokosan/take_a_lecture/lecture/lecture_model.dart';
+import 'package:motokosan/take_a_lecture/lecture/play/lecture_class.dart';
 
 class APIService {
   APIService._instantiate();

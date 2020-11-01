@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:motokosan/take_a_lecture/lecture/play/lecture_class.dart';
+import 'package:motokosan/take_a_lecture/question/play/question_class.dart';
+import 'package:motokosan/take_a_lecture/question/play/question_firebase.dart';
 import 'package:motokosan/widgets/bar_title.dart';
 import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../widgets/ok_show_dialog.dart';
 import '../../../constants.dart';
-import '../../lecture/lecture_model.dart';
 import 'question_add.dart';
 import 'question_edit.dart';
-import '../question_model.dart';
+import '../play/question_model.dart';
 
 class QuestionPage extends StatelessWidget {
   final String groupName;
@@ -80,13 +82,65 @@ class QuestionPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(" 確認テストを編集", style: cTextUpBarL, textScaleFactor: 1),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text("講義：", style: cTextUpBarS, textScaleFactor: 1),
-                Text(_lecture.title, style: cTextUpBarS, textScaleFactor: 1),
-              ],
+            Expanded(
+                flex: 2,
+                child:
+                    Text(" 確認テストを編集", style: cTextUpBarL, textScaleFactor: 1)),
+            Expanded(
+              flex: 3,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 2),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.1),
+                    // border: Border.all(color: Colors.white),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  padding: EdgeInsets.all(5),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Row(
+                        // mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          // Text("講義：", style: cTextUpBarS, textScaleFactor: 1),
+                          Flexible(
+                            child: Text(
+                              _lecture.title,
+                              style: cTextUpBarS,
+                              textScaleFactor: 1,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              // overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(width: 10),
+                          Text(
+                            "問題数：${_lecture.questionLength} 問",
+                            style: cTextUpBarSS,
+                            textScaleFactor: 1,
+                          ),
+                          Text(
+                            "${_lecture.allAnswers} ",
+                            style: cTextUpBarSS,
+                            textScaleFactor: 1,
+                          ),
+                          Text(
+                            "合格点：${_lecture.passingScore} 点",
+                            style: cTextUpBarSS,
+                            textScaleFactor: 1,
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
             )
           ],
         ),
@@ -135,33 +189,75 @@ class QuestionPage extends StatelessWidget {
       BuildContext context, QuestionModel model, Question _question) {
     return Card(
       key: Key(_question.questionId),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
       elevation: 15,
-      child: ListTile(
-        dense: true,
-        title: Text("${_question.question}",
-            style: cTextListM, textScaleFactor: 1),
-        leading: Text("${_question.questionNo}",
-            style: cTextListS, textScaleFactor: 1),
-        onTap: () async {
-          // Edit
-          model.question = _question;
-          model.setCorrectForEditing();
-          await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => QuestionEdit(
-                  groupName,
-                  _lecture,
-                  _question,
-                ),
-                fullscreenDialog: true,
-              ));
-          model.startLoading();
-          await model.fetchQuestion(groupName, _lecture.lectureId);
-          model.stopLoading();
-        },
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            stops: [0.03, 0.03],
+            colors: [cCardLeft, Colors.white],
+          ),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: ListTile(
+          dense: true,
+          title: _title(context, _question),
+          subtitle: _subtitle(context, _question),
+          leading: _leading(context, _question),
+          onTap: () async {
+            // Edit
+            model.question = _question;
+            model.setCorrectForEditing();
+            await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => QuestionEdit(
+                    groupName,
+                    _lecture,
+                    _question,
+                  ),
+                  fullscreenDialog: true,
+                ));
+            model.startLoading();
+            await model.fetchQuestion(groupName, _lecture.lectureId);
+            model.stopLoading();
+          },
+        ),
       ),
     );
+  }
+
+  Widget _title(BuildContext context, Question _question) {
+    return Text(
+      "${_question.question}",
+      style: cTextListM,
+      textScaleFactor: 1,
+      maxLines: 2,
+    );
+  }
+
+  Widget _subtitle(BuildContext context, Question _question) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Container(
+          color: Colors.grey.withOpacity(0.2),
+          padding: EdgeInsets.symmetric(horizontal: 2),
+          child: Text(
+            "解答選択肢：${_getOptionCount(_question)}",
+            style: cTextListS,
+            textScaleFactor: 1,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _leading(BuildContext context, Question _question) {
+    return Text("${_question.questionNo}",
+        style: cTextListS, textScaleFactor: 1);
   }
 
   Widget _floatingActionButton(BuildContext context, QuestionModel model) {
@@ -195,5 +291,19 @@ class QuestionPage extends StatelessWidget {
       ),
       child: Container(height: 45),
     );
+  }
+
+  int _getOptionCount(Question _question) {
+    int _count = 0;
+    if (_question.choices4.isNotEmpty) {
+      _count = 4;
+    } else {
+      if (_question.choices3.isNotEmpty) {
+        _count = 3;
+      } else {
+        _count = 2;
+      }
+    }
+    return _count;
   }
 }

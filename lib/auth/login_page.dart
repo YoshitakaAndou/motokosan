@@ -10,6 +10,7 @@ import '../constants.dart';
 import '../home.dart';
 import 'login_model.dart';
 import 'signup_page.dart';
+import '../user_data/userdata_firebase.dart';
 
 class LoginPage extends StatelessWidget {
   @override
@@ -313,7 +314,8 @@ class LoginPage extends StatelessWidget {
       print("model.userData.uid:${model.userData.uid}");
       //Authのuidと本体のuidを比較
       if (_uid != model.userData.uid) {
-        model.userData = await model.getUserDataFromFs(_uid);
+        model.userData = await FSUserData.instance
+            .fetchUserData(_uid, model.userData.userGroup);
         //違っていたら本体に保存するか？
         await MyDialog.instance.okShowDialogFunc(
             context: context,
@@ -355,7 +357,7 @@ class LoginPage extends StatelessWidget {
       await Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => Home(userData: model.userData),
+          builder: (context) => Home(model.userData),
         ),
       );
       model.setIsLoading(false);

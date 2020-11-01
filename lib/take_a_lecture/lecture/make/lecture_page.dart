@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:motokosan/take_a_lecture/lecture/play/lecture_class.dart';
+import 'package:motokosan/take_a_lecture/lecture/play/lecture_firebase.dart';
+import 'package:motokosan/take_a_lecture/organizer/play/organizer_class.dart';
+import 'package:motokosan/take_a_lecture/workshop/play/workshop_class.dart';
 import 'package:motokosan/widgets/bar_title.dart';
 import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
@@ -6,22 +10,20 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../widgets/ok_show_dialog.dart';
 import '../../../constants.dart';
 import '../../question/make/question_page.dart';
-import '../../organizer/organizer_model.dart';
-import '../../workshop/workshop_model.dart';
 import 'lecture_add.dart';
 import 'lecture_edit.dart';
-import '../lecture_model.dart';
+import '../play/lecture_model.dart';
 
 class LecturePage extends StatelessWidget {
   final String groupName;
-  final Organizer _organizerId;
+  final Organizer _organizer;
   final Workshop _workshop;
-  LecturePage(this.groupName, this._organizerId, this._workshop);
+  LecturePage(this.groupName, this._organizer, this._workshop);
 
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<LectureModel>(context, listen: false);
-    model.lecture.organizerId = _organizerId.organizerId;
+    model.lecture.organizerId = _organizer.organizerId;
     model.lecture.workshopId = _workshop.workshopId;
     Future(() async {
       model.startLoading();
@@ -81,20 +83,52 @@ class LecturePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(" 講義を編集", style: cTextUpBarL, textScaleFactor: 1),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text("研修会：", style: cTextUpBarM, textScaleFactor: 1),
-                    Text(_workshop.title,
-                        style: cTextUpBarM, textScaleFactor: 1),
-                  ],
-                )
-              ],
+            Expanded(
+                flex: 2,
+                child: Text(" 講義を編集", style: cTextUpBarL, textScaleFactor: 1)),
+            Expanded(
+              flex: 3,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 2),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.1),
+                    // border: Border.all(color: Colors.white),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  padding: EdgeInsets.all(5),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          // Text("研修会：", style: cTextListS, textScaleFactor: 1),
+                          Text(
+                            "${_organizer.title}",
+                            style: cTextUpBarS,
+                            textScaleFactor: 1,
+                            maxLines: 1,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          SizedBox(width: 10),
+                          Text(
+                            " ${_workshop.title}",
+                            style: cTextUpBarS,
+                            textScaleFactor: 1,
+                            maxLines: 1,
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
             )
           ],
         ),
@@ -143,58 +177,122 @@ class LecturePage extends StatelessWidget {
   Widget _listItem(BuildContext context, LectureModel model, Lecture _lecture) {
     return Card(
       key: Key(_lecture.lectureId),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
       elevation: 15,
-      child: ListTile(
-        dense: true,
-        title: Text("${_lecture.title}", style: cTextListL, textScaleFactor: 1),
-        subtitle: Text("   ${_lecture.subTitle}",
-            style: cTextListS, textAlign: TextAlign.start, textScaleFactor: 1),
-        trailing: InkWell(
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            stops: [0.03, 0.03],
+            colors: [cCardLeft, Colors.white],
+          ),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: ListTile(
+          dense: true,
+          title:
+              Text("${_lecture.title}", style: cTextListL, textScaleFactor: 1),
+          subtitle: _subtitle(context, _lecture),
+          trailing: InkWell(
+            onTap: () async {
+              // 確認問題へ
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => QuestionPage(
+                    groupName,
+                    _lecture,
+                  ),
+                ),
+              );
+              await model.fetchLecture(groupName, _workshop.workshopId);
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.withOpacity(0.3)),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              padding: EdgeInsets.all(3),
+              child: Column(
+                children: [
+                  Text("テストを編集", style: cTextListSS, textScaleFactor: 1),
+                  Icon(FontAwesomeIcons.arrowRight),
+                ],
+              ),
+            ),
+          ),
           onTap: () async {
-            // 確認問題へ
+            // 編集に移る前　model.categoryに値を渡す
+            model.lecture = _lecture;
+            model.initProperties();
+            // Slideデータの作成 => model.slides
+            await model.getSlideUrls(groupName, _lecture.lectureId);
+            model.slides.add(Slide(slideImage: null));
+            // 編集へ
             await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => QuestionPage(
+                builder: (context) => LectureEdit(
                   groupName,
                   _lecture,
+                  _workshop,
+                  _organizer,
                 ),
+                fullscreenDialog: true,
               ),
             );
             await model.fetchLecture(groupName, _workshop.workshopId);
           },
-          child: Container(
-            child: Column(
-              children: [
-                Text("テストを編集", style: cTextListS, textScaleFactor: 1),
-                Icon(FontAwesomeIcons.arrowRight),
-              ],
-            ),
+        ),
+      ),
+    );
+  }
+
+  Widget _subtitle(BuildContext context, Lecture _lecture) {
+    bool _haveTest = _lecture.questionLength == 0 ? false : true;
+    bool _haveImg = _lecture.slideLength == 0 ? false : true;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        SizedBox(width: 10),
+        Container(
+          color: Colors.grey.withOpacity(0.2),
+          padding: EdgeInsets.symmetric(horizontal: 2),
+          child: Text(
+            "問題:${_lecture.questionLength} 問",
+            style: _haveTest ? cTextListS : cTextUpBarS,
+            textScaleFactor: 1,
           ),
         ),
-        onTap: () async {
-          // 編集に移る前　model.categoryに値を渡す
-          model.lecture = _lecture;
-          model.initProperties();
-          // Slideデータの作成 => model.slides
-          await model.getSlideUrls(groupName, _lecture.lectureId);
-          model.slides.add(Slide(slideImage: null));
-          // 編集へ
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => LectureEdit(
-                groupName,
-                _lecture,
-                _workshop,
-                _organizerId,
-              ),
-              fullscreenDialog: true,
-            ),
-          );
-          await model.fetchLecture(groupName, _workshop.workshopId);
-        },
-      ),
+        Container(
+          color: Colors.grey.withOpacity(0.2),
+          padding: EdgeInsets.symmetric(horizontal: 2),
+          child: Text(
+            "${_lecture.allAnswers} ",
+            style: _haveTest ? cTextListS : cTextUpBarS,
+            textScaleFactor: 1,
+          ),
+        ),
+        Container(
+          color: Colors.grey.withOpacity(0.2),
+          padding: EdgeInsets.symmetric(horizontal: 2),
+          child: Text(
+            "合格:${_lecture.passingScore} 点",
+            style: _haveTest ? cTextListS : cTextUpBarS,
+            textScaleFactor: 1,
+          ),
+        ),
+        Container(
+          color: Colors.grey.withOpacity(0.2),
+          padding: EdgeInsets.symmetric(horizontal: 2),
+          child: Text(
+            "画像:${_lecture.slideLength} 枚",
+            style: _haveImg ? cTextListS : cTextUpBarS,
+            textScaleFactor: 1,
+          ),
+        ),
+      ],
     );
   }
 
@@ -204,14 +302,14 @@ class LecturePage extends StatelessWidget {
       child: Icon(FontAwesomeIcons.plus),
       onPressed: () async {
         // 新規登録へ
-        model.initLecture(_organizerId, _workshop);
+        model.initLecture(_organizer, _workshop);
         model.initProperties();
         model.initSlide();
         await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) =>
-                  LectureAdd(groupName, _organizerId, _workshop),
+                  LectureAdd(groupName, _organizer, _workshop),
               fullscreenDialog: true,
             ));
         await model.fetchLecture(groupName, _workshop.workshopId);

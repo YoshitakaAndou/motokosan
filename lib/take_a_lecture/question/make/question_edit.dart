@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:motokosan/take_a_lecture/lecture/play/lecture_class.dart';
+import 'package:motokosan/take_a_lecture/question/play/question_class.dart';
+import 'package:motokosan/take_a_lecture/question/play/question_firebase.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../question_model.dart';
+import '../play/question_model.dart';
 import '../../../widgets/ok_show_dialog.dart';
 import '../../../constants.dart';
-import '../../lecture/lecture_model.dart';
 
 class QuestionEdit extends StatelessWidget {
   final String groupName;
@@ -35,7 +37,12 @@ class QuestionEdit extends StatelessWidget {
         appBar: AppBar(
           toolbarHeight: cToolBarH,
           centerTitle: true,
-          title: Text("確認テストの編集", style: cTextTitleL, textScaleFactor: 1),
+          title: Text("確認テストの編集",
+              style: TextStyle(
+                  color: Colors.indigo,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600),
+              textScaleFactor: 1),
           actions: [
             if (model.isUpdate)
               Padding(

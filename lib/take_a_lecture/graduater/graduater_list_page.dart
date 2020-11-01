@@ -1,0 +1,157 @@
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:motokosan/take_a_lecture/organizer/play/organizer_class.dart';
+import 'package:motokosan/take_a_lecture/workshop/play/workshop_class.dart';
+import 'package:motokosan/user_data/userdata_class.dart';
+import 'package:motokosan/widgets/bar_title.dart';
+import 'package:motokosan/widgets/go_back.dart';
+import 'package:motokosan/widgets/guriguri.dart';
+import 'package:provider/provider.dart';
+
+import '../../constants.dart';
+import 'graduater_model.dart';
+
+class GraduaterListPage extends StatelessWidget {
+  final UserData _userData;
+  final Organizer _organizer;
+  final WorkshopList _workshopList;
+  GraduaterListPage(this._userData, this._organizer, this._workshopList);
+
+  @override
+  Widget build(BuildContext context) {
+    final model = Provider.of<GraduaterModel>(context, listen: false);
+    Future(() async {
+      model.startLoading();
+      await model.generateGraduaterList(_userData.userGroup);
+      model.stopLoading();
+    });
+    return Consumer<GraduaterModel>(builder: (context, model, child) {
+      return Scaffold(
+        resizeToAvoidBottomInset: true,
+        appBar: AppBar(
+          toolbarHeight: cToolBarH,
+          title: barTitle(context),
+          leading: Container(),
+          actions: [
+            GoBack.instance.goBack(
+                context: context, icon: Icon(FontAwesomeIcons.times), num: 1),
+          ],
+        ),
+        body: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Expanded(flex: 1, child: _infoArea()),
+            Expanded(
+              flex: 10,
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListView.builder(
+                      itemCount: model.graduaters.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          key: Key(model.graduaters[index].graduaterId),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          elevation: 20,
+                          child: ListTile(
+                            // dense: true,
+                            title: _title(context, model, index),
+                            subtitle: _subtitle(context, model, index),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  if (model.isLoading) GuriGuri.instance.guriguri3(context),
+                ],
+              ),
+            ),
+          ],
+        ),
+        bottomNavigationBar: _bottomNavigationBar(context),
+      );
+    });
+  }
+
+  Widget _infoArea() {
+    return Container(
+      width: double.infinity,
+      height: cInfoAreaH,
+      color: cContBg,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(FontAwesomeIcons.userGraduate, color: Colors.white),
+                SizedBox(width: 10),
+                Text(" 研修会修了者", style: cTextUpBarLL, textScaleFactor: 1),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text("研修会：${_workshopList.workshop.title}",
+                    style: cTextUpBarM, textScaleFactor: 1),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _title(BuildContext context, GraduaterModel model, int index) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "${model.graduaterLists[index].userData.userName}",
+          style: cTextListL,
+          textScaleFactor: 1,
+        ),
+      ],
+    );
+  }
+
+  Widget _subtitle(BuildContext context, GraduaterModel model, int index) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "${model.graduaterLists[index].graduater.graduaterId}",
+          style: cTextListS,
+          textScaleFactor: 1,
+        ),
+      ],
+    );
+  }
+
+  Widget _bottomNavigationBar(BuildContext context) {
+    return BottomAppBar(
+      color: Theme.of(context).primaryColor,
+      notchMargin: 6.0,
+      shape: AutomaticNotchedShape(
+        RoundedRectangleBorder(),
+        StadiumBorder(
+          side: BorderSide(),
+        ),
+      ),
+      child: Container(
+        height: cBottomAppBarH,
+        padding: EdgeInsets.all(10),
+        child: Text(
+          "",
+          style: cTextUpBarL,
+          textScaleFactor: 1,
+        ),
+      ),
+    );
+  }
+}

@@ -3,12 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/take_a_lecture/lecture/make/lecture_web.dart';
-import 'package:motokosan/take_a_lecture/question/question_model.dart';
+import 'package:motokosan/take_a_lecture/lecture/play/lecture_class.dart';
+import 'package:motokosan/take_a_lecture/lecture/play/lecture_firebase.dart';
+import 'package:motokosan/take_a_lecture/organizer/play/organizer_class.dart';
+import 'package:motokosan/take_a_lecture/question/play/question_class.dart';
+import 'package:motokosan/take_a_lecture/question/play/question_firebase.dart';
+import 'package:motokosan/take_a_lecture/workshop/play/workshop_class.dart';
 import 'package:motokosan/widgets/datasave_widget.dart';
 import 'package:provider/provider.dart';
-import '../lecture_model.dart';
-import '../../organizer/organizer_model.dart';
-import '../../workshop/workshop_model.dart';
+import '../play/lecture_model.dart';
 import '../../../widgets/ok_show_dialog.dart';
 import '../../../constants.dart';
 import 'lecture_video.dart';
@@ -186,6 +189,7 @@ class LectureEdit extends StatelessWidget {
       ),
       onChanged: (text) {
         model.changeValue("title", text);
+        model.setUpdate();
       },
       onSubmitted: (text) {
         model.changeValue("title", text);

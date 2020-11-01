@@ -9,7 +9,7 @@ import 'package:motokosan/widgets/datasave_widget.dart';
 import 'package:motokosan/widgets/guriguri.dart';
 import 'package:motokosan/widgets/ok_show_dialog.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import '../lecture_model.dart';
+import '../play/lecture_model.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -263,7 +263,7 @@ class _LectureWebState extends State<LectureWeb> {
         ),
         onPressed: () async {
           //最後に開いていたページのURLを保存
-          model.webLastUrl = await _controller.currentUrl();
+          model.setWebLastUrl(await _controller.currentUrl());
           Navigator.pop(context);
           // 保存のチェックを確認して閉じる
           Navigator.pop(context, model.videoSetLecture());

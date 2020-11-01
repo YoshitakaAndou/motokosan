@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:motokosan/take_a_lecture/target/target_firebase.dart';
+import 'package:motokosan/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -6,19 +8,20 @@ import '../../widgets/bar_title.dart';
 import '../../widgets/ok_show_dialog.dart';
 import '../../constants.dart';
 import 'target_add.dart';
+import 'target_class.dart';
 import 'target_edit.dart';
 import 'target_model.dart';
 
 class TargetPage extends StatelessWidget {
-  final String groupName;
-  TargetPage({this.groupName});
+  final UserData _userData;
+  TargetPage(this._userData);
 
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<TargetModel>(context, listen: false);
     Future(() async {
       model.startLoading();
-      await model.fetchTarget(groupName);
+      await model.fetchTarget(_userData.userGroup);
       model.stopLoading();
     });
     return Consumer<TargetModel>(builder: (context, model, child) {
@@ -75,11 +78,12 @@ class TargetPage extends StatelessWidget {
         print("${_data.title} [$_count]");
         _data.targetNo = (_count + 1).toString().padLeft(4, "0");
         //Fsにアップデート
-        await model.setTargetFs(false, groupName, _data, DateTime.now());
+        await FSTarget.instance
+            .setTargetFs(false, _userData.userGroup, _data, DateTime.now());
         _count += 1;
       }
       //一通り終わったらFsから読み込んで再描画させる
-      await model.fetchTarget(groupName);
+      await model.fetchTarget(_userData.userGroup);
     } catch (e) {
       MyDialog.instance.okShowDialog(context, e.toString());
     }
@@ -127,10 +131,10 @@ class TargetPage extends StatelessWidget {
           await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => TargetEdit(groupName, _target),
+                builder: (context) => TargetEdit(_userData.userGroup, _target),
                 fullscreenDialog: true,
               ));
-          await model.fetchTarget(groupName);
+          await model.fetchTarget(_userData.userGroup);
         },
       ),
     );
@@ -145,10 +149,10 @@ class TargetPage extends StatelessWidget {
         await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => TargetAdd(groupName: groupName),
+              builder: (context) => TargetAdd(groupName: _userData.userGroup),
               fullscreenDialog: true,
             ));
-        await model.fetchTarget(groupName);
+        await model.fetchTarget(_userData.userGroup);
       },
     );
   }

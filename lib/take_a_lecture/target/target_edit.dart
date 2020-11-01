@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:motokosan/take_a_lecture/target/target_firebase.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../target/target_model.dart';
 import '../../widgets/ok_show_dialog.dart';
 import '../../constants.dart';
+import 'target_class.dart';
 
 class TargetEdit extends StatelessWidget {
   final String groupName;
@@ -402,7 +404,7 @@ class TargetEdit extends StatelessWidget {
         print("${_data.title} [$_count]");
         _data.targetNo = _count.toString().padLeft(4, "0");
         //Fsにアップデート
-        await model.setTargetFs(false, groupName, _data, DateTime.now());
+        await FSTarget.instance.setTargetFs(false, groupName, _data, DateTime.now());
         _count += 1;
       }
       //一通り終わったらFsから読み込んで再描画させる

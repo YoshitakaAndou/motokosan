@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+int videoEndAt = 5;
+
 //FireBaseのID
 const String cQuizId = "Question:2020-08-18";
 const String cQasId = "QA:2020-08-29";
@@ -28,6 +30,8 @@ const double cEditOffsetW = 20;
 
 //リスト上部のコンテナ
 const cContBg = Colors.green;
+// Data編集リストのCardの左端の色
+const cCardLeft = Colors.green;
 
 //Edit/AddのpopWindow
 const cPopWindow = Colors.black26;

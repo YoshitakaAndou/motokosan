@@ -4,7 +4,7 @@ import 'package:motokosan/widgets/ok_show_dialog.dart';
 import 'package:provider/provider.dart';
 
 import '../../../constants.dart';
-import '../organizer_model.dart';
+import '../play/organizer_model.dart';
 
 class OrganizerAdd extends StatelessWidget {
   final String groupName;

@@ -1,28 +1,28 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:motokosan/take_a_lecture/organizer/organizer_list_page.dart';
-import 'package:motokosan/take_a_lecture/organizer/organizer_model.dart';
+import 'package:motokosan/take_a_lecture/graduater/graduater_class.dart';
+import 'package:motokosan/take_a_lecture/graduater/graduater_firebase.dart';
+import 'package:motokosan/take_a_lecture/lecture/play/lecture_database.dart';
+import 'package:motokosan/take_a_lecture/organizer/play/organizer_list_page.dart';
+import 'package:motokosan/take_a_lecture/organizer/play/organizer_model.dart';
+import 'package:motokosan/take_a_lecture/question/play/question_database.dart';
 import 'package:motokosan/take_a_lecture/target/target_page.dart';
+import 'package:motokosan/take_a_lecture/workshop/play/workshop_database.dart';
 import 'package:provider/provider.dart';
-import 'auth/signup_model.dart';
 import 'constants.dart';
 import 'take_a_lecture/organizer/make/organizer_page.dart';
+import 'user_data/userdata_class.dart';
 import 'widgets/bar_title.dart';
+import 'widgets/ok_show_dialog.dart';
 
 class Home extends StatelessWidget {
-  final UserData userData;
-  Home({this.userData});
+  final UserData _userData;
+  Home(this._userData);
 
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<OrganizerModel>(context);
-    // final _database = DatabaseModel();
-    // final _databaseLec = LecDatabaseModel();
-    // // const double _sizedBox = 15.0;
-    // Future(() async {
-    //   model.setDates(await _database.getQuizzesNotKey("○"));
-    // });
     return Scaffold(
       appBar: AppBar(
         title: barTitle(context),
@@ -61,12 +61,12 @@ class Home extends StatelessWidget {
                       ),
                     ),
                     onPressed: () async {
-                      await model.fetchOrganizerList(userData.userGroup);
+                      await model.fetchOrganizerList(_userData.userGroup);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => OrganizerListPage(
-                              userData.userGroup, true, model.organizerList),
+                              _userData, true, model.organizerList),
                         ),
                       );
                     },
@@ -127,8 +127,7 @@ class Home extends StatelessWidget {
                           await Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  TargetPage(groupName: userData.userGroup),
+                              builder: (context) => TargetPage(_userData),
                             ),
                           );
                         },
@@ -144,28 +143,66 @@ class Home extends StatelessWidget {
                           await Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  OrganizerPage(userData.userGroup),
+                              builder: (context) => OrganizerPage(_userData),
                             ),
                           );
                         },
                       ),
-                      // _menuItem(
-                      //   context: context,
-                      //   title: "受講済みをリセット",
-                      //   icon: Icon(Icons.restore, color: Colors.green[800]),
-                      //   onTap: () {
-                      //     Navigator.pop(context);
-                      //     okShowDialogFunc(
-                      //         context: context,
-                      //         mainTitle: "受講済みをリセット",
-                      //         subTitle: "実行しますか？",
-                      //         onPressed: () async {
-                      //           // await _databaseLec.resetLecAnswered("", "");
-                      //           Navigator.pop(context);
-                      //         });
-                      //   },
-                      // ),
+                      _menuItem(
+                        context: context,
+                        title: "受講済みをリセット",
+                        icon: Icon(Icons.restore, color: Colors.green[800]),
+                        onTap: () {
+                          Navigator.pop(context);
+                          MyDialog.instance.okShowDialogFunc(
+                              context: context,
+                              mainTitle: "受講済みをリセット",
+                              subTitle: "実行しますか？",
+                              onPressed: () async {
+                                await QuestionDatabase.instance
+                                    .deleteQuestionResults();
+                                await LectureDatabase.instance
+                                    .deleteLectureResults();
+                                // todo 消す前にGraduatesが有るか調べる
+                                final List<Graduater> _graduater =
+                                    await FSGraduater.instance
+                                        .fetchGraduater(_userData);
+                                if (_graduater.length != 0) {
+                                  await FSGraduater.instance
+                                      .deleteGraduaterSelect(
+                                          _userData.userGroup);
+                                  print("FSのGraduatesを削除しました");
+                                }
+                                await WorkshopDatabase.instance
+                                    .deleteWorkshopResults();
+                                Navigator.pop(context);
+                              });
+                        },
+                      ),
+                      _menuItem(
+                        context: context,
+                        title: "再生時間を変更する",
+                        icon: Icon(FontAwesomeIcons.film,
+                            color: Colors.green[800]),
+                        onTap: () {
+                          Navigator.pop(context);
+                          MyDialog.instance.okShowDialogFunc(
+                              context: context,
+                              mainTitle: videoEndAt == 5
+                                  ? "動画を最後まで再生する"
+                                  : "動画再生を5秒にする",
+                              subTitle: "変更しますか？",
+                              onPressed: () async {
+                                if (videoEndAt == 5) {
+                                  videoEndAt = 5000;
+                                } else {
+                                  videoEndAt = 5;
+                                }
+                                print("動画再生時間：$videoEndAt");
+                                Navigator.pop(context);
+                              });
+                        },
+                      ),
                       Container(
                         width: double.infinity,
                         height: 70,
@@ -178,13 +215,13 @@ class Home extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  Text("グループ名：${userData.userGroup}",
+                                  Text("グループ名：${_userData.userGroup}",
                                       style: cTextListSS),
-                                  Text("ユーザー名：${userData.userName}",
+                                  Text("ユーザー名：${_userData.userName}",
                                       style: cTextListSS),
-                                  Text("e-mail  ：${userData.userEmail}",
+                                  Text("e-mail  ：${_userData.userEmail}",
                                       style: cTextListSS),
-                                  Text("passWord：${userData.userPassword}",
+                                  Text("passWord：${_userData.userPassword}",
                                       style: cTextListSS),
                                 ],
                               ),

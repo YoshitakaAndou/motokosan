@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:motokosan/take_a_lecture/lecture/play/lecture_class.dart';
 import 'package:provider/provider.dart';
-import '../../lecture/lecture_model.dart';
-import '../question_model.dart';
+import '../play/question_model.dart';
 import '../../../widgets/ok_show_dialog.dart';
 import '../../../constants.dart';
 
