@@ -155,28 +155,31 @@ class Home extends StatelessWidget {
                         onTap: () {
                           Navigator.pop(context);
                           MyDialog.instance.okShowDialogFunc(
-                              context: context,
-                              mainTitle: "受講済みをリセット",
-                              subTitle: "実行しますか？",
-                              onPressed: () async {
-                                await QuestionDatabase.instance
-                                    .deleteQuestionResults();
-                                await LectureDatabase.instance
-                                    .deleteLectureResults();
-                                // todo 消す前にGraduatesが有るか調べる
-                                final List<Graduater> _graduater =
-                                    await FSGraduater.instance
-                                        .fetchGraduater(_userData);
-                                if (_graduater.length != 0) {
+                            context: context,
+                            mainTitle: "受講済みをリセット",
+                            subTitle: "実行しますか？",
+                            onPressed: () async {
+                              await QuestionDatabase.instance
+                                  .deleteQuestionResults();
+                              await LectureDatabase.instance
+                                  .deleteLectureResults();
+                              await WorkshopDatabase.instance
+                                  .deleteWorkshopResults();
+                              // todo 消す前にGraduatesが有るか調べる
+                              final List<Graduater> _graduater =
                                   await FSGraduater.instance
-                                      .deleteGraduaterSelect(
-                                          _userData.userGroup);
+                                      .fetchGraduater(_userData);
+                              if (_graduater.length != 0) {
+                                for (Graduater _data in _graduater) {
+                                  await FSGraduater.instance.deleteGraduater(
+                                      _userData.userGroup, _data.graduaterId);
                                   print("FSのGraduatesを削除しました");
                                 }
-                                await WorkshopDatabase.instance
-                                    .deleteWorkshopResults();
-                                Navigator.pop(context);
-                              });
+                              }
+
+                              Navigator.pop(context);
+                            },
+                          );
                         },
                       ),
                       _menuItem(

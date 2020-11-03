@@ -208,8 +208,13 @@ class WorkshopListPage extends StatelessWidget {
         ),
       ),
     );
-    model.setWorkshopResult(returnArgument.workshopList.workshopResult, index);
-    // await model.fetchTarget(groupName);
+    // todo 必須
+    if (returnArgument == null) {
+      returnArgument = ReturnArgument();
+    } else {
+      model.setWorkshopResult(
+          returnArgument.workshopList.workshopResult, index);
+    }
   }
 
   Widget _bottomNavigationBar(BuildContext context) {
@@ -233,15 +238,4 @@ class WorkshopListPage extends StatelessWidget {
       ),
     );
   }
-
-  // Future<void> _initWorkshop(WorkshopModel model) async {
-  //   model.startLoading();
-  //   if (_organizer.title == "指定無し") {
-  //     //前画面で”指定無し”を選んだ場合は全ての研修会を取得
-  //     await model.fetchLists(groupName, _organizer);
-  //   } else {
-  //     await model.fetchListsByCategory(groupName, _organizer);
-  //   }
-  //   model.stopLoading();
-  // }
 }

@@ -19,6 +19,7 @@ class QuestionModel extends ChangeNotifier {
   bool isClear = false;
   bool isScoreClear = false;
   bool isAllAnswersClear = false;
+  bool isStack = false;
   String correct = "";
   int answerNum = 0;
   int questionsCount = 0;
@@ -50,6 +51,7 @@ class QuestionModel extends ChangeNotifier {
     isClear = false;
     isScoreClear = false;
     isAllAnswersClear = false;
+    isStack = false;
     correct = "";
     answerNum = 0;
     questionsCount = 0;
@@ -107,6 +109,11 @@ class QuestionModel extends ChangeNotifier {
 
   void startLoading() {
     isLoading = true;
+    notifyListeners();
+  }
+
+  void setIsStack(bool _key) {
+    isStack = _key;
     notifyListeners();
   }
 
@@ -244,4 +251,3 @@ class QuestionModel extends ChangeNotifier {
     notifyListeners();
   }
 }
-

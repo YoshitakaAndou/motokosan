@@ -97,7 +97,7 @@ class _LecturePlayState extends State<LecturePlay> {
               leading: GoBack.instance.goBackWithReturArg(
                 context: context,
                 icon: Icon(FontAwesomeIcons.undo),
-                lectureArgument: ReturnArgument(isNextQuestion: false),
+                returnArgument: ReturnArgument(isNextQuestion: false),
                 num: 1,
               ),
               actions: [
@@ -106,7 +106,7 @@ class _LecturePlayState extends State<LecturePlay> {
                     : GoBack.instance.goBackWithReturArg(
                         context: context,
                         icon: Icon(FontAwesomeIcons.chevronRight),
-                        lectureArgument: ReturnArgument(isNextQuestion: true),
+                        returnArgument: ReturnArgument(isNextQuestion: true),
                         num: 1,
                       ),
               ],
@@ -227,9 +227,11 @@ class _LecturePlayState extends State<LecturePlay> {
                 Container(
                   color: Colors.white.withOpacity(0.3),
                   child: Text(
-                    widget._lectureList.lecture.allAnswers == "全問解答が必要"
-                        ? "テスト解答必須"
-                        : "",
+                    widget._lectureList.lectureResult.isTaken == "受講済"
+                        ? "受講済"
+                        : widget._lectureList.lecture.allAnswers == "全問解答が必要"
+                            ? "テスト解答必須"
+                            : "",
                     style: cTextUpBarS,
                     textAlign: TextAlign.center,
                     textScaleFactor: 1,
@@ -439,13 +441,14 @@ class _LecturePlayState extends State<LecturePlay> {
           mainAxisSize: MainAxisSize.min,
           children: [
             _bottomSheetTitle(),
+            SizedBox(height: 10),
             if (!widget._isLast) _bottomSheetNext(context),
             _bottomSheetReturn(context),
             if (widget._lectureList.lecture.questionLength != 0 &&
                 widget._lectureList.lectureResult.isTakenAt == 0)
               _bottomSheetTest(context, _lectureResult),
             SizedBox(
-              height: MediaQuery.of(context).size.height / 8,
+              height: MediaQuery.of(context).size.height / 15,
             )
           ],
         );
@@ -463,7 +466,7 @@ class _LecturePlayState extends State<LecturePlay> {
       ),
       child: Center(
         child: Text(
-          "この講義の動画再生が終了しました",
+          "動画の再生が終了しました",
           style: cTextUpBarL,
           textScaleFactor: 1,
         ),
@@ -474,16 +477,22 @@ class _LecturePlayState extends State<LecturePlay> {
   Widget _bottomSheetNext(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: ListTile(
-        leading: Icon(FontAwesomeIcons.youtube),
-        title: Text('次を見る', style: cTextListL, textScaleFactor: 1),
-        onTap: () async {
-          if (widget._lectureList.lecture.questionLength == 0) {
-            await _saveLectureResult(context);
-          }
-          Navigator.of(context).pop();
-          Navigator.of(context).pop(ReturnArgument(isNextQuestion: true));
-        },
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.withOpacity(0.5)),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: ListTile(
+          leading: Icon(FontAwesomeIcons.youtube),
+          title: Text('次を見る', style: cTextListL, textScaleFactor: 1),
+          onTap: () async {
+            if (widget._lectureList.lecture.questionLength == 0) {
+              await _saveLectureResult(context);
+            }
+            Navigator.of(context).pop();
+            Navigator.of(context).pop(ReturnArgument(isNextQuestion: true));
+          },
+        ),
       ),
     );
   }
@@ -491,16 +500,22 @@ class _LecturePlayState extends State<LecturePlay> {
   Widget _bottomSheetReturn(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: ListTile(
-        leading: Icon(FontAwesomeIcons.undo),
-        title: Text('一覧へ戻る', style: cTextListL, textScaleFactor: 1),
-        onTap: () async {
-          if (widget._lectureList.lecture.questionLength == 0) {
-            await _saveLectureResult(context);
-          }
-          Navigator.of(context).pop();
-          Navigator.of(context).pop(ReturnArgument(isNextQuestion: false));
-        },
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.withOpacity(0.5)),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: ListTile(
+          leading: Icon(FontAwesomeIcons.undo),
+          title: Text('一覧へ戻る', style: cTextListL, textScaleFactor: 1),
+          onTap: () async {
+            if (widget._lectureList.lecture.questionLength == 0) {
+              await _saveLectureResult(context);
+            }
+            Navigator.of(context).pop();
+            Navigator.of(context).pop(ReturnArgument(isNextQuestion: false));
+          },
+        ),
       ),
     );
   }
@@ -508,41 +523,48 @@ class _LecturePlayState extends State<LecturePlay> {
   Widget _bottomSheetTest(BuildContext context, LectureResult lectureResult) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: ListTile(
-        leading: Icon(FontAwesomeIcons.school),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (widget._lectureList.lecture.allAnswers == "全問解答が必要")
-              Text('確認テストへ進む', style: cTextListL, textScaleFactor: 1),
-            if (widget._lectureList.lecture.allAnswers != "全問解答が必要")
-              Text('確認テストを解いてみる', style: cTextListL, textScaleFactor: 1),
-            if (widget._lectureList.lecture.allAnswers == "全問解答が必要")
-              Text(
-                  "受講完了には確認テスト(${widget._lectureList.lecture.questionLength}問)の全問解答が必要です。",
-                  style: cTextListSR,
-                  textScaleFactor: 1),
-            if (widget._lectureList.lecture.allAnswers == "全問解答が必要" &&
-                widget._lectureList.lecture.passingScore == 0)
-              Text("合格点は設けておりません。", style: cTextListSR, textScaleFactor: 1),
-            if (widget._lectureList.lecture.allAnswers == "全問解答が必要" &&
-                widget._lectureList.lecture.passingScore != 0)
-              Text("${widget._lectureList.lecture.passingScore}点以上が合格です。",
-                  style: cTextListSR, textScaleFactor: 1),
-          ],
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.withOpacity(0.5)),
+          borderRadius: BorderRadius.circular(10),
         ),
-        onTap: () {
-          Navigator.of(context).pop();
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => QuestionListPage(
-                widget._userData,
-                widget._lectureList,
-              ),
-            ),
-          );
-        },
+        child: ListTile(
+          leading: Icon(FontAwesomeIcons.school),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (widget._lectureList.lecture.allAnswers == "全問解答が必要")
+                Text('確認テストへ進む', style: cTextListL, textScaleFactor: 1),
+              if (widget._lectureList.lecture.allAnswers != "全問解答が必要")
+                Text('確認テストを解いてみる', style: cTextListL, textScaleFactor: 1),
+              if (widget._lectureList.lecture.allAnswers == "全問解答が必要")
+                Text(
+                    "受講完了には確認テスト(${widget._lectureList.lecture.questionLength}問)の全問解答が必要です。",
+                    style: cTextListSR,
+                    textScaleFactor: 1),
+              if (widget._lectureList.lecture.allAnswers == "全問解答が必要" &&
+                  widget._lectureList.lecture.passingScore == 0)
+                Text("合格点は設けておりません。", style: cTextListSR, textScaleFactor: 1),
+              if (widget._lectureList.lecture.allAnswers == "全問解答が必要" &&
+                  widget._lectureList.lecture.passingScore != 0)
+                Text("${widget._lectureList.lecture.passingScore}点以上が合格です。",
+                    style: cTextListSR, textScaleFactor: 1),
+            ],
+          ),
+          onTap: () {
+            Navigator.of(context).pop();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => QuestionListPage(
+                        widget._userData,
+                        widget._lectureList,
+                        widget._isLast,
+                      ),
+                  fullscreenDialog: true),
+            );
+          },
+        ),
       ),
     );
   }

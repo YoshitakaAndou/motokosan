@@ -43,36 +43,36 @@ class GoBack {
       {BuildContext context,
       Icon icon,
       int num,
-      ReturnArgument lectureArgument}) {
+      ReturnArgument returnArgument}) {
     return IconButton(
       icon: icon,
       iconSize: 20,
       color: Colors.black54,
       onPressed: () {
         if (num == 1) {
-          Navigator.of(context).pop(lectureArgument);
+          Navigator.of(context).pop(returnArgument);
         }
         if (num == 2) {
-          Navigator.of(context).pop(lectureArgument);
-          Navigator.of(context).pop(lectureArgument);
+          Navigator.of(context).pop(returnArgument);
+          Navigator.of(context).pop(returnArgument);
         }
         if (num == 3) {
-          Navigator.of(context).pop(lectureArgument);
-          Navigator.of(context).pop(lectureArgument);
-          Navigator.of(context).pop(lectureArgument);
+          Navigator.of(context).pop(returnArgument);
+          Navigator.of(context).pop(returnArgument);
+          Navigator.of(context).pop(returnArgument);
         }
         if (num == 4) {
-          Navigator.of(context).pop(lectureArgument);
-          Navigator.of(context).pop(lectureArgument);
-          Navigator.of(context).pop(lectureArgument);
-          Navigator.of(context).pop(lectureArgument);
+          Navigator.of(context).pop(returnArgument);
+          Navigator.of(context).pop(returnArgument);
+          Navigator.of(context).pop(returnArgument);
+          Navigator.of(context).pop(returnArgument);
         }
         if (num == 5) {
-          Navigator.of(context).pop(lectureArgument);
-          Navigator.of(context).pop(lectureArgument);
-          Navigator.of(context).pop(lectureArgument);
-          Navigator.of(context).pop(lectureArgument);
-          Navigator.of(context).pop(lectureArgument);
+          Navigator.of(context).pop(returnArgument);
+          Navigator.of(context).pop(returnArgument);
+          Navigator.of(context).pop(returnArgument);
+          Navigator.of(context).pop(returnArgument);
+          Navigator.of(context).pop(returnArgument);
         }
       },
     );

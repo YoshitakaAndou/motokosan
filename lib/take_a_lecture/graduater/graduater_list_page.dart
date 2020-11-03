@@ -20,10 +20,11 @@ class GraduaterListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<GraduaterModel>(context, listen: false);
+    print(_organizer.title);
     Future(() async {
-      model.startLoading();
+      // model.startLoading();
       await model.generateGraduaterList(_userData.userGroup);
-      model.stopLoading();
+      // model.stopLoading();
     });
     return Consumer<GraduaterModel>(builder: (context, model, child) {
       return Scaffold(
@@ -88,19 +89,21 @@ class GraduaterListPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Icon(FontAwesomeIcons.userGraduate, color: Colors.white),
-                SizedBox(width: 10),
-                Text(" 研修会修了者", style: cTextUpBarLL, textScaleFactor: 1),
+                Text("${_workshopList.workshop.title}",
+                    style: cTextUpBarM, textScaleFactor: 1),
               ],
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("研修会：${_workshopList.workshop.title}",
-                    style: cTextUpBarM, textScaleFactor: 1),
+                Icon(FontAwesomeIcons.userGraduate,
+                    color: Colors.white, size: 15),
+                SizedBox(width: 10),
+                Text(" 研修会修了者", style: cTextUpBarL, textScaleFactor: 1),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -122,10 +125,10 @@ class GraduaterListPage extends StatelessWidget {
 
   Widget _subtitle(BuildContext context, GraduaterModel model, int index) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(
-          "${model.graduaterLists[index].graduater.graduaterId}",
+          "修了日：${model.graduaterLists[index].graduater.takenAt}",
           style: cTextListS,
           textScaleFactor: 1,
         ),

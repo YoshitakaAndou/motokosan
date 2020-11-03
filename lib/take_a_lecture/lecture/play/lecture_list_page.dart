@@ -31,10 +31,10 @@ class LectureListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final model = Provider.of<LectureModel>(context, listen: false);
     Future(() async {
-      model.startLoading();
+      // model.startLoading();
       await model.generateLectureList(
           _userData.userGroup, _workshopList.workshop.workshopId);
-      model.stopLoading();
+      // model.stopLoading();
     });
     return Consumer<LectureModel>(builder: (context, model, child) {
       return Scaffold(
@@ -45,7 +45,7 @@ class LectureListPage extends StatelessWidget {
           leading: GoBack.instance.goBackWithReturArg(
             context: context,
             icon: Icon(FontAwesomeIcons.chevronLeft),
-            lectureArgument: ReturnArgument(
+            returnArgument: ReturnArgument(
               workshopList: _workshopList,
             ),
             num: 1,
@@ -54,7 +54,7 @@ class LectureListPage extends StatelessWidget {
             GoBack.instance.goBackWithReturArg(
               context: context,
               icon: Icon(FontAwesomeIcons.home),
-              lectureArgument: ReturnArgument(
+              returnArgument: ReturnArgument(
                 workshopList: _workshopList,
               ),
               num: 3,
@@ -301,13 +301,8 @@ class LectureListPage extends StatelessWidget {
           );
   }
 
-  Future<void> _onTap(
-    BuildContext context,
-    LectureModel model,
-    int index,
-    String _groupName,
-    String _workshopId,
-  ) async {
+  Future<void> _onTap(BuildContext context, LectureModel model, int index,
+      String _groupName, String _workshopId) async {
     ReturnArgument returnArgument = ReturnArgument();
     returnArgument.isNextQuestion = true;
 
@@ -339,7 +334,9 @@ class LectureListPage extends StatelessWidget {
           ),
         ),
       );
-
+      if (returnArgument == null) {
+        returnArgument = ReturnArgument();
+      }
       if (model.lectureLists[index].lecture.videoUrl.isNotEmpty) {
         //スマホの向きを上のみに戻す
         SystemChrome.setPreferredOrientations([
@@ -354,7 +351,6 @@ class LectureListPage extends StatelessWidget {
     }
     await model.generateLectureList(_groupName, _workshopId);
     _checkWorkshopIsTaken(model);
-    // todo workshopResultが送られているかチェック
     final _sendCheck =
         await WorkshopDatabase.instance.getWorkshopResult(_workshopId);
     if (_sendCheck.length > 0) {
@@ -365,8 +361,6 @@ class LectureListPage extends StatelessWidget {
     // todo workshopResultの保存
     await _saveWorkshopResult(context, model, 0, "");
     if (model.lectureLists.length == model.takenCount) {
-      // todo 研修会クリア
-      // todo workshopResultのチェック
       final _results =
           await WorkshopDatabase.instance.getWorkshopResult(_workshopId);
       if (_results.length > 0) {
@@ -385,12 +379,8 @@ class LectureListPage extends StatelessWidget {
     }
   }
 
-  Future<void> _saveWorkshopResult(
-    BuildContext context,
-    LectureModel model,
-    int _isSendAt,
-    String _graduaterId,
-  ) async {
+  Future<void> _saveWorkshopResult(BuildContext context, LectureModel model,
+      int _isSendAt, String _graduaterId) async {
     print(
         "_saveWorkshopResult .isTaken: ${_workshopList.workshopResult.isTaken}");
     _workshopList.workshopResult.graduaterId = _graduaterId;
@@ -617,9 +607,6 @@ class LectureListPage extends StatelessWidget {
   }
 
   Widget _bottomNavigationBar(BuildContext context, LectureModel model) {
-    // todo
-    print("sendButton.isSendAt:${_workshopList.workshopResult.isSendAt}");
-    print("sendButton.isTaken:${_workshopList.workshopResult.isTaken}");
     return BottomAppBar(
       color: Theme.of(context).primaryColor,
       notchMargin: 6.0,

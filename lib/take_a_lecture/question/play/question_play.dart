@@ -144,7 +144,7 @@ class _QuestionPlayState extends State<QuestionPlay> {
         leading: GoBack.instance.goBackWithReturArg(
           context: context,
           icon: Icon(Icons.arrow_back_ios),
-          lectureArgument: ReturnArgument(isNextQuestion: false),
+          returnArgument: ReturnArgument(isNextQuestion: false),
           num: 1,
         ),
         actions: [
