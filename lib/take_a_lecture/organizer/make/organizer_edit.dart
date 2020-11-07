@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:motokosan/take_a_lecture/organizer/play/organizer_class.dart';
+import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
 import 'package:motokosan/take_a_lecture/organizer/play/organizer_firebase.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../widgets/ok_show_dialog.dart';
 import '../../../constants.dart';
-import '../play/organizer_model.dart';
+import '../organizer_model.dart';
 
 class OrganizerEdit extends StatelessWidget {
   final String groupName;
@@ -365,9 +365,11 @@ class OrganizerEdit extends StatelessWidget {
   }
 
   Widget _deleteButton(BuildContext context, OrganizerModel model) {
-    return FloatingActionButton(
+    return FloatingActionButton.extended(
       elevation: 15,
-      child: Icon(FontAwesomeIcons.trashAlt),
+
+      icon: Icon(FontAwesomeIcons.trashAlt),
+      label: Text(" この主催者を削除", style: cTextUpBarM, textScaleFactor: 1),
       // todo 削除
       onPressed: () {
         MyDialog.instance.okShowDialogFunc(
@@ -390,12 +392,12 @@ class OrganizerEdit extends StatelessWidget {
   }
 
   Future<void> _deleteSave(
-      BuildContext context, OrganizerModel model, _categoryId) async {
+      BuildContext context, OrganizerModel model, _organizerId) async {
     final FSOrganizer fsOrganizer = FSOrganizer();
     model.startLoading();
     try {
       //FsをTargetIdで削除
-      await model.deleteCategoryFs(groupName, _categoryId);
+      await model.deleteOrganizerFs(groupName, _organizerId);
       //配列を削除するのは無理だから再びFsをフェッチ
       await model.fetchOrganizer(groupName);
       //頭から順にtargetNoを振る

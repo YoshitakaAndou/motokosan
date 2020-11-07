@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:motokosan/take_a_lecture/workshop/play/workshop_database.dart';
+import 'package:motokosan/take_a_lecture/workshop/workshop_database.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
 
-import '../workshop/play/workshop_class.dart';
-import '../workshop/play/workshop_firebase.dart';
+import '../workshop/workshop_class.dart';
+import '../workshop/workshop_firebase.dart';
 import 'graduater_class.dart';
 
 class FSGraduater {

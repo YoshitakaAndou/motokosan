@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:motokosan/take_a_lecture/lecture/play/lecture_class.dart';
-import 'package:motokosan/take_a_lecture/lecture/play/lecture_firebase.dart';
-import 'package:motokosan/take_a_lecture/organizer/play/organizer_class.dart';
-import 'package:motokosan/take_a_lecture/workshop/play/workshop_class.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_firebase.dart';
+import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
+import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/widgets/bar_title.dart';
 import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
@@ -12,7 +12,7 @@ import '../../../constants.dart';
 import '../../question/make/question_page.dart';
 import 'lecture_add.dart';
 import 'lecture_edit.dart';
-import '../play/lecture_model.dart';
+import '../lecture_model.dart';
 
 class LecturePage extends StatelessWidget {
   final String groupName;
@@ -260,7 +260,7 @@ class LecturePage extends StatelessWidget {
           color: Colors.grey.withOpacity(0.2),
           padding: EdgeInsets.symmetric(horizontal: 2),
           child: Text(
-            "問題:${_lecture.questionLength} 問",
+            "問題 ${_lecture.questionLength}問",
             style: _haveTest ? cTextListS : cTextUpBarS,
             textScaleFactor: 1,
           ),
@@ -278,7 +278,7 @@ class LecturePage extends StatelessWidget {
           color: Colors.grey.withOpacity(0.2),
           padding: EdgeInsets.symmetric(horizontal: 2),
           child: Text(
-            "合格:${_lecture.passingScore} 点",
+            "合格 ${_lecture.passingScore}点",
             style: _haveTest ? cTextListS : cTextUpBarS,
             textScaleFactor: 1,
           ),
@@ -287,7 +287,7 @@ class LecturePage extends StatelessWidget {
           color: Colors.grey.withOpacity(0.2),
           padding: EdgeInsets.symmetric(horizontal: 2),
           child: Text(
-            "画像:${_lecture.slideLength} 枚",
+            "画像 ${_lecture.slideLength}枚",
             style: _haveImg ? cTextListS : cTextUpBarS,
             textScaleFactor: 1,
           ),
@@ -297,9 +297,10 @@ class LecturePage extends StatelessWidget {
   }
 
   Widget _floatingActionButton(BuildContext context, LectureModel model) {
-    return FloatingActionButton(
+    return FloatingActionButton.extended(
       elevation: 15,
-      child: Icon(FontAwesomeIcons.plus),
+      icon: Icon(FontAwesomeIcons.plus),
+      label: Text(" 講義を追加", style: cTextUpBarL, textScaleFactor: 1),
       onPressed: () async {
         // 新規登録へ
         model.initLecture(_organizer, _workshop);

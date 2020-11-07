@@ -9,7 +9,7 @@ import 'package:motokosan/widgets/datasave_widget.dart';
 import 'package:motokosan/widgets/guriguri.dart';
 import 'package:motokosan/widgets/ok_show_dialog.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import '../play/lecture_model.dart';
+import '../lecture_model.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 

@@ -10,6 +10,7 @@ class Workshop {
   int lectureLength;
   int updateAt;
   int createAt;
+  int deadlineAt;
   String targetId;
   String organizerId;
   String key;
@@ -26,6 +27,7 @@ class Workshop {
     this.lectureLength = 0,
     this.updateAt = 0,
     this.createAt = 0,
+    this.deadlineAt = 0,
     this.targetId = "",
     this.organizerId = "",
     this.key = "",

@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:motokosan/take_a_lecture/lecture/play/lecture_class.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
 import 'package:motokosan/take_a_lecture/return_argument.dart';
-import 'package:motokosan/take_a_lecture/lecture/play/lecture_database.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_database.dart';
 import 'package:motokosan/take_a_lecture/question/play/question_database.dart';
-import 'package:motokosan/take_a_lecture/question/play/question_model.dart';
+import 'package:motokosan/take_a_lecture/question/question_model.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/bar_title.dart';
 import 'package:motokosan/widgets/convert_items.dart';
@@ -19,13 +19,8 @@ class QuestionListPage extends StatelessWidget {
   final UserData _userData;
   final LectureList _lectureList;
   final bool _isLast;
-  // final WorkshopList _workshopList;
 
-  QuestionListPage(
-    this._userData,
-    this._lectureList,
-    this._isLast,
-  );
+  QuestionListPage(this._userData, this._lectureList, this._isLast);
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +60,12 @@ class QuestionListPage extends StatelessWidget {
                   ListView.builder(
                     itemCount: model.questionLists.length,
                     itemBuilder: (context, index) {
-                      return Card(
+                      return Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(width: 0.5, color: Colors.grey),
+                          ),
+                        ),
                         child: ListTile(
                           dense: true,
                           title: _title(context, model, index),

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:motokosan/take_a_lecture/lecture/play/lecture_class.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
 import 'package:motokosan/take_a_lecture/return_argument.dart';
 import 'package:motokosan/take_a_lecture/question/play/question_database.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
@@ -12,7 +12,7 @@ import '../../../widgets/bar_title.dart';
 import '../../../widgets/go_back.dart';
 import 'package:soundpool/soundpool.dart';
 import '../../../constants.dart';
-import 'question_class.dart';
+import '../question_class.dart';
 
 class QuestionPlay extends StatefulWidget {
   final UserData _userData;

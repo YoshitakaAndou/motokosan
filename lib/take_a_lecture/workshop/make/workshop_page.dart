@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:motokosan/take_a_lecture/organizer/play/organizer_class.dart';
-import 'package:motokosan/take_a_lecture/workshop/play/workshop_firebase.dart';
+import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
+import 'package:motokosan/take_a_lecture/workshop/workshop_firebase.dart';
 import 'package:motokosan/widgets/bar_title.dart';
+import 'package:motokosan/widgets/convert_items.dart';
 import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:motokosan/take_a_lecture/workshop/play/workshop_class.dart';
+import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import '../../../constants.dart';
 import '../../../widgets/ok_show_dialog.dart';
 import '../../lecture/make/lecture_page.dart';
-import '../play/workshop_model.dart';
+import '../workshop_model.dart';
 import 'workshop_add.dart';
 import 'workshop_edit.dart';
 
@@ -237,7 +238,16 @@ class WorkshopPage extends StatelessWidget {
           color: Colors.grey.withOpacity(0.2),
           padding: EdgeInsets.symmetric(horizontal: 2),
           child: Text(
-            "登録講座:${_workshop.lectureLength}件",
+            "期日 ${ConvertItems.instance.intToString(_workshop.deadlineAt)}",
+            style: _haveLecture ? cTextListS : cTextUpBarS,
+            textScaleFactor: 1,
+          ),
+        ),
+        Container(
+          color: Colors.grey.withOpacity(0.2),
+          padding: EdgeInsets.symmetric(horizontal: 2),
+          child: Text(
+            "登録講座 ${_workshop.lectureLength}件",
             style: _haveLecture ? cTextListS : cTextUpBarS,
             textScaleFactor: 1,
           ),
@@ -247,9 +257,10 @@ class WorkshopPage extends StatelessWidget {
   }
 
   Widget _floatingActionButton(BuildContext context, WorkshopModel model) {
-    return FloatingActionButton(
+    return FloatingActionButton.extended(
       elevation: 15,
-      child: Icon(FontAwesomeIcons.plus),
+      icon: Icon(FontAwesomeIcons.plus),
+      label: Text(" 研修会を追加", style: cTextUpBarL, textScaleFactor: 1),
       onPressed: () async {
         model.initData(_organizer);
         await Navigator.push(

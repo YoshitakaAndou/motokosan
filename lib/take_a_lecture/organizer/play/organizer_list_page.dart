@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:motokosan/take_a_lecture/workshop/list/workshop_list_page.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/go_back.dart';
 import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../widgets/bar_title.dart';
-import '../../workshop/play/workshop_list_page.dart';
 import '../../../constants.dart';
-import 'organizer_class.dart';
-import 'organizer_model.dart';
+import '../organizer_class.dart';
+import '../organizer_model.dart';
 
 class OrganizerListPage extends StatefulWidget {
   final UserData _userData;

@@ -1,15 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:motokosan/widgets/convert_items.dart';
 
-import 'question_class.dart';
+import '../question_class.dart';
 
 class FSQuestion {
   static final FSQuestion instance = FSQuestion();
 
   Future<List<Question>> fetchDates(
-      String _groupName,
-      String _lectureId,
-      ) async {
+    String _groupName,
+    String _lectureId,
+  ) async {
     final _docs = await FirebaseFirestore.instance
         .collection("Groups")
         .doc(_groupName)
@@ -18,34 +18,34 @@ class FSQuestion {
         .get();
     final List<Question> _results = _docs.docs
         .map((doc) => Question(
-      questionId: doc["questionId"],
-      questionNo: doc["questionNo"],
-      question: doc["question"],
-      choices1: doc["choices1"],
-      choices2: doc["choices2"],
-      choices3: doc["choices3"],
-      choices4: doc["choices4"],
-      correctChoices: doc["correctChoices"],
-      answerDescription: doc["answerDescription"],
-      updateAt: doc["upDate"],
-      createAt: doc["createAt"],
-      answeredAt: doc["answeredAt"],
-      answered: doc["answered"],
-      organizerId: doc["organizerId"],
-      workshopId: doc["workshopId"],
-      lectureId: doc["lectureId"],
-    ))
+              questionId: doc["questionId"],
+              questionNo: doc["questionNo"],
+              question: doc["question"],
+              choices1: doc["choices1"],
+              choices2: doc["choices2"],
+              choices3: doc["choices3"],
+              choices4: doc["choices4"],
+              correctChoices: doc["correctChoices"],
+              answerDescription: doc["answerDescription"],
+              updateAt: doc["upDate"],
+              createAt: doc["createAt"],
+              answeredAt: doc["answeredAt"],
+              answered: doc["answered"],
+              organizerId: doc["organizerId"],
+              workshopId: doc["workshopId"],
+              lectureId: doc["lectureId"],
+            ))
         .toList();
     _results.sort((a, b) => a.questionNo.compareTo(b.questionNo));
     return _results;
   }
 
   Future<void> setData(
-      bool _isAdd,
-      String _groupName,
-      Question _data,
-      DateTime _timeStamp,
-      ) async {
+    bool _isAdd,
+    String _groupName,
+    Question _data,
+    DateTime _timeStamp,
+  ) async {
     final _questionId = _isAdd ? _timeStamp.toString() : _data.questionId;
     await FirebaseFirestore.instance
         .collection("Groups")
@@ -64,7 +64,7 @@ class FSQuestion {
       "answerDescription": _data.answerDescription,
       "upDate": ConvertItems.instance.dateToInt(_timeStamp),
       "createAt":
-      _isAdd ? ConvertItems.instance.dateToInt(_timeStamp) : _data.createAt,
+          _isAdd ? ConvertItems.instance.dateToInt(_timeStamp) : _data.createAt,
       "answeredAt": _isAdd
           ? ConvertItems.instance.dateToInt(_timeStamp)
           : _data.answeredAt,
@@ -78,9 +78,9 @@ class FSQuestion {
   }
 
   Future<void> deleteData(
-      String _groupName,
-      String _questionId,
-      ) async {
+    String _groupName,
+    String _questionId,
+  ) async {
     await FirebaseFirestore.instance
         .collection("Groups")
         .doc(_groupName)

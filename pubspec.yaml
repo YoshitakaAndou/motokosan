@@ -46,6 +46,7 @@ dependencies:
   webview_flutter: ^1.0.1
   http: ^0.12.2
   flutter_launcher_icons: ^0.8.1
+  flutter_signin_button: ^1.1.0
 
   cupertino_icons: ^0.1.3
 

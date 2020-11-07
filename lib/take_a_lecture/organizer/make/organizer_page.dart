@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:motokosan/take_a_lecture/organizer/play/organizer_class.dart';
+import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
 import 'package:motokosan/take_a_lecture/organizer/play/organizer_firebase.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/bar_title.dart';
@@ -12,7 +12,7 @@ import '../../../widgets/ok_show_dialog.dart';
 import '../../../constants.dart';
 import 'organizer_add.dart';
 import 'organizer_edit.dart';
-import '../play/organizer_model.dart';
+import '../organizer_model.dart';
 
 class OrganizerPage extends StatelessWidget {
   final UserData _userData;
@@ -188,9 +188,10 @@ class OrganizerPage extends StatelessWidget {
   }
 
   Widget _floatingActionButton(BuildContext context, OrganizerModel model) {
-    return FloatingActionButton(
+    return FloatingActionButton.extended(
       elevation: 15,
-      child: Icon(FontAwesomeIcons.plus),
+      icon: Icon(FontAwesomeIcons.plus),
+      label: Text(" 主催者を追加", style: cTextUpBarL, textScaleFactor: 1),
       onPressed: () async {
         model.initData();
         await Navigator.push(

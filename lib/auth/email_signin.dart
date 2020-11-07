@@ -1,33 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:motokosan/widgets/body_data.dart';
 import 'package:motokosan/widgets/flare_actors.dart';
 import 'package:provider/provider.dart';
 import '../widgets/bar_title.dart';
-import '../widgets/user_data.dart';
 import '../widgets/ok_show_dialog.dart';
 import '../widgets/bubble/bubble.dart';
 import '../constants.dart';
-import '../home.dart';
-import 'login_model.dart';
-import 'signup_page.dart';
+import '../home/home.dart';
+import 'email_model.dart';
+import 'email_signup.dart';
 import '../user_data/userdata_firebase.dart';
 
-class LoginPage extends StatelessWidget {
+class EmailSignin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final model = Provider.of<LoginModel>(context, listen: false);
+    final model = Provider.of<EmailModel>(context, listen: false);
     final groupController = TextEditingController();
     final emailController = TextEditingController();
     final passwordController = TextEditingController();
     final beforeGroup = model.userData.userGroup;
     final beforeEmail = model.userData.userEmail;
     final beforePassword = model.userData.userPassword;
-    //todo print
-    userDataPrint(model.userData, "login_page");
+    final Size _size = MediaQuery.of(context).size;
+
     groupController.text = model.userData.userGroup;
     emailController.text = model.userData.userEmail;
     passwordController.text = model.userData.userPassword;
-    return Consumer<LoginModel>(
+    return Consumer<EmailModel>(
       builder: (context, model, child) {
         return Scaffold(
           appBar: AppBar(
@@ -48,8 +48,14 @@ class LoginPage extends StatelessWidget {
                     child: _imageArea(context, model),
                   ),
                   Expanded(
-                    flex: 1,
-                    child: Container(),
+                    flex: 2,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        _toSignUpPage(context, model, _size),
+                      ],
+                    ),
                   ),
                   Expanded(
                     flex: 12,
@@ -67,16 +73,9 @@ class LoginPage extends StatelessWidget {
                               padding: EdgeInsets.all(8),
                               child: Column(
                                 children: [
-                                  _toSignUpPage(
-                                    context,
-                                    model,
-                                  ),
-                                  _groupNameInput(
-                                    context,
-                                    model,
-                                    groupController,
-                                    beforeGroup,
-                                  ),
+                                  // _toSignUpPage(context, model),
+                                  _groupNameInput(context, model,
+                                      groupController, beforeGroup),
                                   _mailAddressInput(
                                     context,
                                     model,
@@ -100,10 +99,6 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  //   Expanded(
-                  //     flex: 1,
-                  //     child: Container(),
-                  //   ),
                 ],
               ),
               if (model.isLoading)
@@ -116,14 +111,14 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget _imageArea(BuildContext context, LoginModel model) {
+  Widget _imageArea(BuildContext context, EmailModel model) {
     return Container(
       height: MediaQuery.of(context).size.height / 3,
       padding: EdgeInsets.all(5),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (model.isUpdate == false && model.userData.userName.isNotEmpty)
+          if (model.userData.userName.isNotEmpty)
             Expanded(
               child: Bubble(
                 color: Color.fromRGBO(225, 255, 199, 1.0),
@@ -148,7 +143,7 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget _loginTitle(BuildContext context, LoginModel model) {
+  Widget _loginTitle(BuildContext context, EmailModel model) {
     return Container(
       width: double.infinity,
       height: 30,
@@ -166,24 +161,28 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget _toSignUpPage(BuildContext context, LoginModel model) {
+  Widget _toSignUpPage(BuildContext context, EmailModel model, Size _size) {
     return Container(
       height: 30,
-      width: double.infinity,
-      alignment: Alignment.centerRight,
-      child: FlatButton(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Icon(Icons.account_box, size: 18, color: Colors.black54),
-            Text("新規登録の方はこちら→", style: cTextListS, textScaleFactor: 1),
-          ],
-        ),
+      width: _size.width / 2.2,
+      child: RaisedButton.icon(
+        icon: Icon(Icons.account_box, size: 18, color: Colors.black54),
+        label: Text("新規登録する→",
+            style: TextStyle(
+                color: Colors.black54,
+                fontSize: 13,
+                fontWeight: FontWeight.w500),
+            textScaleFactor: 1),
+        color: Colors.white,
+        // shape: const OutlineInputBorder(
+        //   borderRadius: BorderRadius.all(Radius.circular(5)),
+        // ),
+        elevation: 10,
         onPressed: () {
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => SignUpPage(),
+              builder: (context) => EmailSignup(),
             ),
           );
         },
@@ -192,7 +191,7 @@ class LoginPage extends StatelessWidget {
   }
 
   Widget _groupNameInput(
-      BuildContext context, LoginModel model, groupController, beforeGroup) {
+      BuildContext context, EmailModel model, groupController, beforeGroup) {
     return Row(
       children: [
         Expanded(
@@ -222,7 +221,7 @@ class LoginPage extends StatelessWidget {
   }
 
   Widget _mailAddressInput(
-      BuildContext context, LoginModel model, emailController, beforeEmail) {
+      BuildContext context, EmailModel model, emailController, beforeEmail) {
     return Row(
       children: [
         Expanded(
@@ -250,7 +249,7 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget _passwordInput(BuildContext context, LoginModel model,
+  Widget _passwordInput(BuildContext context, EmailModel model,
       passwordController, beforePassword) {
     return Row(
       children: [
@@ -285,7 +284,7 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget _loginButton(BuildContext context, LoginModel model) {
+  Widget _loginButton(BuildContext context, EmailModel model) {
     return Container(
       width: double.infinity,
       height: 40,
@@ -304,20 +303,28 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Future<void> _loginProcess(BuildContext context, LoginModel model) async {
+  Future<void> _loginProcess(BuildContext context, EmailModel model) async {
     model.setIsLoading(true);
     try {
       //Authにログインしてuidを取得
-      final _uid = await model.logIn();
-      //FirebaseStorageからUser情報を取得
-      print("_uid:$_uid");
-      print("model.userData.uid:${model.userData.uid}");
-      //Authのuidと本体のuidを比較
-      if (_uid != model.userData.uid) {
+      final _uid = await model.signIn();
+      print("Authの_uid:$_uid");
+      print("本体model.userData.uid:${model.userData.uid}");
+
+      //本体が空だったらFSUserの情報を本体に登録
+      if (model.userData.uid.isEmpty) {
+        print("本体が空だった");
         model.userData = await FSUserData.instance
             .fetchUserData(_uid, model.userData.userGroup);
-        //違っていたら本体に保存するか？
-        await MyDialog.instance.okShowDialogFunc(
+        await BodyData.instance.saveDataToPhone(model.userData);
+      } else {
+        //Authのuidと本体のuidを比較
+        if (_uid != model.userData.uid) {
+          print("本体と違っていた");
+          model.userData = await FSUserData.instance
+              .fetchUserData(_uid, model.userData.userGroup);
+          //違っていたら本体に保存するか？
+          await MyDialog.instance.okShowDialogFunc(
             context: context,
             mainTitle: "本体情報と違うアカウントでログインしました！",
             subTitle: "\ngroup :${model.userData.userGroup}"
@@ -325,35 +332,13 @@ class LoginPage extends StatelessWidget {
                 "\nemail :${model.userData.userEmail}\n"
                 "\n本体情報を上書き保存しますか？",
             onPressed: () async {
-              await model.saveDataToPhone(model.userData);
+              await BodyData.instance.saveDataToPhone(model.userData);
               Navigator.pop(context);
-            });
+            },
+          );
+        }
       }
-      // await okShowDialog(context, "ログインしました");
       await FlareActors.instance.done(context);
-      // await firework(context);
-      //DataBaseのチェック
-      // final _databaseQuiz = DatabaseModel();
-      // Future(() async {
-      //   final _datesQuiz = await _databaseQuiz.getQuizzes();
-      //   if (_datesQuiz.length == 0) {
-      //     //新規の場合はDBが空なのでFBからデータを注入
-      //     await _databaseQuiz.insertQuizzes(await fetchQuizFsCloud(cQuizId));
-      //   }
-      // });
-      // final _databaseQa = QaDatabaseModel();
-      // Future(() async {
-      //   await _databaseQa.deleteAllQa();
-      //   await _databaseQa.insertQas(await fetchFsCloud(cQasId));
-      // });
-      // final _databaseLec = LecDatabaseModel();
-      // Future(() async {
-      //   final _datesLec = await _databaseLec.getLecs();
-      //   if (_datesLec.length == 0) {
-      //     //新規の場合はDBが空なのでFBからデータを注入
-      //     await _databaseLec.insertLecs(await lFetchFsCloud(cLecsId));
-      //   }
-      // });
       await Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -368,22 +353,22 @@ class LoginPage extends StatelessWidget {
   }
 
   Future<Widget> _errorMessage(BuildContext context, String _error) async {
-    if (_error.contains("ERROR_INVALID_EMAIL")) {
+    if (_error.contains("invalid-email")) {
       _error = "メールアドレスの形式が間違っています！";
     }
-    if (_error.contains("ERROR_WRONG_PASSWORD")) {
+    if (_error.contains("wrong-password")) {
       _error = "パスワードが間違っています！";
     }
-    if (_error.contains("ERROR_USER_NOT_FOUND")) {
+    if (_error.contains("user-not-found")) {
       _error = "指定されたメールアドレスでのユーザ登録がありません！";
     }
-    if (_error.contains("ERROR_USER_DISABLED")) {
+    if (_error.contains("user-disabled")) {
       _error = "指定したユーザーが無効になっています！";
     }
-    if (_error.contains("ERROR_TOO_MANY_REQUESTS")) {
+    if (_error.contains("too-many-requests")) {
       _error = "指定したユーザーとしてサインインする試みが多すぎます！";
     }
-    if (_error.contains("ERROR_OPERATION_NOT_ALLOWED")) {
+    if (_error.contains("operation-not-allowed")) {
       _error = "指定したユーザのログインが許されていません！";
     }
     return await MyDialog.instance.okShowDialog(context, _error);

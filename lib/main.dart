@@ -2,19 +2,23 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:motokosan/auth/email_signin.dart';
+import 'package:motokosan/auth/email_signup.dart';
+import 'package:motokosan/home/home.dart';
+import 'package:motokosan/user_data/userdata_firebase.dart';
+import 'auth/google_model.dart';
+import 'auth/google_signin.dart';
+import 'home/home_model.dart';
 import 'take_a_lecture/graduater/graduater_model.dart';
-import 'take_a_lecture/organizer/play/organizer_model.dart';
-import 'take_a_lecture/question/play/question_model.dart';
-import 'take_a_lecture/workshop/play/workshop_model.dart';
+import 'take_a_lecture/organizer/organizer_model.dart';
+import 'take_a_lecture/question/question_model.dart';
+import 'take_a_lecture/workshop/workshop_model.dart';
 import 'package:provider/provider.dart';
-import 'auth/login_page.dart';
-import 'auth/signup_model.dart';
-import 'auth/signup_page.dart';
 import 'take_a_lecture/target/target_model.dart';
-import 'take_a_lecture/lecture/play/lecture_model.dart';
-import 'widgets/user_data.dart';
-import 'auth/login_model.dart';
+import 'take_a_lecture/lecture/lecture_model.dart';
+import 'auth/email_model.dart';
 import 'widgets/datasave_widget.dart';
+import 'widgets/user_data.dart';
 
 void main() async {
   //Future処理に必要
@@ -22,14 +26,16 @@ void main() async {
   await Firebase.initializeApp();
 
   runApp((MultiProvider(providers: [
-    ChangeNotifierProvider(create: (context) => LoginModel()),
-    ChangeNotifierProvider(create: (context) => SignupModel()),
+    ChangeNotifierProvider(create: (context) => HomeModel()),
+    ChangeNotifierProvider(create: (context) => EmailModel()),
+    ChangeNotifierProvider(create: (context) => GoogleModel()),
     ChangeNotifierProvider(create: (context) => TargetModel()),
     ChangeNotifierProvider(create: (context) => OrganizerModel()),
     ChangeNotifierProvider(create: (context) => WorkshopModel()),
     ChangeNotifierProvider(create: (context) => LectureModel()),
     ChangeNotifierProvider(create: (context) => QuestionModel()),
     ChangeNotifierProvider(create: (context) => GraduaterModel()),
+    ChangeNotifierProvider(create: (context) => GoogleModel()),
   ], child: MyApp())));
 
   //向き指定
@@ -104,12 +110,19 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    final model = Provider.of<LoginModel>(context, listen: false);
+    final model = Provider.of<EmailModel>(context, listen: false);
     model.userData.uid = _uid;
     model.userData.userGroup = _group;
     model.userData.userName = _name;
     model.userData.userEmail = _email;
     model.userData.userPassword = _password;
+    bool _isCurrentUserSignIn = FSUserData.instance.isCurrentUserSignIn();
+    if (_isCurrentUserSignIn) {
+      if (_group.isEmpty) {
+        _isCurrentUserSignIn = false;
+      }
+    }
+
     //todo print
     userDataPrint(model.userData, "main");
     return MaterialApp(
@@ -136,7 +149,13 @@ class _MyAppState extends State<MyApp> {
           iconTheme: IconThemeData(color: Colors.black87),
         ),
       ),
-      home: (model.userData.userEmail == "") ? SignUpPage() : LoginPage(),
+      home: _isCurrentUserSignIn
+          ? Home(model.userData)
+          : model.userData.userPassword == "google認証"
+              ? GoogleSignin(userData: model.userData)
+              : model.userData.userEmail.isEmpty
+                  ? EmailSignup()
+                  : EmailSignin(),
     );
   }
 }

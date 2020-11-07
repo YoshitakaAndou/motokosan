@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:motokosan/take_a_lecture/organizer/play/organizer_class.dart';
-import 'package:motokosan/take_a_lecture/workshop/play/workshop_firebase.dart';
+import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
+import 'package:motokosan/take_a_lecture/workshop/workshop_firebase.dart';
+import 'package:motokosan/widgets/convert_items.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../play/workshop_model.dart';
+import '../workshop_model.dart';
 import '../../../widgets/ok_show_dialog.dart';
 import '../../../constants.dart';
-import 'package:motokosan/take_a_lecture/workshop/play/workshop_class.dart';
+import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
+import 'dart:async';
 
 class WorkshopEdit extends StatelessWidget {
   final String groupName;
@@ -26,6 +28,7 @@ class WorkshopEdit extends StatelessWidget {
     option1TextController.text = _workshop.option1;
     option2TextController.text = _workshop.option2;
     option3TextController.text = _workshop.option3;
+
     return Consumer<WorkshopModel>(builder: (context, model, child) {
       return Scaffold(
         resizeToAvoidBottomInset: true,
@@ -64,7 +67,13 @@ class WorkshopEdit extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        _switch(model, context),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _switch(model, context),
+                            _deadlineDate(model, context),
+                          ],
+                        ),
                         _title(model, titleTextController),
                         _subTitle(model, subTitleTextController),
                         _option1(model, option1TextController),
@@ -141,28 +150,82 @@ class WorkshopEdit extends StatelessWidget {
   }
 
   Widget _switch(WorkshopModel model, BuildContext context) {
+    final _okSwitch = _workshop.lectureLength > 0;
+    return Column(
+      children: [
+        Row(
+          children: [
+            if (_okSwitch)
+              Text("登録講座 ${_workshop.lectureLength}件",
+                  style: TextStyle(fontSize: 12, color: Colors.black87),
+                  textScaleFactor: 1),
+            if (!_okSwitch)
+              Text("講座０件の間は公開できません！",
+                  style: TextStyle(fontSize: 10, color: Colors.red),
+                  textScaleFactor: 1),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Switch(
+              value: _workshop.isRelease,
+              activeColor: Colors.green,
+              activeTrackColor: Colors.grey,
+              inactiveThumbColor: Colors.white,
+              inactiveTrackColor: Colors.grey,
+              onChanged: (value) {
+                if (_workshop.lectureLength > 0) {
+                  _workshop.isRelease = value;
+                  model.setUpdate();
+                }
+              },
+            ),
+            SizedBox(width: 20),
+            Text(_workshop.isRelease ? '公開する' : '非公開',
+                style: TextStyle(
+                    fontSize: 15,
+                    color:
+                        _workshop.isRelease ? Colors.black87 : Colors.black26),
+                textScaleFactor: 1),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _deadlineDate(WorkshopModel model, BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Switch(
-          value: _workshop.isRelease,
-          activeColor: Colors.green,
-          activeTrackColor: Colors.grey,
-          inactiveThumbColor: Colors.white,
-          inactiveTrackColor: Colors.grey,
-          onChanged: (value) {
-            _workshop.isRelease = value;
-            model.setUpdate();
-          },
-        ),
-        SizedBox(width: 20),
-        Text(_workshop.isRelease ? '公開する' : '非公開',
+        Text("期日：${ConvertItems.instance.intToString(_workshop.deadlineAt)}",
             style: TextStyle(
-                fontSize: 15,
+                fontSize: 12,
                 color: _workshop.isRelease ? Colors.black87 : Colors.black26),
             textScaleFactor: 1),
+        SizedBox(width: 10),
+        IconButton(
+          icon: Icon(FontAwesomeIcons.calendarAlt,
+              size: 20, color: Colors.black54),
+          onPressed: () => _deadlineOnTap(context, model),
+        ),
       ],
     );
+  }
+
+  Future<void> _deadlineOnTap(BuildContext context, WorkshopModel model) async {
+    final DateTime _initDate = DateTime.parse(_workshop.deadlineAt.toString());
+    final DateTime selected = await showDatePicker(
+      context: context,
+      initialDate: _initDate,
+      firstDate: DateTime.now().subtract(Duration(days: 30)),
+      lastDate: DateTime.now().add(Duration(days: 770)),
+    );
+    if (selected != null) {
+      _workshop.deadlineAt = ConvertItems.instance.dateToInt(selected);
+      // model.workshop.deadlineAt = _workshop.deadlineAt;
+      model.setUpdate();
+    }
   }
 
   Widget _title(WorkshopModel model, _titleTextController) {
@@ -171,7 +234,7 @@ class WorkshopEdit extends StatelessWidget {
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
       decoration: InputDecoration(
-        labelText: "研修会名:",
+        labelText: "研修会名",
         labelStyle: TextStyle(fontSize: 10),
         hintText: "研修会名 を入力してください",
         hintStyle: TextStyle(fontSize: 12),
@@ -197,7 +260,7 @@ class WorkshopEdit extends StatelessWidget {
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
       decoration: InputDecoration(
-        labelText: "subTitle:",
+        labelText: "subTitle",
         labelStyle: TextStyle(fontSize: 10),
         hintText: "subTitle を入力してください",
         hintStyle: TextStyle(fontSize: 12),
@@ -223,9 +286,9 @@ class WorkshopEdit extends StatelessWidget {
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
       decoration: InputDecoration(
-        labelText: "option1:",
+        labelText: "インフォメーション",
         labelStyle: TextStyle(fontSize: 10),
-        hintText: "option1 を入力してください",
+        hintText: "インフォメーション を入力してください",
         hintStyle: TextStyle(fontSize: 12),
         suffixIcon: IconButton(
           onPressed: () {
@@ -249,9 +312,9 @@ class WorkshopEdit extends StatelessWidget {
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
       decoration: InputDecoration(
-        labelText: "option2:",
+        labelText: "マーク表示",
         labelStyle: TextStyle(fontSize: 10),
-        hintText: "option2 を入力してください",
+        hintText: "マーク表示 を入力してください",
         hintStyle: TextStyle(fontSize: 12),
         suffixIcon: IconButton(
           onPressed: () {
@@ -275,7 +338,7 @@ class WorkshopEdit extends StatelessWidget {
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
       decoration: InputDecoration(
-        labelText: "option3:",
+        labelText: "option3",
         labelStyle: TextStyle(fontSize: 10),
         hintText: "option3 を入力してください",
         hintStyle: TextStyle(fontSize: 12),
@@ -385,6 +448,7 @@ class WorkshopEdit extends StatelessWidget {
     model.workshop.workshopNo = _workshop.workshopNo;
     model.workshop.createAt = _workshop.createAt;
     model.workshop.updateAt = _workshop.updateAt;
+    model.workshop.deadlineAt = _workshop.deadlineAt;
     try {
       await model.updateWorkshopFs(groupName, DateTime.now());
       await model.fetchWorkshopByOrganizer(groupName, _organizer.organizerId);
@@ -399,9 +463,11 @@ class WorkshopEdit extends StatelessWidget {
   }
 
   Widget _deleteButton(BuildContext context, WorkshopModel model) {
-    return FloatingActionButton(
+    return FloatingActionButton.extended(
       elevation: 15,
-      child: Icon(FontAwesomeIcons.trashAlt),
+
+      icon: Icon(FontAwesomeIcons.trashAlt),
+      label: Text(" この研修会を削除", style: cTextUpBarM, textScaleFactor: 1),
       // todo 削除
       onPressed: () {
         MyDialog.instance.okShowDialogFunc(

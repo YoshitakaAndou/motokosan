@@ -2,8 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'organizer_class.dart';
-import 'organizer_firebase.dart';
-
+import 'play/organizer_firebase.dart';
 
 class OrganizerModel extends ChangeNotifier {
   List<Organizer> organizers = [];
@@ -105,7 +104,7 @@ class OrganizerModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> deleteCategoryFs(_groupName, _organizerId) async {
+  Future<void> deleteOrganizerFs(_groupName, _organizerId) async {
     await FSOrganizer.instance.deleteData(_groupName, _organizerId);
     notifyListeners();
   }

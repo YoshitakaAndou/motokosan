@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'question_class.dart';
+import '../question_class.dart';
 
 class QuestionDatabase {
   static final QuestionDatabase instance = QuestionDatabase();

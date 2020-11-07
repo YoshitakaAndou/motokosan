@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/take_a_lecture/lecture/make/lecture_web.dart';
-import 'package:motokosan/take_a_lecture/lecture/play/lecture_class.dart';
-import 'package:motokosan/take_a_lecture/lecture/play/lecture_firebase.dart';
-import 'package:motokosan/take_a_lecture/organizer/play/organizer_class.dart';
-import 'package:motokosan/take_a_lecture/question/play/question_class.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_firebase.dart';
+import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
+import 'package:motokosan/take_a_lecture/question/question_class.dart';
 import 'package:motokosan/take_a_lecture/question/play/question_firebase.dart';
-import 'package:motokosan/take_a_lecture/workshop/play/workshop_class.dart';
+import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/widgets/datasave_widget.dart';
 import 'package:provider/provider.dart';
-import '../play/lecture_model.dart';
+import '../lecture_model.dart';
 import '../../../widgets/ok_show_dialog.dart';
 import '../../../constants.dart';
 import 'lecture_video.dart';
@@ -175,7 +175,7 @@ class LectureEdit extends StatelessWidget {
       keyboardType: TextInputType.text,
       controller: _titleTextController,
       decoration: InputDecoration(
-        labelText: "講義名:",
+        labelText: "講義名",
         labelStyle: TextStyle(fontSize: 10),
         hintText: "講義名 を入力してください",
         hintStyle: TextStyle(fontSize: 12),
@@ -205,7 +205,7 @@ class LectureEdit extends StatelessWidget {
       keyboardType: TextInputType.text,
       controller: _subTitleTextController,
       decoration: InputDecoration(
-        labelText: "subTitle:",
+        labelText: "subTitle",
         labelStyle: TextStyle(fontSize: 10),
         hintText: "subTitle を入力してください",
         hintStyle: TextStyle(fontSize: 12),
@@ -238,7 +238,7 @@ class LectureEdit extends StatelessWidget {
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
       decoration: InputDecoration(
-        labelText: "YouTubeURL:",
+        labelText: "YouTubeURL",
         labelStyle: TextStyle(fontSize: 10),
         hintText: "YouTube動画URL を入力してください",
         hintStyle: TextStyle(fontSize: 12),
@@ -635,9 +635,11 @@ class LectureEdit extends StatelessWidget {
   }
 
   Widget _deleteButton(BuildContext context, LectureModel model) {
-    return FloatingActionButton(
+    return FloatingActionButton.extended(
       elevation: 15,
-      child: Icon(FontAwesomeIcons.trashAlt),
+
+      icon: Icon(FontAwesomeIcons.trashAlt),
+      label: Text(" この講義を削除", style: cTextUpBarM, textScaleFactor: 1),
       // todo 削除
       onPressed: () {
         MyDialog.instance.okShowDialogFunc(

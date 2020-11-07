@@ -1,12 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:motokosan/take_a_lecture/organizer/play/organizer_class.dart';
+import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
 
 import 'workshop_class.dart';
 import 'workshop_database.dart';
 import 'workshop_firebase.dart';
-
-
 
 class WorkshopModel extends ChangeNotifier {
   List<Workshop> workshops = [];
@@ -63,6 +61,11 @@ class WorkshopModel extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  // void changeDeadlineAt(int _val) {
+  //   workshop.deadlineAt = _val;
+  //   notifyListeners();
+  // }
 
   void changeIsRelease(bool _val) {
     workshop.isRelease = _val;
@@ -200,4 +203,3 @@ class WorkshopModel extends ChangeNotifier {
     notifyListeners();
   }
 }
-

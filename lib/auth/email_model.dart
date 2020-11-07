@@ -1,21 +1,44 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../widgets/datasave_widget.dart';
+import 'package:motokosan/user_data/userdata_firebase.dart';
+import 'package:motokosan/widgets/body_data.dart';
 import '../user_data/userdata_class.dart';
 
-class SignupModel extends ChangeNotifier {
+class EmailModel extends ChangeNotifier {
   UserData userData = UserData();
+  bool isLoading = false;
   bool isUpdate = false;
+  bool currentUserSignIn = false;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // void initUserData() {
-  //   userData.userGroup = "";
-  //   userData.userName = "";
-  //   userData.userEmail = "";
-  //   userData.userPassword = "";
-  // }
+  Future<String> signIn() async {
+    if (userData.userGroup.isEmpty) {
+      throw ("グループ名を入力してください");
+    }
+    if (userData.userEmail.isEmpty) {
+      throw ("メールアドレスを入力してください");
+    }
+    if (userData.userPassword.isEmpty) {
+      throw ("パスワードを入力してください");
+    }
+
+    final User user = (await _auth.signInWithEmailAndPassword(
+      email: userData.userEmail,
+      password: userData.userPassword,
+    ))
+        .user;
+
+    // todo FB Usersのデータをmodelに格納
+    final _userData =
+        await FSUserData.instance.fetchUserData(user.uid, userData.userGroup);
+    userData.userName = _userData.userName;
+
+    return user.uid;
+  }
 
   void changeValue(String _arg, String _val) {
     switch (_arg) {
@@ -55,19 +78,16 @@ class SignupModel extends ChangeNotifier {
     if (userData.userPassword.length < 6) {
       throw ("パスワードは６文字以上で入力してください");
     }
-    final User user = (await _auth.createUserWithEmailAndPassword(
+    final User _user = (await _auth.createUserWithEmailAndPassword(
       email: userData.userEmail,
       password: userData.userPassword,
     ))
         .user;
-    userData.uid = user.uid;
-    userData.userEmail = user.email;
 
-    DataSave.saveString("_uid", userData.uid);
-    DataSave.saveString("_group", userData.userGroup);
-    DataSave.saveString("_name", userData.userName);
-    DataSave.saveString("_email", userData.userEmail);
-    DataSave.saveString("_password", userData.userPassword);
+    userData.uid = _user.uid;
+    userData.userEmail = _user.email;
+
+    await BodyData.instance.saveDataToPhone(userData);
 
     // Authへ登録した際に発行されたUIDを元にデータベースUsersに登録する
     FirebaseFirestore.instance
@@ -83,5 +103,25 @@ class SignupModel extends ChangeNotifier {
       "password": userData.userPassword,
       "createdAt": Timestamp.now(),
     });
+  }
+
+  void setEmail(String _email) {
+    userData.userEmail = _email;
+    notifyListeners();
+  }
+
+  void setPassword(String _password) {
+    userData.userPassword = _password;
+    notifyListeners();
+  }
+
+  void setIsLoading(bool _setData) {
+    isLoading = _setData;
+    notifyListeners();
+  }
+
+  void setIsUpdate(bool _setData) {
+    isUpdate = _setData;
+    notifyListeners();
   }
 }

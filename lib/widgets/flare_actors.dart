@@ -8,17 +8,20 @@ class FlareActors {
     return await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Container(
-          width: 450,
-          height: 300,
-          child: FlareActor(
-            'assets/flr/done.flr',
-            animation: 'done',
-            alignment: Alignment.center,
-            fit: BoxFit.contain,
-            callback: (text) {
-              Navigator.of(context).pop();
-            },
+        return GestureDetector(
+          onTap: () => Navigator.of(context).pop(),
+          child: Container(
+            width: 450,
+            height: 300,
+            child: FlareActor(
+              'assets/flr/done.flr',
+              animation: 'done',
+              alignment: Alignment.center,
+              fit: BoxFit.contain,
+              callback: (text) {
+                Navigator.of(context).pop();
+              },
+            ),
           ),
         );
       },
@@ -30,17 +33,20 @@ class FlareActors {
       context: context,
       builder: (BuildContext context) {
         final Size _size = MediaQuery.of(context).size;
-        return Container(
-          width: _size.width,
-          height: _size.height,
-          child: FlareActor(
-            'assets/flr/fireworks.flr',
-            animation: 'fireworks',
-            alignment: Alignment.center,
-            fit: BoxFit.contain,
-            callback: (text) {
-              Navigator.of(context).pop();
-            },
+        return GestureDetector(
+          onTap: () => Navigator.of(context).pop(),
+          child: Container(
+            width: _size.width,
+            height: _size.height,
+            child: FlareActor(
+              'assets/flr/fireworks.flr',
+              animation: 'fireworks',
+              alignment: Alignment.center,
+              fit: BoxFit.contain,
+              callback: (text) {
+                Navigator.of(context).pop();
+              },
+            ),
           ),
         );
       },

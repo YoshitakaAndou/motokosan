@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:motokosan/take_a_lecture/lecture/play/lecture_class.dart';
-import 'package:motokosan/take_a_lecture/question/play/question_class.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
+import 'package:motokosan/take_a_lecture/question/question_class.dart';
 import 'package:motokosan/take_a_lecture/question/play/question_firebase.dart';
 import 'package:motokosan/widgets/bar_title.dart';
 import 'package:motokosan/widgets/guriguri.dart';
@@ -10,7 +10,7 @@ import '../../../widgets/ok_show_dialog.dart';
 import '../../../constants.dart';
 import 'question_add.dart';
 import 'question_edit.dart';
-import '../play/question_model.dart';
+import '../question_model.dart';
 
 class QuestionPage extends StatelessWidget {
   final String groupName;
@@ -261,9 +261,10 @@ class QuestionPage extends StatelessWidget {
   }
 
   Widget _floatingActionButton(BuildContext context, QuestionModel model) {
-    return FloatingActionButton(
+    return FloatingActionButton.extended(
       elevation: 15,
-      child: Icon(FontAwesomeIcons.plus),
+      icon: Icon(FontAwesomeIcons.plus),
+      label: Text(" 確認テストを追加", style: cTextUpBarL, textScaleFactor: 1),
       // add
       onPressed: () async {
         model.initQuestion(_lecture);

@@ -1,22 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_signin_button/flutter_signin_button.dart';
+import 'package:motokosan/auth/email_model.dart';
+import 'package:motokosan/widgets/user_data.dart';
 import 'package:provider/provider.dart';
 import '../widgets/bar_title.dart';
 import '../widgets/ok_show_dialog.dart';
-import 'login_page.dart';
+import 'email_signin.dart';
+import 'google_signup.dart';
 import '../constants.dart';
-import '../home.dart';
+import '../home/home.dart';
 
-import 'signup_model.dart';
-
-class SignUpPage extends StatelessWidget {
+class EmailSignup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final model = Provider.of<EmailModel>(context, listen: false);
     final groupController = TextEditingController();
     final nameController = TextEditingController();
     final emailController = TextEditingController();
     final passwordController = TextEditingController();
-
-    return Consumer<SignupModel>(
+    groupController.text = model.userData.userGroup;
+    nameController.text = model.userData.userName;
+    emailController.text = model.userData.userEmail;
+    passwordController.text = model.userData.userPassword;
+    final Size _size = MediaQuery.of(context).size;
+    // todo print
+    userDataPrint(model.userData, "GoogleSignup");
+    return Consumer<EmailModel>(
       builder: (context, model, child) {
         return Scaffold(
           appBar: AppBar(
@@ -35,7 +44,17 @@ class SignUpPage extends StatelessWidget {
                         // height: MediaQuery.of(context).size.height / 3,
                         child: Image.asset("assets/images/nurse03.png")),
                   ),
-                  Expanded(flex: 1, child: Container()),
+                  Expanded(
+                    flex: 2,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _toGoogleSignup(context, model, _size),
+                        _toSigninPage(context, model, _size),
+                      ],
+                    ),
+                  ),
                   Expanded(
                     flex: 10,
                     child: SingleChildScrollView(
@@ -52,7 +71,6 @@ class SignUpPage extends StatelessWidget {
                               padding: EdgeInsets.all(8),
                               child: Column(
                                 children: [
-                                  _toSigninPage(context, model),
                                   _groupNameInput(
                                     context,
                                     model,
@@ -94,7 +112,7 @@ class SignUpPage extends StatelessWidget {
     );
   }
 
-  Widget _title(BuildContext context, SignupModel model) {
+  Widget _title(BuildContext context, EmailModel model) {
     return Container(
       width: double.infinity,
       height: 30,
@@ -112,24 +130,19 @@ class SignUpPage extends StatelessWidget {
     );
   }
 
-  Widget _toSigninPage(BuildContext context, SignupModel model) {
+  Widget _toGoogleSignup(BuildContext context, EmailModel model, Size _size) {
     return Container(
-      height: 20,
-      width: double.infinity,
-      alignment: Alignment.centerRight,
-      child: FlatButton(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Icon(Icons.account_circle, size: 18, color: Colors.black54),
-            Text("登録済みの方はログイン画面へ→", style: cTextListS, textScaleFactor: 1),
-          ],
-        ),
+      height: 30,
+      width: _size.width / 2.2,
+      child: SignInButton(
+        Buttons.Google,
+        text: "googleで登録",
+        elevation: 10,
         onPressed: () {
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => LoginPage(),
+              builder: (context) => GoogleSignup(),
             ),
           );
         },
@@ -137,7 +150,36 @@ class SignUpPage extends StatelessWidget {
     );
   }
 
-  Widget _groupNameInput(BuildContext context, SignupModel model,
+  Widget _toSigninPage(BuildContext context, EmailModel model, Size _size) {
+    return Container(
+      height: 30,
+      width: _size.width / 2.2,
+      child: RaisedButton.icon(
+        icon: Icon(Icons.account_box, size: 18, color: Colors.black54),
+        label: Text("登録済みの方→",
+            style: TextStyle(
+                color: Colors.black54,
+                fontSize: 13,
+                fontWeight: FontWeight.w500),
+            textScaleFactor: 1),
+        color: Colors.white,
+        // shape: const OutlineInputBorder(
+        //   borderRadius: BorderRadius.all(Radius.circular(5)),
+        // ),
+        elevation: 10,
+        onPressed: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EmailSignin(),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _groupNameInput(BuildContext context, EmailModel model,
       TextEditingController groupController) {
     return Row(
       children: [
@@ -161,7 +203,6 @@ class SignUpPage extends StatelessWidget {
               ),
             ),
             onChanged: (text) {
-              model.isUpdate = true;
               model.changeValue("userGroup", text);
             },
           ),
@@ -170,7 +211,7 @@ class SignUpPage extends StatelessWidget {
     );
   }
 
-  Widget _nameInput(BuildContext context, SignupModel model,
+  Widget _nameInput(BuildContext context, EmailModel model,
       TextEditingController nameController) {
     return Row(
       children: [
@@ -194,7 +235,6 @@ class SignUpPage extends StatelessWidget {
               ),
             ),
             onChanged: (text) {
-              model.isUpdate = true;
               model.changeValue("userName", text);
             },
           ),
@@ -203,7 +243,7 @@ class SignUpPage extends StatelessWidget {
     );
   }
 
-  Widget _mailAddressInput(BuildContext context, SignupModel model,
+  Widget _mailAddressInput(BuildContext context, EmailModel model,
       TextEditingController emailController) {
     return Row(
       children: [
@@ -227,7 +267,6 @@ class SignUpPage extends StatelessWidget {
               ),
             ),
             onChanged: (text) {
-              model.isUpdate = true;
               model.changeValue("userEmail", text);
             },
           ),
@@ -236,7 +275,7 @@ class SignUpPage extends StatelessWidget {
     );
   }
 
-  Widget _passwordInput(BuildContext context, SignupModel model,
+  Widget _passwordInput(BuildContext context, EmailModel model,
       TextEditingController passwordController) {
     return Row(
       children: [
@@ -264,7 +303,6 @@ class SignUpPage extends StatelessWidget {
             ),
             obscureText: true,
             onChanged: (text) {
-              model.isUpdate = true;
               model.changeValue("userPassword", text);
             },
           ),
@@ -273,7 +311,7 @@ class SignUpPage extends StatelessWidget {
     );
   }
 
-  Widget _signupButton(BuildContext context, SignupModel model) {
+  Widget _signupButton(BuildContext context, EmailModel model) {
     return Container(
       width: double.infinity,
       height: 40,
@@ -287,39 +325,16 @@ class SignUpPage extends StatelessWidget {
           borderSide: BorderSide(color: Colors.green, width: 2),
         ),
         elevation: 15,
-        onPressed:
-            !model.isUpdate ? null : () => _signupProcess(context, model),
+        onPressed: () => _signupProcess(context, model),
       ),
     );
   }
 
-  Future<void> _signupProcess(BuildContext context, SignupModel model) async {
+  Future<void> _signupProcess(BuildContext context, EmailModel model) async {
     try {
       await model.signUp();
       await MyDialog.instance.okShowDialog(context, "登録完了しました");
       Navigator.pop(context);
-      // //todo DBaseのチェック
-      // final _databaseQuiz = DatabaseModel();
-      // Future(() async {
-      //   final _datesQuiz = await _databaseQuiz.getQuizzes();
-      //   if (_datesQuiz.length == 0) {
-      //     //新規の場合はDBが空なのでFBからデータを注入
-      //     await _databaseQuiz.insertQuizzes(await fetchQuizFsCloud(cQuizId));
-      //   }
-      // });
-      // final _databaseQa = QaDatabaseModel();
-      // Future(() async {
-      //   await _databaseQa.deleteAllQa();
-      //   await _databaseQa.insertQas(await fetchFsCloud(cQasId));
-      // });
-      // final _databaseLec = LecDatabaseModel();
-      // Future(() async {
-      //   final _datesLec = await _databaseLec.getLecs();
-      //   if (_datesLec.length == 0) {
-      //     //新規の場合はDBが空なのでFBからデータを注入
-      //     await _databaseLec.insertLecs(await lFetchFsCloud(cLecsId));
-      //   }
-      // });
       await Navigator.push(
         context,
         MaterialPageRoute(
@@ -332,15 +347,16 @@ class SignUpPage extends StatelessWidget {
   }
 
   Future<Widget> _errorMessage(BuildContext context, String _error) async {
-    if (_error.contains("ERROR_INVALID_EMAIL")) {
-      _error = "メールアドレスの形式が間違っています！";
+    if (_error.contains("invalid-email")) {
+      _error = "メールアドレスの形式が間違っています！"
+          "\n*** @ *** . *** 形式が必要です。";
     }
     if (_error.contains("ERROR_WEAK_PASSWORD")) {
       _error = "パスワードの強度が十分ではありません！";
     }
-    if (_error.contains("ERROR_EMAIL_ALREADY_IN_USE")) {
-      _error = "メールアドレスが別のアカウントですでに使用されています！"
-          "\nメールアドレスを変えるか、ログイン画面でログインしてください！";
+    if (_error.contains("email-already-in-use")) {
+      _error = "このメールアドレスは既に登録されています！"
+          "\nアドレスを変えるか、ログイン画面でログインしてください！";
     }
     return await MyDialog.instance.okShowDialog(context, _error);
   }

@@ -1,6 +1,5 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:motokosan/take_a_lecture/lecture/play/lecture_firebase.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_firebase.dart';
 import 'package:motokosan/widgets/convert_items.dart';
 
 import 'workshop_class.dart';
@@ -21,7 +20,7 @@ class FSWorkshop {
       DateTime _timeStamp) async {
     final _workshopId = _isAdd ? _timeStamp.toString() : _data.workshopId;
     _data.lectureLength =
-    await FSLecture.instance.getLectureLength(_groupName, _data.workshopId);
+        await FSLecture.instance.getLectureLength(_groupName, _data.workshopId);
     await FirebaseFirestore.instance
         .collection("Groups")
         .doc(_groupName)
@@ -39,7 +38,8 @@ class FSWorkshop {
       "lectureLength": _data.lectureLength,
       "upDate": ConvertItems.instance.dateToInt(_timeStamp),
       "createAt":
-      _isAdd ? ConvertItems.instance.dateToInt(_timeStamp) : _data.createAt,
+          _isAdd ? ConvertItems.instance.dateToInt(_timeStamp) : _data.createAt,
+      "deadlineAt": _data.deadlineAt,
       "targetId": _data.targetId,
       "organizerId": _data.organizerId,
     }).catchError((onError) {
@@ -72,7 +72,7 @@ class FSWorkshop {
         .doc(_groupName)
         .collection("Workshop")
         .where("organizerId", isEqualTo: _organizerId)
-    // .orderBy('workshopNo', descending: false)
+        // .orderBy('workshopNo', descending: false)
         .get();
 
     final List<Workshop> _results = _documentToList(_docs);
@@ -113,6 +113,7 @@ class FSWorkshop {
       lectureLength: _doc["lectureLength"],
       updateAt: _doc["upDate"],
       createAt: _doc["createAt"],
+      deadlineAt: _doc["deadlineAt"],
       targetId: _doc["targetId"],
       organizerId: _doc["organizerId"],
     );
@@ -121,20 +122,21 @@ class FSWorkshop {
   List<Workshop> _documentToList(QuerySnapshot _docs) {
     return _docs.docs
         .map((doc) => Workshop(
-      workshopId: doc["workshopId"],
-      workshopNo: doc["workshopNo"],
-      title: doc["title"],
-      subTitle: doc["subTitle"],
-      option1: doc["option1"],
-      option2: doc["option2"],
-      option3: doc["option3"],
-      isRelease: doc["isRelease"],
-      lectureLength: doc["lectureLength"],
-      updateAt: doc["upDate"],
-      createAt: doc["createAt"],
-      targetId: doc["targetId"],
-      organizerId: doc["organizerId"],
-    ))
+              workshopId: doc["workshopId"],
+              workshopNo: doc["workshopNo"],
+              title: doc["title"],
+              subTitle: doc["subTitle"],
+              option1: doc["option1"],
+              option2: doc["option2"],
+              option3: doc["option3"],
+              isRelease: doc["isRelease"],
+              lectureLength: doc["lectureLength"],
+              updateAt: doc["upDate"],
+              createAt: doc["createAt"],
+              deadlineAt: doc["deadlineAt"],
+              targetId: doc["targetId"],
+              organizerId: doc["organizerId"],
+            ))
         .toList();
   }
 }

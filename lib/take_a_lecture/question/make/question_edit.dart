@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:motokosan/take_a_lecture/lecture/play/lecture_class.dart';
-import 'package:motokosan/take_a_lecture/question/play/question_class.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
+import 'package:motokosan/take_a_lecture/question/question_class.dart';
 import 'package:motokosan/take_a_lecture/question/play/question_firebase.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../play/question_model.dart';
+import '../question_model.dart';
 import '../../../widgets/ok_show_dialog.dart';
 import '../../../constants.dart';
 
@@ -465,9 +465,10 @@ class QuestionEdit extends StatelessWidget {
   }
 
   Widget _deleteButton(BuildContext context, QuestionModel model) {
-    return FloatingActionButton(
+    return FloatingActionButton.extended(
       elevation: 15,
-      child: Icon(FontAwesomeIcons.trashAlt),
+      icon: Icon(FontAwesomeIcons.trashAlt),
+      label: Text(" このテストを削除", style: cTextUpBarM, textScaleFactor: 1),
       // todo 削除
       onPressed: () {
         MyDialog.instance.okShowDialogFunc(
