@@ -22,11 +22,15 @@ class WorkshopModel extends ChangeNotifier {
     workshop.workshopNo = "";
     workshop.title = "";
     workshop.subTitle = "";
-    workshop.option1 = "";
-    workshop.option2 = "";
+    workshop.information = "";
+    workshop.subInformation = "";
     workshop.option3 = "";
     workshop.isRelease = false;
+    workshop.isExam = false;
     workshop.lectureLength = 0;
+    workshop.questionLength = 0;
+    workshop.numOfExam = 0;
+    workshop.passingScore = 0;
     workshop.updateAt = 0;
     workshop.createAt = 0;
     workshop.targetId = "";
@@ -49,11 +53,11 @@ class WorkshopModel extends ChangeNotifier {
       case "subTitle":
         workshop.subTitle = _val;
         break;
-      case "option1":
-        workshop.option1 = _val;
+      case "information":
+        workshop.information = _val;
         break;
-      case "option2":
-        workshop.option2 = _val;
+      case "subInformation":
+        workshop.subInformation = _val;
         break;
       case "option3":
         workshop.option3 = _val;
@@ -69,6 +73,11 @@ class WorkshopModel extends ChangeNotifier {
 
   void changeIsRelease(bool _val) {
     workshop.isRelease = _val;
+    notifyListeners();
+  }
+
+  void changeIsExam(bool _val) {
+    workshop.isExam = _val;
     notifyListeners();
   }
 
@@ -101,7 +110,7 @@ class WorkshopModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchLists(String _groupName, Organizer _organizer) async {
+  Future<void> fetchLists(String _groupName) async {
     final List<Workshop> _workshops =
         await FSWorkshop.instance.fetchDatesAll(_groupName);
     if (_workshops.length > 0) {
@@ -126,6 +135,7 @@ class WorkshopModel extends ChangeNotifier {
           workshopLists.add(WorkshopList(
             workshop: _workshop,
             organizerName: _organizerName,
+            organizerTitle: "指定無し",
             listNo: "$_organizerNo${_workshop.workshopNo}",
             workshopResult: WorkshopResult(),
           ));
@@ -133,6 +143,7 @@ class WorkshopModel extends ChangeNotifier {
           workshopLists.add(WorkshopList(
             workshop: _workshop,
             organizerName: _organizerName,
+            organizerTitle: "指定無し",
             listNo: "$_organizerNo${_workshop.workshopNo}",
             workshopResult: _workshopResults[0],
           ));
@@ -159,6 +170,7 @@ class WorkshopModel extends ChangeNotifier {
         workshopLists.add(WorkshopList(
           workshop: _workshop,
           organizerName: _organizer.title,
+          organizerTitle: _organizer.title,
           listNo: _workshop.workshopNo,
           workshopResult: WorkshopResult(),
         ));
@@ -166,6 +178,7 @@ class WorkshopModel extends ChangeNotifier {
         workshopLists.add(WorkshopList(
           workshop: _workshop,
           organizerName: _organizer.title,
+          organizerTitle: _organizer.title,
           listNo: _workshop.workshopNo,
           workshopResult: _workshopResults[0],
         ));

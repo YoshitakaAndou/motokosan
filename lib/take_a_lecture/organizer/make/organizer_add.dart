@@ -51,21 +51,17 @@ class OrganizerAdd extends StatelessWidget {
               child: Column(
                 children: [
                   _infoArea(model),
-                  Container(
-                    width: MediaQuery.of(context).size.width - 28,
-                    height: MediaQuery.of(context).size.height / 2,
-                    padding: EdgeInsets.all(10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _title(model, titleTextController),
-                        _subTitle(model, subTitleTextController),
-                        _option1(model, option1TextController),
-                        _option2(model, option2TextController),
-                        _option3(model, option3TextController),
-                        Divider(height: 5, color: Colors.grey, thickness: 1),
-                      ],
-                    ),
+                  ListView(
+                    padding: EdgeInsets.all(15),
+                    shrinkWrap: true,
+                    children: [
+                      _title(model, titleTextController),
+                      _subTitle(model, subTitleTextController),
+                      _option1(model, option1TextController),
+                      _option2(model, option2TextController),
+                      _option3(model, option3TextController),
+                      Divider(height: 5, color: Colors.grey, thickness: 1),
+                    ],
                   ),
                 ],
               ),

@@ -61,25 +61,20 @@ class QuestionEdit extends StatelessWidget {
               child: Column(
                 children: [
                   _infoArea(model),
-                  Container(
-                    width: MediaQuery.of(context).size.width - 28,
-                    // height: MediaQuery.of(context).size.height + 300,
+                  ListView(
+                    shrinkWrap: true,
                     padding: EdgeInsets.all(10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        _questionTile(model, qsTextController),
-                        _choices1(model, ch1TitleTextController),
-                        _choices2(model, ch2TitleTextController),
-                        _choices3(model, ch3TitleTextController),
-                        _choices4(model, ch4TitleTextController),
-                        _correctNo(context, model),
-                        Divider(height: 5, color: Colors.grey, thickness: 1),
-                        _description(model, adTextController),
-                        SizedBox(height: 20),
-                      ],
-                    ),
+                    children: [
+                      _questionTile(model, qsTextController),
+                      _choices1(model, ch1TitleTextController),
+                      _choices2(model, ch2TitleTextController),
+                      _choices3(model, ch3TitleTextController),
+                      _choices4(model, ch4TitleTextController),
+                      _correctNo(context, model),
+                      Divider(height: 5, color: Colors.grey, thickness: 1),
+                      _description(model, adTextController),
+                      SizedBox(height: 20),
+                    ],
                   ),
                 ],
               ),

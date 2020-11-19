@@ -12,7 +12,6 @@ class GoogleModel extends ChangeNotifier {
   UserData userData = UserData();
   bool isLoading = false;
   bool isUpdate = false;
-  bool isDisable = false;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -87,8 +86,8 @@ class GoogleModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setDisable(bool _bool) {
-    isDisable = _bool;
+  void setIsLoading(bool _setData) {
+    isLoading = _setData;
     notifyListeners();
   }
 

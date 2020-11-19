@@ -9,8 +9,8 @@ import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../constants.dart';
 import '../workshop_model.dart';
-import 'bottomsheet_info_items_ws.dart';
-import 'list_tile_body.dart';
+import 'workshop_list_bottomsheet_info_items_ws.dart';
+import 'workshop_list_tile_body.dart';
 
 class WorkshopListPage extends StatelessWidget {
   final UserData _userData;
@@ -26,7 +26,7 @@ class WorkshopListPage extends StatelessWidget {
       model.startLoading();
       if (_organizer.title == "指定無し") {
         //前画面で”指定無し”を選んだ場合は全ての研修会を取得
-        await model.fetchLists(_userData.userGroup, _organizer);
+        await model.fetchLists(_userData.userGroup);
       } else {
         await model.fetchListsByOrganizer(_userData.userGroup, _organizer);
       }
@@ -64,17 +64,15 @@ class WorkshopListPage extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ListView.builder(
+                      shrinkWrap: true,
                       itemCount: model.workshopLists.length,
-                      itemBuilder: (context, index) {
+                      itemBuilder: (context, int index) {
                         return Card(
                           key: Key(
                               model.workshopLists[index].workshop.workshopId),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
+                          shape: cListCardShape,
                           elevation: 20,
-                          child:
-                              ListTileBody(_userData, _organizer, model, index),
+                          child: WorkshopListTileBody(_userData, model, index),
                         );
                       },
                     ),
@@ -157,7 +155,7 @@ class WorkshopListPage extends StatelessWidget {
         ),
       ),
       builder: (BuildContext context) {
-        return BottomSheetInfoItemsWS(model, _isHideBS);
+        return WorkshopListBottomSheetInfoItemsWS(model, _isHideBS);
       },
     );
   }

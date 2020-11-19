@@ -4,7 +4,6 @@ import 'package:motokosan/auth/email_signup.dart';
 import 'package:motokosan/auth/google_model.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/flare_actors.dart';
-import 'package:motokosan/widgets/user_data.dart';
 import 'package:provider/provider.dart';
 import '../widgets/bar_title.dart';
 import '../widgets/ok_show_dialog.dart';
@@ -28,8 +27,6 @@ class GoogleSignin extends StatelessWidget {
     model.userData = userData;
     groupController.text = model.userData.userGroup;
     nameController.text = model.userData.userName;
-    // todo print
-    userDataPrint(model.userData, "GoogleSignin");
     return Consumer<GoogleModel>(
       builder: (context, model, child) {
         return Scaffold(
@@ -72,22 +69,19 @@ class GoogleSignin extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             _loginTitle(context, model),
-                            Container(
+                            ListView(
+                              shrinkWrap: true,
                               padding: EdgeInsets.all(8),
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  SizedBox(height: 10),
-                                  _groupNameInput(context, model,
-                                      groupController, beforeGroup),
-                                  _nameInput(context, model, nameController,
-                                      beforeName),
-                                  SizedBox(height: 30),
-                                  _loginButton(context, model),
-                                  SizedBox(height: 20),
-                                ],
-                              ),
+                              children: [
+                                SizedBox(height: 10),
+                                _groupNameInput(context, model, groupController,
+                                    beforeGroup),
+                                _nameInput(
+                                    context, model, nameController, beforeName),
+                                SizedBox(height: 30),
+                                _loginButton(context, model),
+                                SizedBox(height: 20),
+                              ],
                             ),
                           ],
                         ),
@@ -285,8 +279,8 @@ class GoogleSignin extends StatelessWidget {
   }
 
   Future<void> _loginProcess(BuildContext context, GoogleModel model) async {
+    model.setIsLoading(true);
     try {
-      print(model.userData.userGroup);
       if (await model.googleSignin()) {
         // google認証成功
         await FlareActors.instance.done(context);
@@ -311,7 +305,9 @@ class GoogleSignin extends StatelessWidget {
           ),
         );
       }
+      model.setIsLoading(false);
     } catch (e) {
+      model.setIsLoading(false);
       _errorMessage(context, e.toString());
     }
   }

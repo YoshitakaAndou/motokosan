@@ -3,11 +3,15 @@ class Workshop {
   String workshopNo;
   String title;
   String subTitle;
-  String option1;
-  String option2;
+  String information; //Option1より変更
+  String subInformation; //Option2より変更
   String option3;
   bool isRelease;
+  bool isExam; //追加
   int lectureLength;
+  int questionLength; //追加
+  int numOfExam; //追加
+  int passingScore; //追加
   int updateAt;
   int createAt;
   int deadlineAt;
@@ -20,11 +24,15 @@ class Workshop {
     this.workshopNo = "",
     this.title = "",
     this.subTitle = "",
-    this.option1 = "",
-    this.option2 = "",
+    this.information = "",
+    this.subInformation = "",
     this.option3 = "",
     this.isRelease = false,
+    this.isExam = false,
     this.lectureLength = 0,
+    this.questionLength = 0,
+    this.numOfExam = 0,
+    this.passingScore = 0,
     this.updateAt = 0,
     this.createAt = 0,
     this.deadlineAt = 0,
@@ -37,7 +45,7 @@ class Workshop {
 class WorkshopResult {
   int id;
   String workshopId;
-  String isTaken;
+  String isTaken; // "研修済","受講済","未受講",""
   String graduaterId;
   int lectureCount;
   int takenCount;
@@ -71,12 +79,14 @@ class WorkshopResult {
 class WorkshopList {
   Workshop workshop;
   String organizerName;
+  String organizerTitle;
   String listNo;
   WorkshopResult workshopResult;
 
   WorkshopList({
     this.workshop,
     this.organizerName,
+    this.organizerTitle,
     this.listNo,
     this.workshopResult,
   });

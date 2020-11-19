@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/take_a_lecture/lecture/play/bottomsheet_play_items.dart';
-import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
 import 'package:motokosan/take_a_lecture/return_argument.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
@@ -16,7 +15,6 @@ import '../../../widgets/go_back.dart';
 
 class LecturePlay extends StatefulWidget {
   final UserData _userData;
-  final Organizer _organizer;
   final WorkshopList _workshopList;
   final LectureList _lectureList;
   final List<Slide> _slides;
@@ -24,7 +22,6 @@ class LecturePlay extends StatefulWidget {
 
   LecturePlay(
     this._userData,
-    this._organizer,
     this._workshopList,
     this._lectureList,
     this._slides,
@@ -37,7 +34,7 @@ class LecturePlay extends StatefulWidget {
 
 class _LecturePlayState extends State<LecturePlay> {
   final ScrollController _homeController = ScrollController();
-  final GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
+  // final GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
   LectureResult _lectureResult = LectureResult();
   // 状態設定
   bool isHelp = false;
@@ -49,7 +46,6 @@ class _LecturePlayState extends State<LecturePlay> {
   @override
   void initState() {
     super.initState();
-    print(widget._organizer.title);
     if (widget._lectureList.lecture.videoUrl.isNotEmpty) {
       startVideo(widget._lectureList.lecture.videoUrl, true);
     }
@@ -64,121 +60,141 @@ class _LecturePlayState extends State<LecturePlay> {
         endAt: videoEndAt,
         hideControls: true,
         hideThumbnail: true,
-        mute: false,
+        // enableCaption: false,
+        // disableDragSeek: false,
+        // mute: false,
         loop: false,
       ),
-    );
+    )..addListener(listener);
+  }
+
+  void listener() {
+    if (_controller.value.playerState == PlayerState.playing && !isVideoStop) {
+      _controller.play();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // final model = Provider.of<LectureModel>(context, listen: false);
-    //サイズ
-    final Size _size = MediaQuery.of(context).size;
-    final _upHeight = _size.width / 1.42; //1.42
-    final _bottomHeight = _size.height - _upHeight - 100;
     //向き
     var isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
-    //スマホの向きを一時的に上固定から横も可能にする
+    // スマホの向きを一時的に上固定から横も可能にする
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.portraitUp,
     ]);
+    return isPortrait ? _portrait(context) : _landscape(context);
+  }
+
+  Widget _portrait(BuildContext context) {
+    final Size _size = MediaQuery.of(context).size;
+    print("height:${_size.height},width:${_size.width}");
+    final _movieHeight = _size.width / 1.42; //1.42
+    final _bottomHeight = _size.height - _movieHeight - cInfoAreaH - 40;
     return Scaffold(
-      key: _scaffoldState,
-      appBar: isPortrait
-          // 縦向きの時
-          ? AppBar(
-              toolbarHeight: cToolBarH,
-              centerTitle: true,
-              title: barTitle(context),
-              leading: GoBack.instance.goBackWithReturArg(
-                context: context,
-                icon: Icon(FontAwesomeIcons.undo),
-                returnArgument: ReturnArgument(isNextQuestion: false),
-                num: 1,
-              ),
-              actions: [
-                widget._isLast
-                    ? Container()
-                    : GoBack.instance.goBackWithReturArg(
-                        context: context,
-                        icon: Icon(FontAwesomeIcons.chevronRight),
-                        returnArgument: ReturnArgument(isNextQuestion: true),
-                        num: 1,
-                      ),
-              ],
-            )
-          // 横向きの時
-          : PreferredSize(
-              preferredSize: Size.fromHeight(0),
-              child: AppBar(
-                backgroundColor: Colors.white.withOpacity(0.0),
-                elevation: 0.0,
-              ),
-            ),
+      appBar: AppBar(
+        toolbarHeight: cToolBarH,
+        centerTitle: true,
+        title: barTitle(context),
+        leading: GoBack.instance.goBackWithReturArg(
+          context: context,
+          icon: Icon(FontAwesomeIcons.undo),
+          returnArgument: ReturnArgument(isNextQuestion: false),
+          num: 1,
+        ),
+        actions: [
+          widget._isLast
+              ? Container()
+              : GoBack.instance.goBackWithReturArg(
+                  context: context,
+                  icon: Icon(FontAwesomeIcons.chevronRight),
+                  returnArgument: ReturnArgument(isNextQuestion: true),
+                  num: 1,
+                ),
+        ],
+      ),
       body: Stack(
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // 縦向きの時の動画画面
-              if (isPortrait)
-                Container(
-                  width: _size.width,
-                  height: _size.width * 0.7,
-                  color: Colors.grey,
+              Container(
+                width: _size.width,
+                height: _size.width * 0.7,
+                color: Colors.grey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _infoArea(),
+                    SizedBox(height: 2),
+                    if (widget._lectureList.lecture.videoUrl.isNotEmpty)
+                      _videoTile(true, _size),
+                  ],
+                ),
+              ),
+              Container(
+                width: _size.width,
+                height: _bottomHeight,
+                child: SingleChildScrollView(
+                  controller: _homeController,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      _infoArea(),
-                      SizedBox(height: 2),
-                      if (widget._lectureList.lecture.videoUrl.isNotEmpty)
-                        _videoTile(isPortrait),
+                      SizedBox(height: 10),
+                      if (widget._slides.length > 0 && isSlideButton)
+                        _slideButton(),
+                      if (widget._slides.length > 0 && isSlide)
+                        _gridView(context, _size),
+                      Divider(height: 5, color: Colors.grey, thickness: 1),
+                      _descriptionTile(),
+                      Divider(height: 5, color: Colors.grey, thickness: 1),
+                      // _nextButton(),
+                      SizedBox(height: 30),
                     ],
                   ),
                 ),
-              // 横向きの時の動画画面
-              if (!isPortrait)
-                Container(
-                  width: _size.width,
-                  height: _size.height,
-                  color: Colors.black,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      if (widget._lectureList.lecture.videoUrl.isNotEmpty)
-                        _videoTile(isPortrait),
-                    ],
-                  ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _landscape(BuildContext context) {
+    final Size _size = MediaQuery.of(context).size;
+    return Scaffold(
+      // key: _scaffoldState,
+      // appBar: PreferredSize(
+      //   preferredSize: Size.fromHeight(0),
+      //   child: AppBar(
+      //     backgroundColor: Colors.white.withOpacity(0.0),
+      //     elevation: 0.0,
+      //   ),
+      // ),
+      body: Stack(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: _size.width,
+                height: _size.height,
+                color: Colors.black,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  // crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (widget._lectureList.lecture.videoUrl.isNotEmpty)
+                      _videoTile(false, _size),
+                  ],
                 ),
-              // 縦向きの時の残り画面
-              if (isPortrait)
-                Container(
-                  width: _size.width,
-                  height: _bottomHeight,
-                  child: SingleChildScrollView(
-                    controller: _homeController,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (widget._slides.length > 0 && isSlideButton)
-                          _slideButton(),
-                        if (widget._slides.length > 0 && isSlide)
-                          _gridView(context, _size),
-                        Divider(height: 5, color: Colors.grey, thickness: 1),
-                        _descriptionTile(),
-                        Divider(height: 5, color: Colors.grey, thickness: 1),
-                        // _nextButton(),
-                        SizedBox(height: 30),
-                      ],
-                    ),
-                  ),
-                ),
+              ),
             ],
           ),
         ],
@@ -244,8 +260,7 @@ class _LecturePlayState extends State<LecturePlay> {
     );
   }
 
-  Widget _videoTile(bool _isPortrait) {
-    final Size _size = MediaQuery.of(context).size;
+  Widget _videoTile(bool _isPortrait, Size _size) {
     return Expanded(
       child: Stack(
         children: [
@@ -254,6 +269,7 @@ class _LecturePlayState extends State<LecturePlay> {
             controller: _controller,
             // 動画の最後まで再生したら
             onEnded: (data) async {
+              isVideoStop = true;
               _controller.pause();
               // 画面の向き固定を元に戻す
               SystemChrome.setPreferredOrientations(
@@ -284,13 +300,6 @@ class _LecturePlayState extends State<LecturePlay> {
                 width: _size.width,
                 height: _size.width / 1.42,
                 color: Colors.transparent,
-                // FullScreenボタンを隠してみる
-                // alignment: Alignment.bottomRight,
-                // child: Container(
-                //   width: _size.width / 8,
-                //   height: _size.height / 15,
-                //   color: Colors.red.withOpacity(0),
-                // ),
                 child: isVideoStop ? _videoStop() : Container(),
               ),
             )
@@ -310,13 +319,6 @@ class _LecturePlayState extends State<LecturePlay> {
                 width: _size.width,
                 height: _size.height,
                 color: Colors.transparent,
-                // FullScreenボタンを隠してみる
-                // alignment: Alignment.bottomRight,
-                // child: Container(
-                //   width: 50,
-                //   height: 100,
-                //   color: Colors.red.withOpacity(0),
-                // ),
                 child: isVideoStop ? _videoStop() : Container(),
               ),
             )
@@ -345,14 +347,6 @@ class _LecturePlayState extends State<LecturePlay> {
     );
   }
 
-  // int _stringToSeconds(String _data) {
-  //   // h:mm:ssを秒に変換
-  //   int _h = int.parse(_data.substring(0, 1));
-  //   int _m = int.parse(_data.substring(2, 4));
-  //   int _s = int.parse(_data.substring(5, 7));
-  //   return _h * 60 * 60 + _m * 60 + _s;
-  // }
-
   Widget _slideButton() {
     return RaisedButton(
       child: Text("スライドを表示"),
@@ -373,8 +367,6 @@ class _LecturePlayState extends State<LecturePlay> {
     return Container(
       width: _size.width,
       height: _size.width / 1.4,
-      // color: Colors.grey,
-      // padding: EdgeInsets.only(top: 15, left: 5, right: 5, bottom: 5),
       child: GridView.builder(
         scrollDirection: Axis.horizontal,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -393,7 +385,6 @@ class _LecturePlayState extends State<LecturePlay> {
 
   Widget _gridTile(Slide _slide, int _index) {
     return GestureDetector(
-      // onLongPress: onLongPress,
       onTap: () {
         setState(() {
           isSlide = false;
@@ -425,6 +416,7 @@ class _LecturePlayState extends State<LecturePlay> {
 
   Future<Widget> _showModalBottomSheetPlay(BuildContext context) async {
     return await showModalBottomSheet(
+      backgroundColor: cBSBack,
       context: context,
       isDismissible: false,
       elevation: 15,

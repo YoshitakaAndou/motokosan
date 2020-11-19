@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:motokosan/take_a_lecture/lecture/lecture_firebase.dart';
 import 'package:motokosan/take_a_lecture/lecture/play/lecture_play.dart';
-import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_database.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
@@ -11,27 +10,29 @@ import '../../../constants.dart';
 import '../../return_argument.dart';
 import '../lecture_class.dart';
 import '../lecture_model.dart';
-import 'bottomsheet_send_items.dart';
+import 'lecture_list_bottomsheet_send_items.dart';
 
-class ListTileBody extends StatelessWidget {
+class LectureListTileBody extends StatelessWidget {
   final UserData _userData;
-  final Organizer _organizer;
   final WorkshopList _workshopList;
   final LectureModel model;
-  final int index;
-  ListTileBody(this._userData, this._organizer, this._workshopList, this.model,
-      this.index);
+  final int _index;
+  LectureListTileBody(
+      this._userData, this._workshopList, this.model, this._index);
 
   @override
   Widget build(BuildContext context) {
+    // todo print
+    print("index?: $_index");
+    print("length?:${model.lectureLists.length}");
     return ListTile(
       contentPadding: EdgeInsets.symmetric(vertical: 1, horizontal: 5),
       // dense: true,
-      leading: _leading(context, model, index),
-      title: _title(context, model, index),
-      subtitle: _subtitle(context, model, index),
-      trailing: _trailing(context, model, index),
-      onTap: () => _onTap(context, model, index, _userData.userGroup,
+      leading: _leading(context, model, _index),
+      title: _title(context, model, _index),
+      subtitle: _subtitle(context, model, _index),
+      trailing: _trailing(context, model, _index),
+      onTap: () => _onTap(context, model, _index, _userData.userGroup,
           _workshopList.workshop.workshopId),
     );
   }
@@ -47,8 +48,8 @@ class ListTileBody extends StatelessWidget {
     return _results;
   }
 
-  Widget _leading(BuildContext context, LectureModel model, int index) {
-    final _imageUrl = model.lectureLists[index].lecture.thumbnailUrl ?? "";
+  Widget _leading(BuildContext context, LectureModel model, int _index) {
+    final _imageUrl = model.lectureLists[_index].lecture.thumbnailUrl ?? "";
     if (_imageUrl.isNotEmpty) {
       return Stack(
         children: [
@@ -58,7 +59,7 @@ class ListTileBody extends StatelessWidget {
             color: Colors.black54.withOpacity(0.8),
             child: Image.network(_imageUrl),
           ),
-          if (model.lectures[index].videoDuration.isNotEmpty)
+          if (model.lectures[_index].videoDuration.isNotEmpty)
             Container(
               width: 60,
               height: 50,
@@ -66,7 +67,7 @@ class ListTileBody extends StatelessWidget {
               child: Container(
                 color: Colors.black54.withOpacity(0.8),
                 child: Text(
-                  "${model.lectureLists[index].lecture.videoDuration}",
+                  "${model.lectureLists[_index].lecture.videoDuration}",
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.white,
@@ -90,59 +91,59 @@ class ListTileBody extends StatelessWidget {
     }
   }
 
-  Widget _title(BuildContext context, LectureModel model, int index) {
+  Widget _title(BuildContext context, LectureModel model, int _index) {
     return Text(
-      "${model.lectureLists[index].lecture.title}",
+      "${model.lectureLists[_index].lecture.title}",
       style: cTextListM,
       textScaleFactor: 1,
     );
   }
 
-  Widget _subtitle(BuildContext context, LectureModel model, int index) {
+  Widget _subtitle(BuildContext context, LectureModel model, int _index) {
     return Padding(
       padding: EdgeInsets.only(left: 25),
       child: Column(
         children: [
           Text(
-            "${model.lectureLists[index].lecture.subTitle}",
+            "${model.lectureLists[_index].lecture.subTitle}",
             style: cTextListSS,
             textAlign: TextAlign.left,
             textScaleFactor: 1,
           ),
-          _statusInfo(context, model, index),
+          _statusInfo(context, model, _index),
         ],
       ),
     );
   }
 
-  Widget _statusInfo(BuildContext context, LectureModel model, int index) {
+  Widget _statusInfo(BuildContext context, LectureModel model, int _index) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        if (model.lectureLists[index].lecture.questionLength != 0)
+        if (model.lectureLists[_index].lecture.questionLength != 0)
           Container(
             padding: EdgeInsets.symmetric(horizontal: 5),
             color: Colors.greenAccent.withOpacity(0.2),
             child: Text(
-                "テスト:${model.lectureLists[index].lecture.questionLength}問",
+                "テスト:${model.lectureLists[_index].lecture.questionLength}問",
                 style: cTextListSS,
                 textScaleFactor: 1),
           ),
-        if (model.lectureLists[index].lecture.questionLength == 0)
+        if (model.lectureLists[_index].lecture.questionLength == 0)
           Container(
             padding: EdgeInsets.symmetric(horizontal: 5),
             color: Colors.grey.withOpacity(0.2),
             child: Text("テスト無し", style: cTextUpBarSS, textScaleFactor: 1),
           ),
-        if (model.lectureLists[index].lecture.questionLength != 0 &&
-            model.lectureLists[index].lecture.allAnswers.isNotEmpty)
+        if (model.lectureLists[_index].lecture.questionLength != 0 &&
+            model.lectureLists[_index].lecture.allAnswers.isNotEmpty)
           Container(
             padding: EdgeInsets.symmetric(horizontal: 5),
             color: Colors.greenAccent.withOpacity(0.2),
-            child: Text("${model.lectureLists[index].lecture.allAnswers}",
+            child: Text("${model.lectureLists[_index].lecture.allAnswers}",
                 style: cTextListSS, textScaleFactor: 1),
           ),
-        if (model.lectureLists[index].lecture.questionLength == 0)
+        if (model.lectureLists[_index].lecture.questionLength == 0)
           Container(
             padding: EdgeInsets.symmetric(horizontal: 5),
             color: Colors.grey.withOpacity(0.2),
@@ -152,10 +153,10 @@ class ListTileBody extends StatelessWidget {
     );
   }
 
-  Widget _trailing(BuildContext context, LectureModel model, int index) {
+  Widget _trailing(BuildContext context, LectureModel model, int _index) {
     // todo
-    print("${model.lectureLists[index].lectureResult.isTaken}");
-    return model.lectureLists[index].lectureResult.isTaken == "受講済"
+    print("${model.lectureLists[_index].lectureResult.isTaken}");
+    return model.lectureLists[_index].lectureResult.isTaken == "受講済"
         ? Container(
             width: 30,
             height: 30,
@@ -180,7 +181,7 @@ class ListTileBody extends StatelessWidget {
           );
   }
 
-  Future<void> _onTap(BuildContext context, LectureModel model, int index,
+  Future<void> _onTap(BuildContext context, LectureModel model, int _index,
       String _groupName, String _workshopId) async {
     ReturnArgument returnArgument = ReturnArgument();
     returnArgument.isNextQuestion = true;
@@ -188,10 +189,10 @@ class ListTileBody extends StatelessWidget {
     while (returnArgument.isNextQuestion) {
       final _slides1 = await _preparationOfSlide(
         model,
-        model.lectureLists[index].lecture.slideLength,
-        model.lectureLists[index].lecture.lectureId,
+        model.lectureLists[_index].lecture.slideLength,
+        model.lectureLists[_index].lecture.lectureId,
       );
-      if (model.lectures[index].videoUrl.isNotEmpty) {
+      if (model.lectures[_index].videoUrl.isNotEmpty) {
         //スマホの向きを一時的に上固定から横も可能にする
         SystemChrome.setPreferredOrientations([
           DeviceOrientation.landscapeRight,
@@ -205,64 +206,74 @@ class ListTileBody extends StatelessWidget {
         MaterialPageRoute(
           builder: (context) => LecturePlay(
             _userData,
-            _organizer,
             _workshopList,
-            model.lectureLists[index],
+            model.lectureLists[_index],
             _slides1,
-            model.lectureLists.length - index == 1 ? true : false,
+            model.lectureLists.length - _index == 1 ? true : false,
           ),
         ),
       );
       if (returnArgument == null) {
         returnArgument = ReturnArgument();
       }
-      if (model.lectureLists[index].lecture.videoUrl.isNotEmpty) {
+      if (model.lectureLists[_index].lecture.videoUrl.isNotEmpty) {
         //スマホの向きを上のみに戻す
         SystemChrome.setPreferredOrientations([
           DeviceOrientation.portraitUp,
         ]);
       }
-      index = index + 1;
+      _index = _index + 1;
       // リストの最後まで来たら終わり
-      if (index >= model.lectureLists.length) {
+      if (_index >= model.lectureLists.length) {
         returnArgument.isNextQuestion = false;
       }
     }
+    // 表示用のデータを再構築
     await model.generateLectureList(_groupName, _workshopId);
+    // isTakenのチェック（研修済・受講済）
     _checkWorkshopIsTaken(model);
-    final _sendCheck =
+    // 本体のWorkshopResultを読み出す
+    final List<WorkshopResult> _sendCheck =
         await WorkshopDatabase.instance.getWorkshopResult(_workshopId);
-    if (_sendCheck.length > 0) {
-      if (_sendCheck[0].graduaterId.isNotEmpty) {
-        return;
-      }
+    // FBへ転送済みだったら早期return
+    if (_sendCheck.length > 0 && _sendCheck[0].graduaterId.isNotEmpty) {
+      return;
     }
     // todo workshopResultの保存
     await _saveWorkshopResult(context, model, 0, "");
     if (model.lectureLists.length == model.takenCount) {
-      final _results =
+      final List<WorkshopResult> _results =
           await WorkshopDatabase.instance.getWorkshopResult(_workshopId);
-      if (_results.length > 0) {
-        if (_results[0].graduaterId.isEmpty) {
-          await _showModalBottomSheetSend(context, model, false);
-        }
+      // if (_results.length > 0) {
+      if (_results[0].isTaken == "研修済" && _results[0].graduaterId.isEmpty) {
+        await _showModalBottomSheetSend(context, model, false);
       }
     }
   }
 
   _checkWorkshopIsTaken(LectureModel model) {
-    if (model.lectureLists.length > model.takenCount) {
-      _workshopList.workshopResult.isTaken = "受講中";
-    } else {
-      _workshopList.workshopResult.isTaken = "受講済";
+    if (_workshopList.workshopResult.isTaken != "研修済") {
+      if (model.lectureLists.length > model.takenCount) {
+        _workshopList.workshopResult.isTaken = "受講中";
+      } else {
+        if (_workshopList.workshop.isExam) {
+          //修了試験があったら
+          _workshopList.workshopResult.isTaken = "受講済";
+        } else {
+          _workshopList.workshopResult.isTaken = "研修済";
+        }
+      }
     }
   }
 
-  Future<void> _saveWorkshopResult(BuildContext context, LectureModel model,
-      int _isSendAt, String _graduaterId) async {
-    print(
-        "_saveWorkshopResult .isTaken: ${_workshopList.workshopResult.isTaken}");
-    _workshopList.workshopResult.graduaterId = _graduaterId;
+  Future<void> _saveWorkshopResult(
+    BuildContext context,
+    LectureModel model,
+    int _isSendAt,
+    String _graduaterId,
+  ) async {
+    final bool _isExam = _workshopList.workshop.isExam;
+    _workshopList.workshopResult.graduaterId = _isExam ? "" : _graduaterId;
     _workshopList.workshopResult.workshopId = _workshopList.workshop.workshopId;
     _workshopList.workshopResult.lectureCount = model.lectureLists.length;
     _workshopList.workshopResult.takenCount = model.takenCount;
@@ -287,7 +298,7 @@ class ListTileBody extends StatelessWidget {
         ),
       ),
       builder: (BuildContext context) {
-        return BottomSheetSendItems(
+        return LectureListBottomSheetSendItems(
             _userData, _workshopList, model, fromButton);
       },
     );

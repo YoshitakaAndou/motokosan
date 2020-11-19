@@ -23,8 +23,8 @@ class WorkshopAdd extends StatelessWidget {
     final option3TextController = TextEditingController();
     titleTextController.text = model.workshop.title;
     subTitleTextController.text = model.workshop.subTitle;
-    option1TextController.text = model.workshop.option1;
-    option2TextController.text = model.workshop.option2;
+    option1TextController.text = model.workshop.information;
+    option2TextController.text = model.workshop.subInformation;
     option3TextController.text = model.workshop.option3;
     model.workshop.workshopNo =
         (model.workshops.length + 1).toString().padLeft(4, "0");
@@ -56,28 +56,24 @@ class WorkshopAdd extends StatelessWidget {
               child: Column(
                 children: [
                   _infoArea(model),
-                  Container(
-                    width: MediaQuery.of(context).size.width - 28,
-                    height: MediaQuery.of(context).size.height / 2,
+                  ListView(
+                    shrinkWrap: true,
                     padding: EdgeInsets.all(10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _switch(model, context, _isRelease),
-                            _deadlineDate(model, context),
-                          ],
-                        ),
-                        _title(model, titleTextController),
-                        _subTitle(model, subTitleTextController),
-                        _option1(model, option1TextController),
-                        _option2(model, option2TextController),
-                        _option3(model, option3TextController),
-                        Divider(height: 5, color: Colors.grey, thickness: 1),
-                      ],
-                    ),
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _switch(model, context, _isRelease),
+                          _deadlineDate(model, context),
+                        ],
+                      ),
+                      _title(model, titleTextController),
+                      _subTitle(model, subTitleTextController),
+                      _option1(model, option1TextController),
+                      _option2(model, option2TextController),
+                      // _option3(model, option3TextController),
+                      Divider(height: 5, color: Colors.grey, thickness: 1),
+                    ],
                   ),
                 ],
               ),
@@ -140,7 +136,7 @@ class WorkshopAdd extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text("講座が０件の間は公開できません！",
+            Text("講座が０件では公開できません！",
                 style: TextStyle(fontSize: 10, color: Colors.black26),
                 textScaleFactor: 1),
           ],
@@ -296,9 +292,9 @@ class WorkshopAdd extends StatelessWidget {
       keyboardType: TextInputType.text,
       controller: option2TextController,
       decoration: InputDecoration(
-        labelText: "マーク表示",
+        labelText: "サブインフォメーション",
         labelStyle: TextStyle(fontSize: 10),
-        hintText: "マーク表示 を入力してください",
+        hintText: "サブインフォメーション を入力してください",
         hintStyle: TextStyle(fontSize: 12),
         suffixIcon: IconButton(
           onPressed: () {
@@ -316,32 +312,32 @@ class WorkshopAdd extends StatelessWidget {
     );
   }
 
-  Widget _option3(WorkshopModel model, option3TextController) {
-    return TextField(
-      maxLines: null,
-      textInputAction: TextInputAction.done,
-      keyboardType: TextInputType.text,
-      controller: option3TextController,
-      decoration: InputDecoration(
-        labelText: "option3:",
-        labelStyle: TextStyle(fontSize: 10),
-        hintText: "option3 を入力してください",
-        hintStyle: TextStyle(fontSize: 12),
-        suffixIcon: IconButton(
-          onPressed: () {
-            option3TextController.text = "";
-          },
-          icon: Icon(Icons.clear, size: 15),
-        ),
-      ),
-      onChanged: (text) {
-        model.changeValue("option3", text);
-      },
-      onSubmitted: (text) {
-        model.changeValue("option3", text);
-      },
-    );
-  }
+  // Widget _option3(WorkshopModel model, option3TextController) {
+  //   return TextField(
+  //     maxLines: null,
+  //     textInputAction: TextInputAction.done,
+  //     keyboardType: TextInputType.text,
+  //     controller: option3TextController,
+  //     decoration: InputDecoration(
+  //       labelText: "option3:",
+  //       labelStyle: TextStyle(fontSize: 10),
+  //       hintText: "option3 を入力してください",
+  //       hintStyle: TextStyle(fontSize: 12),
+  //       suffixIcon: IconButton(
+  //         onPressed: () {
+  //           option3TextController.text = "";
+  //         },
+  //         icon: Icon(Icons.clear, size: 15),
+  //       ),
+  //     ),
+  //     onChanged: (text) {
+  //       model.changeValue("option3", text);
+  //     },
+  //     onSubmitted: (text) {
+  //       model.changeValue("option3", text);
+  //     },
+  //   );
+  // }
 
   Future<void> _addProcess(BuildContext context, WorkshopModel model) async {
     DateTime _timeStamp = DateTime.now();
@@ -364,8 +360,8 @@ class WorkshopAdd extends StatelessWidget {
     bool _result = false;
     _result = model.workshop.title.isNotEmpty ? true : _result;
     _result = model.workshop.subTitle.isNotEmpty ? true : _result;
-    _result = model.workshop.option1.isNotEmpty ? true : _result;
-    _result = model.workshop.option2.isNotEmpty ? true : _result;
+    _result = model.workshop.information.isNotEmpty ? true : _result;
+    _result = model.workshop.subInformation.isNotEmpty ? true : _result;
     _result = model.workshop.option3.isNotEmpty ? true : _result;
     return _result;
   }

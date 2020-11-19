@@ -11,12 +11,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../constants.dart';
 import '../lecture_model.dart';
 
-class BottomSheetSendItems extends StatelessWidget {
+class LectureListBottomSheetSendItems extends StatelessWidget {
   final UserData _userData;
   final WorkshopList _workshopList;
   final LectureModel model;
   final bool fromButton;
-  BottomSheetSendItems(
+  LectureListBottomSheetSendItems(
       this._userData, this._workshopList, this.model, this.fromButton);
 
   @override

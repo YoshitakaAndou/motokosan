@@ -12,6 +12,7 @@ class MyDialog {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          elevation: 20,
           title: Text(title ?? "", style: cTextListM, textScaleFactor: 1),
           actions: [
             MaterialButton(
@@ -38,6 +39,7 @@ class MyDialog {
       builder: (_) => AlertDialog(
         title: Text("$mainTitle" ?? "", textScaleFactor: 1, style: cTextAlertL),
         content: Text("$subTitle", textScaleFactor: 1, style: cTextAlertMes),
+        elevation: 20,
         actions: <Widget>[
           MaterialButton(
             child: Text("はい", textScaleFactor: 1, style: cTextAlertYes),

@@ -23,12 +23,12 @@ class FSGraduater {
   }
 
   Future<List<Graduater>> fetchDates(
-    String _groupName,
-  ) async {
+      String _groupName, WorkshopList _workshopList) async {
     final _docs = await FirebaseFirestore.instance
         .collection("Groups")
         .doc(_groupName)
         .collection("Graduater")
+        .where("workshopId", isEqualTo: _workshopList.workshop.workshopId)
         .get();
     final List<Graduater> _results = _docs.docs
         .map((doc) => Graduater(

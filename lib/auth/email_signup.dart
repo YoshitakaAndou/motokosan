@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_signin_button/flutter_signin_button.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/auth/email_model.dart';
-import 'package:motokosan/widgets/user_data.dart';
 import 'package:provider/provider.dart';
 import '../widgets/bar_title.dart';
 import '../widgets/ok_show_dialog.dart';
@@ -23,8 +22,6 @@ class EmailSignup extends StatelessWidget {
     emailController.text = model.userData.userEmail;
     passwordController.text = model.userData.userPassword;
     final Size _size = MediaQuery.of(context).size;
-    // todo print
-    userDataPrint(model.userData, "GoogleSignup");
     return Consumer<EmailModel>(
       builder: (context, model, child) {
         return Scaffold(
@@ -48,7 +45,7 @@ class EmailSignup extends StatelessWidget {
                     flex: 2,
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         _toGoogleSignup(context, model, _size),
                         _toSigninPage(context, model, _size),
@@ -67,32 +64,31 @@ class EmailSignup extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             _title(context, model),
-                            Container(
+                            ListView(
                               padding: EdgeInsets.all(8),
-                              child: Column(
-                                children: [
-                                  _groupNameInput(
-                                    context,
-                                    model,
-                                    groupController,
-                                  ),
-                                  _nameInput(
-                                    context,
-                                    model,
-                                    nameController,
-                                  ),
-                                  _mailAddressInput(
-                                    context,
-                                    model,
-                                    emailController,
-                                  ),
-                                  _passwordInput(
-                                    context,
-                                    model,
-                                    passwordController,
-                                  ),
-                                ],
-                              ),
+                              shrinkWrap: true,
+                              children: [
+                                _groupNameInput(
+                                  context,
+                                  model,
+                                  groupController,
+                                ),
+                                _nameInput(
+                                  context,
+                                  model,
+                                  nameController,
+                                ),
+                                _mailAddressInput(
+                                  context,
+                                  model,
+                                  emailController,
+                                ),
+                                _passwordInput(
+                                  context,
+                                  model,
+                                  passwordController,
+                                ),
+                              ],
                             ),
                             SizedBox(height: 10),
                             _signupButton(context, model),
@@ -134,9 +130,15 @@ class EmailSignup extends StatelessWidget {
     return Container(
       height: 30,
       width: _size.width / 2.2,
-      child: SignInButton(
-        Buttons.Google,
-        text: "googleで登録",
+      child: RaisedButton.icon(
+        icon: Icon(FontAwesomeIcons.google, size: 18, color: Colors.indigo),
+        label: Text(
+          "googleでログイン",
+          style: TextStyle(
+              fontSize: 13, fontWeight: FontWeight.w500, color: Colors.black54),
+          textScaleFactor: 1,
+        ),
+        color: Colors.white,
         elevation: 10,
         onPressed: () {
           Navigator.pushReplacement(

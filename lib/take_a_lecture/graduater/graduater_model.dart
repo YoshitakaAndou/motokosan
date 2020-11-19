@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
 import 'package:motokosan/user_data/userdata_firebase.dart';
 
@@ -23,9 +24,11 @@ class GraduaterModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> generateGraduaterList(String _groupName) async {
+  Future<void> generateGraduaterList(
+      String _groupName, WorkshopList _workshopList) async {
     graduaterLists = List();
-    graduaters = await FSGraduater.instance.fetchDates(_groupName);
+    graduaters =
+        await FSGraduater.instance.fetchDates(_groupName, _workshopList);
     for (Graduater _graduater in graduaters) {
       final _userData =
           await FSUserData.instance.fetchUserData(_graduater.uid, _groupName);
@@ -36,7 +39,7 @@ class GraduaterModel extends ChangeNotifier {
             graduater: _graduater,
           ),
         );
-      }else{
+      } else {
         graduaterLists.add(
           GraduaterList(
             userData: UserData(),

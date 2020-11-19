@@ -105,7 +105,7 @@ class LectureModel extends ChangeNotifier {
         lecture.videoUrl = _val;
         break;
     }
-    notifyListeners();
+    // notifyListeners();
   }
 
   void setSlideImage(int _index, File _imageFile) {

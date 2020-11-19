@@ -29,6 +29,7 @@ class FlareActors {
   }
 
   Future<Widget> firework(BuildContext context) async {
+    print("花火を上げました");
     return await showDialog(
       context: context,
       builder: (BuildContext context) {

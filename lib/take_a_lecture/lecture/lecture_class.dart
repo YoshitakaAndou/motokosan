@@ -53,7 +53,7 @@ class LectureList {
 class LectureResult {
   int id;
   String lectureId;
-  String isTaken;
+  String isTaken; //"受講済","受講中",""
   int questionCount;
   int correctCount;
   int isTakenAt;

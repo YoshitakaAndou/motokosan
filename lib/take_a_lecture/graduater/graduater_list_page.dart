@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
+import 'package:motokosan/take_a_lecture/graduater/graduater_license.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/bar_title.dart';
@@ -14,18 +14,16 @@ import 'graduater_model.dart';
 
 class GraduaterListPage extends StatelessWidget {
   final UserData _userData;
-  final Organizer _organizer;
   final WorkshopList _workshopList;
-  GraduaterListPage(this._userData, this._organizer, this._workshopList);
+  GraduaterListPage(this._userData, this._workshopList);
 
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<GraduaterModel>(context, listen: false);
-    print(_organizer.title);
     Future(() async {
-      // model.startLoading();
-      await model.generateGraduaterList(_userData.userGroup);
-      // model.stopLoading();
+      model.startLoading();
+      await model.generateGraduaterList(_userData.userGroup, _workshopList);
+      model.stopLoading();
     });
     return Consumer<GraduaterModel>(builder: (context, model, child) {
       return Scaffold(
@@ -50,18 +48,38 @@ class GraduaterListPage extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ListView.builder(
+                      // shrinkWrap: true,
                       itemCount: model.graduaters.length,
-                      itemBuilder: (context, index) {
+                      itemBuilder: (context, int index) {
                         return Card(
                           key: Key(model.graduaters[index].graduaterId),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
+                          shape: cListCardShape,
                           elevation: 20,
                           child: ListTile(
                             // dense: true,
                             title: _title(context, model, index),
                             subtitle: _subtitle(context, model, index),
+                            onTap: () {
+                              if (model.graduaterLists[index].userData.uid ==
+                                  _userData.uid) {
+                                GraduaterLicense.instance.licenseShowDialog(
+                                  context,
+                                  _workshopList,
+                                  model.graduaterLists[index],
+                                );
+                              } else {
+                                final snackBar = SnackBar(
+                                  backgroundColor: Colors.red[300],
+                                  content: Text('自分以外の修了証は表示できません！',
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white)),
+                                  duration: Duration(milliseconds: 1500),
+                                );
+                                Scaffold.of(context).showSnackBar(snackBar);
+                              }
+                            },
                           ),
                         );
                       },

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:motokosan/take_a_lecture/lecture/list/lecture_list_page.dart';
-import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/convert_items.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -9,12 +8,11 @@ import '../../../constants.dart';
 import '../../return_argument.dart';
 import '../workshop_model.dart';
 
-class ListTileBody extends StatelessWidget {
+class WorkshopListTileBody extends StatelessWidget {
   final UserData _userData;
-  final Organizer _organizer;
   final WorkshopModel model;
   final int index;
-  ListTileBody(this._userData, this._organizer, this.model, this.index);
+  WorkshopListTileBody(this._userData, this.model, this.index);
 
   @override
   Widget build(BuildContext context) {
@@ -28,39 +26,54 @@ class ListTileBody extends StatelessWidget {
   }
 
   Widget _leading(BuildContext context, WorkshopModel model, int index) {
+    final String _isTaken = model.workshopLists[index].workshopResult.isTaken;
     bool _isTakenCount =
         model.workshopLists[index].workshopResult.takenCount == 0
             ? false
             : true;
-    bool _isClear = model.workshopLists[index].workshopResult.isTaken == "受講済"
-        ? true
-        : false;
+    bool _isExam = model.workshopLists[index].workshop.isExam;
+    bool _isClear = _isTaken == "受講済" ? true : false;
+    bool _isFinish = _isTaken == "研修済" ? true : false;
     return Container(
       padding: EdgeInsets.all(3),
-      color: _isClear
-          ? Colors.green.withOpacity(0.2)
-          : _isTakenCount
-              ? Colors.red.withOpacity(0.2)
-              : Colors.grey.withOpacity(0.1),
+      color: _isFinish
+          ? Colors.green[800]
+          : _isClear
+              ? Colors.green.withOpacity(0.2)
+              : _isTakenCount
+                  ? Colors.red.withOpacity(0.2)
+                  : Colors.grey.withOpacity(0.1),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Text(
-            _isTakenCount
-                ? "${model.workshopLists[index].workshopResult.isTaken}"
-                : "未受講",
-            style: cTextListS,
-            textScaleFactor: 1,
-          ),
-          Text(
-            "${model.workshopLists[index].workshopResult.takenCount} / ${model.workshopLists[index].workshop.lectureLength}",
-            style: TextStyle(
-              fontSize: 10,
-              color: _isTakenCount ? Colors.black : Colors.transparent,
-              fontWeight: FontWeight.w300,
+          if (_isFinish)
+            Text(
+              " $_isTaken ",
+              style: cTextUpBarS,
+              textScaleFactor: 1,
             ),
-            textScaleFactor: 1,
-          ),
+          if (!_isFinish)
+            Text(
+              _isTakenCount ? " $_isTaken " : " 未受講 ",
+              style: cTextListS,
+              textScaleFactor: 1,
+            ),
+          if (_isExam && _isClear)
+            Text(
+              " 試験未 ",
+              style: cTextListSR,
+              textScaleFactor: 1,
+            ),
+          if (_isTaken == "受講中")
+            Text(
+              "${model.workshopLists[index].workshopResult.takenCount} / ${model.workshopLists[index].workshop.lectureLength}",
+              style: TextStyle(
+                fontSize: 10,
+                color: _isTakenCount ? Colors.black : Colors.transparent,
+                fontWeight: FontWeight.w300,
+              ),
+              textScaleFactor: 1,
+            ),
         ],
       ),
     );
@@ -85,7 +98,7 @@ class ListTileBody extends StatelessWidget {
                   style: cTextListS,
                   textScaleFactor: 1),
             ),
-            if (_organizer.title == "指定無し")
+            if (model.workshopLists[index].organizerTitle == "指定無し")
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -121,6 +134,25 @@ class ListTileBody extends StatelessWidget {
       animation: true,
     );
   }
+  //
+  // Widget _trailing(BuildContext context, WorkshopModel model, int index) {
+  //   final double _percent =
+  //       model.workshopLists[index].workshopResult.lectureCount == 0
+  //           ? 0
+  //           : model.workshopLists[index].workshopResult.takenCount /
+  //               model.workshopLists[index].workshopResult.lectureCount;
+  //   final String _percentString = (_percent * 100).toStringAsFixed(0);
+  //   return GFProgressBar(
+  //     animation: true,
+  //     animationDuration: 500,
+  //     percentage: _percent,
+  //     width: 50,
+  //     radius: 40,
+  //     backgroundColor: Colors.black26,
+  //     progressBarColor: Colors.green[800],
+  //     child: Text("$_percentString %", style: cTextListSS, textScaleFactor: 1),
+  //   );
+  // }
 
   Future<void> _onTap(
       BuildContext context, WorkshopModel model, int index) async {
@@ -129,10 +161,7 @@ class ListTileBody extends StatelessWidget {
       context,
       MaterialPageRoute(
         builder: (context) => LectureListPage(
-          _userData,
-          _organizer,
-          model.workshopLists[index],
-        ),
+            _userData, model.workshopLists[index], "fromWorkshop"),
       ),
     );
     // todo 必須

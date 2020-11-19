@@ -5,10 +5,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:motokosan/auth/email_signin.dart';
 import 'package:motokosan/auth/email_signup.dart';
 import 'package:motokosan/home/home.dart';
+import 'package:motokosan/user_data/userdata_class.dart';
 import 'package:motokosan/user_data/userdata_firebase.dart';
 import 'auth/google_model.dart';
 import 'auth/google_signin.dart';
 import 'home/home_model.dart';
+import 'take_a_lecture/exam/exam_model.dart';
 import 'take_a_lecture/graduater/graduater_model.dart';
 import 'take_a_lecture/organizer/organizer_model.dart';
 import 'take_a_lecture/question/question_model.dart';
@@ -18,7 +20,6 @@ import 'take_a_lecture/target/target_model.dart';
 import 'take_a_lecture/lecture/lecture_model.dart';
 import 'auth/email_model.dart';
 import 'widgets/datasave_widget.dart';
-import 'widgets/user_data.dart';
 
 void main() async {
   //Future処理に必要
@@ -36,6 +37,7 @@ void main() async {
     ChangeNotifierProvider(create: (context) => QuestionModel()),
     ChangeNotifierProvider(create: (context) => GraduaterModel()),
     ChangeNotifierProvider(create: (context) => GoogleModel()),
+    ChangeNotifierProvider(create: (context) => ExamModel()),
   ], child: MyApp())));
 
   //向き指定
@@ -123,8 +125,6 @@ class _MyAppState extends State<MyApp> {
       }
     }
 
-    //todo print
-    userDataPrint(model.userData, "main");
     return MaterialApp(
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,

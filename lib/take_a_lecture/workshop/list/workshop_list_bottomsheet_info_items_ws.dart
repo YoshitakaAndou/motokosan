@@ -5,10 +5,10 @@ import 'package:motokosan/widgets/body_data.dart';
 import '../../../constants.dart';
 import '../workshop_model.dart';
 
-class BottomSheetInfoItemsWS extends StatelessWidget {
+class WorkshopListBottomSheetInfoItemsWS extends StatelessWidget {
   final WorkshopModel model;
   final bool _isHideBS;
-  BottomSheetInfoItemsWS(this.model, this._isHideBS);
+  WorkshopListBottomSheetInfoItemsWS(this.model, this._isHideBS);
 
   @override
   Widget build(BuildContext context) {

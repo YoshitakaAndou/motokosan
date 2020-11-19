@@ -1,20 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:motokosan/take_a_lecture/question/question_class.dart';
 import 'package:motokosan/widgets/convert_items.dart';
 
-import '../question_class.dart';
-
-class FSQuestion {
-  static final FSQuestion instance = FSQuestion();
+class FSExam {
+  static final FSExam instance = FSExam();
 
   Future<List<Question>> fetchDates(
     String _groupName,
-    String _lectureId,
+    String _workshopId,
   ) async {
     final _docs = await FirebaseFirestore.instance
         .collection("Groups")
         .doc(_groupName)
         .collection("Question")
-        .where("lectureId", isEqualTo: _lectureId)
+        .where("workshopId", isEqualTo: _workshopId)
         .get();
     final List<Question> _results = _docs.docs
         .map((doc) => Question(
@@ -36,7 +35,8 @@ class FSQuestion {
               lectureId: doc["lectureId"],
             ))
         .toList();
-    _results.sort((a, b) => a.questionNo.compareTo(b.questionNo));
+    _results.shuffle();
+    // _results.sort((a, b) => a.questionNo.compareTo(b.questionNo));
     return _results;
   }
 
@@ -87,19 +87,5 @@ class FSQuestion {
         .collection("Question")
         .doc(_questionId)
         .delete();
-  }
-
-  Future<int> getQuestionLength(_groupName, _workshopId) async {
-    final _docs = await FirebaseFirestore.instance
-        .collection("Groups")
-        .doc(_groupName)
-        .collection("Question")
-        .where("workshopId", isEqualTo: _workshopId)
-        .get();
-    final int _result = _docs.docs.length;
-    // todo print
-    print("QuestionLength:$_result問");
-
-    return _result;
   }
 }

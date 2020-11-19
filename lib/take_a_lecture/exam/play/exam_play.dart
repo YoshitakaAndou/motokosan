@@ -3,37 +3,37 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
-import 'package:motokosan/take_a_lecture/return_argument.dart';
-import 'package:motokosan/take_a_lecture/question/play/question_database.dart';
+import 'package:motokosan/take_a_lecture/exam/exam_class.dart';
+import 'package:motokosan/take_a_lecture/exam/exam_model.dart';
+import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:provider/provider.dart';
 import '../../../widgets/bar_title.dart';
 import '../../../widgets/go_back.dart';
 import 'package:soundpool/soundpool.dart';
 import '../../../constants.dart';
-import '../question_class.dart';
 
-class QuestionPlay extends StatefulWidget {
+class ExamPlay extends StatefulWidget {
   final UserData _userData;
-  final Question dataQs;
-  final LectureList lectureList;
-  final int _remains;
+  final List<ExamList> datesQs;
+  final WorkshopList workshopList;
+  final int index;
   final bool isShowOnly;
 
-  QuestionPlay(this._userData, this.dataQs, this.lectureList, this._remains,
+  ExamPlay(this._userData, this.datesQs, this.workshopList, this.index,
       this.isShowOnly);
 
   @override
-  _QuestionPlayState createState() => _QuestionPlayState();
+  _ExamPlayState createState() => _ExamPlayState();
 }
 
-class _QuestionPlayState extends State<QuestionPlay> {
+class _ExamPlayState extends State<ExamPlay> {
   final ScrollController _homeController = ScrollController();
   List<String> choices = List();
-  Question _dataQs;
-  LectureList _lectureList;
-  QuestionResult _questionResult = QuestionResult();
+  List<ExamList> _datesQs;
+  ExamList _dataQs;
+  WorkshopList _workshopList;
+  int numberOfQuestion = 1;
   int numberOfRemaining;
   Soundpool soundpool;
   int soundIdCorrect = 0;
@@ -48,19 +48,18 @@ class _QuestionPlayState extends State<QuestionPlay> {
   bool isDescription = false;
   bool isPlaying = false;
   bool isButton = false;
-  String lastTimeResult = "";
 
   int answerNum = 0;
 
   @override
   void initState() {
     super.initState();
-    print(widget._userData.userGroup);
+    print(widget._userData.uid);
     isPlaying = !widget.isShowOnly;
-    _dataQs = widget.dataQs;
+    _datesQs = widget.datesQs;
     isButton = true;
-    _lectureList = widget.lectureList;
-    numberOfRemaining = widget._remains;
+    _workshopList = widget.workshopList;
+    numberOfRemaining = widget.datesQs.length - widget.index;
     //todo
     initSounds();
     setQuestion();
@@ -94,14 +93,26 @@ class _QuestionPlayState extends State<QuestionPlay> {
   void setQuestion() {
     // 解答選択肢
     choices = [];
-    choices.add(_dataQs.choices1);
-    choices.add(_dataQs.choices2);
-    if (_dataQs.choices3.isNotEmpty) {
-      choices.add(_dataQs.choices3);
+    choices
+        .add(_datesQs[widget.index + numberOfQuestion - 1].question.choices1);
+    choices
+        .add(_datesQs[widget.index + numberOfQuestion - 1].question.choices2);
+    if (_datesQs[widget.index + numberOfQuestion - 1]
+        .question
+        .choices3
+        .isNotEmpty) {
+      choices
+          .add(_datesQs[widget.index + numberOfQuestion - 1].question.choices3);
     }
-    if (_dataQs.choices4.isNotEmpty) {
-      choices.add(_dataQs.choices4);
+    if (_datesQs[widget.index + numberOfQuestion - 1]
+        .question
+        .choices4
+        .isNotEmpty) {
+      choices
+          .add(_datesQs[widget.index + numberOfQuestion - 1].question.choices4);
     }
+    _dataQs = _datesQs[widget.index + numberOfQuestion - 1];
+
     if (isPlaying) {
       isAnswered = false;
       choices.shuffle();
@@ -122,13 +133,13 @@ class _QuestionPlayState extends State<QuestionPlay> {
     isCorrect = false;
     isCorrectImage = false;
     isDescription = false;
-    lastTimeResult = _dataQs.answered;
     answerNum = 0;
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    final model = Provider.of<ExamModel>(context, listen: false);
     if (isCorrectImage) {
       Timer(Duration(milliseconds: 1500), () {
         isCorrectImage = false;
@@ -141,10 +152,9 @@ class _QuestionPlayState extends State<QuestionPlay> {
         toolbarHeight: cToolBarH,
         centerTitle: true,
         title: barTitle(context),
-        leading: GoBack.instance.goBackWithReturArg(
+        leading: GoBack.instance.goBack(
           context: context,
           icon: Icon(Icons.arrow_back_ios),
-          returnArgument: ReturnArgument(isNextQuestion: false),
           num: 1,
         ),
         actions: [
@@ -171,20 +181,24 @@ class _QuestionPlayState extends State<QuestionPlay> {
                   padding: EdgeInsets.all(20),
                   children: [
                     //問題文
-                    _questionTile(_dataQs.question),
+                    _questionTile(_dataQs.question.question),
                     SizedBox(height: 20),
                     //選択肢
-                    _choiceTile(context, 1),
+                    _choiceTile(context, model, 1),
                     SizedBox(height: 15),
-                    _choiceTile(context, 2),
-                    if (_dataQs.choices3.isNotEmpty) SizedBox(height: 15),
-                    if (_dataQs.choices3.isNotEmpty) _choiceTile(context, 3),
-                    if (_dataQs.choices4.isNotEmpty) SizedBox(height: 15),
-                    if (_dataQs.choices4.isNotEmpty) _choiceTile(context, 4),
+                    _choiceTile(context, model, 2),
+                    if (_dataQs.question.choices3.isNotEmpty)
+                      SizedBox(height: 15),
+                    if (_dataQs.question.choices3.isNotEmpty)
+                      _choiceTile(context, model, 3),
+                    if (_dataQs.question.choices4.isNotEmpty)
+                      SizedBox(height: 15),
+                    if (_dataQs.question.choices4.isNotEmpty)
+                      _choiceTile(context, model, 4),
                     SizedBox(height: 20),
                     _answerDescriptionTile(),
                     SizedBox(height: 15),
-                    _nextButton(isButton),
+                    _nextButton(isButton, model),
                     SizedBox(height: 30)
                   ],
                 ),
@@ -208,15 +222,12 @@ class _QuestionPlayState extends State<QuestionPlay> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "${_lectureList.lecture.title}",
+              "${_workshopList.workshop.title}",
               style: cTextUpBarM,
               textScaleFactor: 1,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            // if (lastTimeResult.isNotEmpty)
-            //   Text("前回：$lastTimeResult",
-            //       textScaleFactor: 1, style: cTextUpBarS),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -289,7 +300,7 @@ class _QuestionPlayState extends State<QuestionPlay> {
     );
   }
 
-  Widget _choiceTile(BuildContext context, int _answerNum) {
+  Widget _choiceTile(BuildContext context, ExamModel model, int _answerNum) {
     return GestureDetector(
       child: Container(
         padding: EdgeInsets.only(right: 0, left: 10, top: 5, bottom: 5),
@@ -309,7 +320,8 @@ class _QuestionPlayState extends State<QuestionPlay> {
                 color: Colors.transparent,
                 shape: CircleBorder(
                   side: BorderSide(
-                    color: choices[_answerNum - 1] == _dataQs.correctChoices &&
+                    color: choices[_answerNum - 1] ==
+                                _dataQs.question.correctChoices &&
                             isAnswered
                         ? Colors.redAccent
                         : Colors.transparent,
@@ -334,36 +346,19 @@ class _QuestionPlayState extends State<QuestionPlay> {
         if (!isAnswered) {
           answerNum = _answerNum;
           isAnswered = true;
-          if (choices[_answerNum - 1] == _dataQs.correctChoices) {
+          if (choices[_answerNum - 1] == _dataQs.question.correctChoices) {
             // 正解
             isCorrect = true;
             isCorrectImage = true;
             await soundpool.play(soundIdCorrect);
-            _questionResult.questionId = _dataQs.questionId;
-            _questionResult.answerResult = "○";
-            _questionResult.answerAt =
-                ConvertItems.instance.dateToInt(DateTime.now());
-            _questionResult.lectureId = _dataQs.lectureId;
-            _questionResult.flag1 = "";
-            await QuestionDatabase.instance.saveValue(_questionResult);
-            final result = await QuestionDatabase.instance
-                .getAnswerResultQuestionId(_questionResult.questionId);
-            print("dbの値：${result[0].answerResult}");
+            model.setExamResult(widget.index + numberOfQuestion - 1, "○");
+            model.correctCount += 1;
           } else {
             // 不正解
             isCorrect = false;
             isCorrectImage = true;
             await soundpool.play(soundIdInCorrect);
-            _questionResult.questionId = _dataQs.questionId;
-            _questionResult.answerResult = "×";
-            _questionResult.answerAt =
-                ConvertItems.instance.dateToInt(DateTime.now());
-            _questionResult.lectureId = _dataQs.lectureId;
-            _questionResult.flag1 = "";
-            await QuestionDatabase.instance.saveValue(_questionResult);
-            final result = await QuestionDatabase.instance
-                .getAnswerResultQuestionId(_questionResult.questionId);
-            print("dbの値：${result[0].answerResult}");
+            model.setExamResult(widget.index + numberOfQuestion - 1, "×");
           }
           if (numberOfRemaining == 1) {
             nextTitle = "閉じる";
@@ -390,12 +385,20 @@ class _QuestionPlayState extends State<QuestionPlay> {
               }
               setState(() {});
             } else {
-              // 問題を閉じる動作
-              if (nextTitle == "閉じる") {
-                Navigator.of(context)
-                    .pop(ReturnArgument(isNextQuestion: false));
+              // 次へ進む
+              numberOfQuestion += 1;
+              numberOfRemaining -= 1;
+              if (!isPlaying) {
+                // スクロールリスナー経由でスクロールを一番上に戻す
+                _homeController.animateTo(-10,
+                    curve: Curves.easeOut,
+                    duration: const Duration(milliseconds: 100));
+              }
+              if (numberOfRemaining == 0) {
+                // 最後まで行って終了
+                Navigator.of(context).pop();
               } else {
-                Navigator.of(context).pop(ReturnArgument(isNextQuestion: true));
+                setQuestion();
               }
             }
             setState(() {});
@@ -406,7 +409,7 @@ class _QuestionPlayState extends State<QuestionPlay> {
   }
 
   Widget _answerDescriptionTile() {
-    if (isAnswered && _dataQs.answerDescription.isNotEmpty) {
+    if (isAnswered && _dataQs.question.answerDescription.isNotEmpty) {
       return Container(
         decoration: BoxDecoration(
           color: Colors.yellow[100],
@@ -414,7 +417,7 @@ class _QuestionPlayState extends State<QuestionPlay> {
           borderRadius: BorderRadius.circular(5),
         ),
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-        child: Text("【解説】\n${_dataQs.answerDescription}",
+        child: Text("【解説】\n${_dataQs.question.answerDescription}",
             textScaleFactor: 1, style: cTextListL),
       );
     } else {
@@ -438,7 +441,7 @@ class _QuestionPlayState extends State<QuestionPlay> {
     }
   }
 
-  Widget _nextButton(bool _isButton) {
+  Widget _nextButton(bool _isButton, ExamModel model) {
     final bool _isElevation = nextTitle == "正解と解説を見る" ? false : true;
     return Container(
       height: 60,
@@ -471,13 +474,20 @@ class _QuestionPlayState extends State<QuestionPlay> {
                     }
                     setState(() {});
                   } else {
-                    // 問題を閉じる動作
-                    if (nextTitle == "閉じる") {
-                      Navigator.of(context)
-                          .pop(ReturnArgument(isNextQuestion: false));
+                    // 次へ進む
+                    numberOfQuestion += 1;
+                    numberOfRemaining -= 1;
+                    if (!isPlaying) {
+                      // スクロールリスナー経由でスクロールを一番上に戻す
+                      _homeController.animateTo(-10,
+                          curve: Curves.easeOut,
+                          duration: const Duration(milliseconds: 100));
+                    }
+                    if (numberOfRemaining == 0) {
+                      // 最後まで行って終了
+                      Navigator.of(context).pop();
                     } else {
-                      Navigator.of(context)
-                          .pop(ReturnArgument(isNextQuestion: true));
+                      setQuestion();
                     }
                   }
                   setState(() {});

@@ -10,12 +10,6 @@ import 'lecture_class.dart';
 class FSLecture {
   static final FSLecture instance = FSLecture();
 
-  Future<int> getLectureLength(_groupName, _workshopId) async {
-    final List<Lecture> _lectures =
-        await FSLecture.instance.fetchDates(_groupName, _workshopId);
-    return _lectures.length;
-  }
-
   Future<List<Lecture>> fetchDates(
     String _groupName,
     String _workshopId,
@@ -105,6 +99,16 @@ class FSLecture {
         .collection("Lecture")
         .doc(_lectureId)
         .delete();
+  }
+
+  Future<int> getLectureLength(_groupName, _workshopId) async {
+    final _docs = await FirebaseFirestore.instance
+        .collection("Groups")
+        .doc(_groupName)
+        .collection("Lecture")
+        .where("workshopId", isEqualTo: _workshopId)
+        .get();
+    return _docs.docs.length;
   }
 }
 

@@ -34,14 +34,14 @@ class WorkshopDatabase {
         'SELECT * FROM workshop_result WHERE workshopId = ?',
         [_data.workshopId]);
     // todo
-    print("saveValueのworkshopId:${_data.workshopId}");
+    print("DB saveValueのworkshopId:${_data.workshopId}");
     if (maps.length == 0) {
       await _insert(_data);
-      print("WorkshopResultを新規登録したよ");
+      print("WorkshopResultを${_data.isTaken}で新規登録したよ");
     } else {
       if (_isUpDate) {
         await _update(_data);
-        print("WorkshopResultを更新したよ");
+        print("WorkshopResultを${_data.isTaken}で更新したよ");
       } else {
         print("WorkshopResultを登録しなかったよ");
       }

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:motokosan/take_a_lecture/exam/play/exam_List_page.dart';
 import 'package:motokosan/take_a_lecture/graduater/graduater_list_page.dart';
-import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
 import 'package:motokosan/take_a_lecture/return_argument.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
@@ -13,29 +13,23 @@ import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../constants.dart';
 import '../lecture_model.dart';
-import 'bottomsheet_info_items_lec.dart';
-import 'bottomsheet_send_items.dart';
-import 'list_tile_body.dart';
+import 'lecture_list_bottomsheet_info_items_lec.dart';
+import 'lecture_list_bottomsheet_send_items.dart';
+import 'lecture_list_tile_body.dart';
 
 class LectureListPage extends StatelessWidget {
   final UserData _userData;
-  final Organizer _organizer;
   final WorkshopList _workshopList;
-  LectureListPage(this._userData, this._organizer, this._workshopList);
+  final String _routeName;
+  LectureListPage(this._userData, this._workshopList, this._routeName);
 
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<LectureModel>(context, listen: false);
-    bool _isHideBS = false;
+    bool _isHideBS = false; //取説ボトムシート
+
     Future(() async {
-      // model.startLoading();
-      _isHideBS = await BodyData.instance.getIsHideLBS();
-      await model.generateLectureList(
-          _userData.userGroup, _workshopList.workshop.workshopId);
-      // model.stopLoading();
-      if (_isHideBS == false) {
-        await _showModalBottomSheetInfo(context, model, _isHideBS);
-      }
+      await _initBuild(context, model, _isHideBS);
     });
     return Consumer<LectureModel>(builder: (context, model, child) {
       return Scaffold(
@@ -55,14 +49,24 @@ class LectureListPage extends StatelessWidget {
             num: 1,
           ),
           actions: [
-            GoBack.instance.goBackWithReturArg(
-              context: context,
-              icon: Icon(FontAwesomeIcons.home),
-              returnArgument: ReturnArgument(
-                workshopList: _workshopList,
+            if (_routeName == "fromWorkshop")
+              GoBack.instance.goBackWithReturArg(
+                context: context,
+                icon: Icon(FontAwesomeIcons.home),
+                returnArgument: ReturnArgument(
+                  workshopList: _workshopList,
+                ),
+                num: 3,
               ),
-              num: 3,
-            ),
+            if (_routeName == "fromHome")
+              GoBack.instance.goBackWithReturArg(
+                context: context,
+                icon: Icon(FontAwesomeIcons.home),
+                returnArgument: ReturnArgument(
+                  workshopList: _workshopList,
+                ),
+                num: 1,
+              ),
           ],
         ),
         body: Column(
@@ -75,15 +79,13 @@ class LectureListPage extends StatelessWidget {
                 children: [
                   ListView.builder(
                     itemCount: model.lectureLists.length,
-                    itemBuilder: (context, index) {
+                    itemBuilder: (context, int index) {
                       return Card(
                         key: Key(model.lectureLists[index].lecture.lectureId),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
+                        shape: cListCardShape,
                         elevation: 20,
-                        child: ListTileBody(
-                            _userData, _organizer, _workshopList, model, index),
+                        child: LectureListTileBody(
+                            _userData, _workshopList, model, index),
                       );
                     },
                   ),
@@ -93,12 +95,29 @@ class LectureListPage extends StatelessWidget {
             ),
           ],
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: _floatingActionButton(context, model, _isHideBS),
         bottomNavigationBar: _bottomNavigationBar(context, model),
       );
     });
   }
 
+  Future<void> _initBuild(
+      BuildContext context, LectureModel model, bool _isHideBS) async {
+    model.startLoading();
+    _isHideBS = await BodyData.instance.getIsHideLBS();
+    model.generateLectureList(
+        _userData.userGroup, _workshopList.workshop.workshopId);
+    model.stopLoading();
+    if (_isHideBS == false) {
+      await _showModalBottomSheetInfo(context, model, _isHideBS);
+    }
+  }
+
   Widget _infoArea() {
+    final String _isExam = _workshopList.workshop.isExam ? " 修了試験 " : "";
+    final String _isExamResult =
+        _workshopList.workshopResult.graduaterId.isNotEmpty ? "済 " : "";
     return Container(
       width: double.infinity,
       height: cInfoAreaH,
@@ -111,10 +130,8 @@ class LectureListPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Text("研修会  ",
-                  //     style: cTextUpBarSS, textScaleFactor: 1, maxLines: 1),
                   Text(
                     _workshopList.workshop.title,
                     style: cTextUpBarM,
@@ -122,6 +139,22 @@ class LectureListPage extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  if (_workshopList.workshop.isExam)
+                    Container(
+                      color: Colors.green[600],
+                      child: Row(
+                        children: [
+                          Text("$_isExam",
+                              style: cTextUpBarS,
+                              textScaleFactor: 1,
+                              maxLines: 1),
+                          Text("$_isExamResult",
+                              style: cTextListSR,
+                              textScaleFactor: 1,
+                              maxLines: 1),
+                        ],
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -167,6 +200,37 @@ class LectureListPage extends StatelessWidget {
     );
   }
 
+  Widget _floatingActionButton(
+      BuildContext context, LectureModel model, bool _isHideBS) {
+    final bool _isExam = _workshopList.workshop.isExam ? true : false;
+    final bool _isTaken =
+        _workshopList.workshopResult.isTaken == "受講済" ? true : false;
+    final bool _isFAButton = _isExam && _isTaken ? true : false;
+    return _isFAButton
+        ? FloatingActionButton.extended(
+            elevation: 20,
+            shape: cFABShape,
+            icon: Icon(FontAwesomeIcons.graduationCap),
+            label: Text(" 修了試験を受ける", style: cTextUpBarL, textScaleFactor: 1),
+            backgroundColor: cFAB,
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ExamListPage(_userData, _workshopList),
+                  fullscreenDialog: true,
+                ),
+              );
+              await _initBuild(context, model, _isHideBS);
+              if (_workshopList.workshopResult.isSendAt == 0 &&
+                  _workshopList.workshopResult.isTaken == "研修済") {
+                _showModalBottomSheetSend(context, model, true);
+              }
+            },
+          )
+        : Container();
+  }
+
   Widget _bottomNavigationBar(BuildContext context, LectureModel model) {
     return BottomAppBar(
       color: Theme.of(context).primaryColor,
@@ -185,7 +249,7 @@ class LectureListPage extends StatelessWidget {
           children: [
             _bottomWebButton(context, model),
             if (_workshopList.workshopResult.isSendAt == 0 &&
-                _workshopList.workshopResult.isTaken == "受講済")
+                _workshopList.workshopResult.isTaken == "研修済")
               _bottomSendButton(context, model),
           ],
         ),
@@ -202,7 +266,7 @@ class LectureListPage extends StatelessWidget {
         textColor: Colors.white,
         label: Text("未送信", style: cTextUpBarM, textScaleFactor: 1),
         onPressed: () {
-          _showModalBottomSheetSend(context, model, true);
+          _showModalBottomSheetSend(context, model, false);
         },
       ),
     );
@@ -223,7 +287,6 @@ class LectureListPage extends StatelessWidget {
             MaterialPageRoute(
               builder: (context) => GraduaterListPage(
                 _userData,
-                _organizer,
                 _workshopList,
               ),
               fullscreenDialog: true,
@@ -248,7 +311,7 @@ class LectureListPage extends StatelessWidget {
         ),
       ),
       builder: (BuildContext context) {
-        return BottomSheetSendItems(
+        return LectureListBottomSheetSendItems(
             _userData, _workshopList, model, fromButton);
       },
     );
@@ -269,7 +332,7 @@ class LectureListPage extends StatelessWidget {
         ),
       ),
       builder: (BuildContext context) {
-        return BottomSheetInfoItemsLec(model, _isHideBS);
+        return LectureListBottomSheetInfoItemsLec(model, _isHideBS);
       },
     );
   }

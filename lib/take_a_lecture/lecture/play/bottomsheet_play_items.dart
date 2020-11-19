@@ -66,6 +66,7 @@ class BottomSheetPlayItems extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.withOpacity(0.5)),
           borderRadius: BorderRadius.circular(10),
+          color: cBSButton,
         ),
         child: ListTile(
           leading: Icon(FontAwesomeIcons.youtube),
@@ -89,6 +90,7 @@ class BottomSheetPlayItems extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.withOpacity(0.5)),
           borderRadius: BorderRadius.circular(10),
+          color: cBSButton,
         ),
         child: ListTile(
           leading: Icon(FontAwesomeIcons.undo),
@@ -112,6 +114,7 @@ class BottomSheetPlayItems extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.withOpacity(0.5)),
           borderRadius: BorderRadius.circular(10),
+          color: cBSButton,
         ),
         child: ListTile(
           leading: Icon(FontAwesomeIcons.school),

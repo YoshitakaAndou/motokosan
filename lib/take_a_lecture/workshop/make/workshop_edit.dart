@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_firebase.dart';
 import 'package:motokosan/widgets/convert_items.dart';
@@ -25,63 +26,33 @@ class WorkshopEdit extends StatelessWidget {
     final option3TextController = TextEditingController();
     titleTextController.text = _workshop.title;
     subTitleTextController.text = _workshop.subTitle;
-    option1TextController.text = _workshop.option1;
-    option2TextController.text = _workshop.option2;
+    option1TextController.text = _workshop.information;
+    option2TextController.text = _workshop.subInformation;
     option3TextController.text = _workshop.option3;
 
     return Consumer<WorkshopModel>(builder: (context, model, child) {
       return Scaffold(
         resizeToAvoidBottomInset: true,
-        appBar: AppBar(
-          toolbarHeight: cToolBarH,
-          centerTitle: true,
-          title: Text("研修会の編集", style: cTextTitleL, textScaleFactor: 1),
-          leading: IconButton(
-            icon: Icon(FontAwesomeIcons.times),
-            color: Colors.black87,
-            onPressed: () => Navigator.pop(context),
-          ),
-          actions: [
-            if (model.isUpdate)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Icon(
-                  FontAwesomeIcons.pencilAlt,
-                  color: Colors.orange.withOpacity(0.5),
-                  size: 20,
-                ),
-              ),
-          ],
-        ),
+        appBar: _appBar(context, model),
         body: Stack(
           children: [
             SingleChildScrollView(
               child: Column(
                 children: [
                   _infoArea(model),
-                  Container(
-                    width: MediaQuery.of(context).size.width - 28,
-                    height: MediaQuery.of(context).size.height / 2,
+                  ListView(
+                    shrinkWrap: true,
                     padding: EdgeInsets.all(10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _switch(model, context),
-                            _deadlineDate(model, context),
-                          ],
-                        ),
-                        _title(model, titleTextController),
-                        _subTitle(model, subTitleTextController),
-                        _option1(model, option1TextController),
-                        _option2(model, option2TextController),
-                        _option3(model, option3TextController),
-                        Divider(height: 5, color: Colors.grey, thickness: 1),
-                      ],
-                    ),
+                    children: [
+                      _releaseDateArea(context, model),
+                      _title(model, titleTextController),
+                      _subTitle(model, subTitleTextController),
+                      _option1(model, option1TextController),
+                      _option2(model, option2TextController),
+                      // _option3(model, option3TextController),
+                      _examArea(context, model),
+                      Divider(height: 5, color: Colors.grey, thickness: 1),
+                    ],
                   ),
                 ],
               ),
@@ -119,6 +90,30 @@ class WorkshopEdit extends StatelessWidget {
     });
   }
 
+  Widget _appBar(BuildContext context, WorkshopModel model) {
+    return AppBar(
+      toolbarHeight: cToolBarH,
+      centerTitle: true,
+      title: Text("研修会の編集", style: cTextTitleL, textScaleFactor: 1),
+      leading: IconButton(
+        icon: Icon(FontAwesomeIcons.times),
+        color: Colors.black87,
+        onPressed: () => Navigator.pop(context),
+      ),
+      actions: [
+        if (model.isUpdate)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Icon(
+              FontAwesomeIcons.pencilAlt,
+              color: Colors.orange.withOpacity(0.5),
+              size: 20,
+            ),
+          ),
+      ],
+    );
+  }
+
   Widget _infoArea(WorkshopModel model) {
     return Container(
       width: double.infinity,
@@ -149,7 +144,17 @@ class WorkshopEdit extends StatelessWidget {
     );
   }
 
-  Widget _switch(WorkshopModel model, BuildContext context) {
+  Widget _releaseDateArea(BuildContext context, WorkshopModel model) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _switchRelease(context, model),
+        _deadlineDate(context, model),
+      ],
+    );
+  }
+
+  Widget _switchRelease(BuildContext context, WorkshopModel model) {
     final _okSwitch = _workshop.lectureLength > 0;
     return Column(
       children: [
@@ -160,7 +165,7 @@ class WorkshopEdit extends StatelessWidget {
                   style: TextStyle(fontSize: 12, color: Colors.black87),
                   textScaleFactor: 1),
             if (!_okSwitch)
-              Text("講座０件の間は公開できません！",
+              Text("講座０件では公開できません！",
                   style: TextStyle(fontSize: 10, color: Colors.red),
                   textScaleFactor: 1),
           ],
@@ -194,7 +199,7 @@ class WorkshopEdit extends StatelessWidget {
     );
   }
 
-  Widget _deadlineDate(WorkshopModel model, BuildContext context) {
+  Widget _deadlineDate(BuildContext context, WorkshopModel model) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -312,9 +317,9 @@ class WorkshopEdit extends StatelessWidget {
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.text,
       decoration: InputDecoration(
-        labelText: "マーク表示",
+        labelText: "サブインフォメーション",
         labelStyle: TextStyle(fontSize: 10),
-        hintText: "マーク表示 を入力してください",
+        hintText: "サブインフォメーション を入力してください",
         hintStyle: TextStyle(fontSize: 12),
         suffixIcon: IconButton(
           onPressed: () {
@@ -332,41 +337,194 @@ class WorkshopEdit extends StatelessWidget {
     );
   }
 
-  Widget _option3(WorkshopModel model, _option3TextController) {
-    return TextField(
-      maxLines: null,
-      textInputAction: TextInputAction.done,
-      keyboardType: TextInputType.text,
-      decoration: InputDecoration(
-        labelText: "option3",
-        labelStyle: TextStyle(fontSize: 10),
-        hintText: "option3 を入力してください",
-        hintStyle: TextStyle(fontSize: 12),
-        suffixIcon: IconButton(
-          onPressed: () {
-            _option3TextController.text = "";
-            model.setUpdate();
-          },
-          icon: Icon(Icons.clear, size: 15),
+  // Widget _option3(WorkshopModel model, _option3TextController) {
+  //   return TextField(
+  //     maxLines: null,
+  //     textInputAction: TextInputAction.done,
+  //     keyboardType: TextInputType.text,
+  //     decoration: InputDecoration(
+  //       labelText: "option3",
+  //       labelStyle: TextStyle(fontSize: 10),
+  //       hintText: "option3 を入力してください",
+  //       hintStyle: TextStyle(fontSize: 12),
+  //       suffixIcon: IconButton(
+  //         onPressed: () {
+  //           _option3TextController.text = "";
+  //           model.setUpdate();
+  //         },
+  //         icon: Icon(Icons.clear, size: 15),
+  //       ),
+  //     ),
+  //     controller: _option3TextController,
+  //     onChanged: (text) {
+  //       model.changeValue("option3", text);
+  //       model.setUpdate();
+  //     },
+  //   );
+  // }
+
+  Widget _examArea(BuildContext context, WorkshopModel model) {
+    return Column(
+      children: [
+        SizedBox(height: 10),
+        _switchExam(context, model),
+        SizedBox(height: 10),
+        if (_workshop.isExam) _numOfExam(context, model),
+        SizedBox(height: 10),
+        if (_workshop.isExam) _passingScore(context, model),
+        SizedBox(height: 10),
+      ],
+    );
+  }
+
+  Widget _switchExam(BuildContext context, WorkshopModel model) {
+    final _okSwitch = _workshop.lectureLength > 0;
+    final _isMax =
+        _workshop.questionLength == _workshop.numOfExam ? true : false;
+    return Row(
+      children: [
+        Expanded(
+          flex: 3,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("全講義受講後の修了試験",
+                  style: TextStyle(fontSize: 13, color: Colors.black87),
+                  textScaleFactor: 1),
+              if (_okSwitch)
+                Text("  登録問題 ${_workshop.questionLength}問",
+                    style: TextStyle(
+                        fontSize: 10,
+                        color: _isMax ? Colors.red : Colors.black87),
+                    textScaleFactor: 1),
+              if (!_okSwitch)
+                Text("0問では実施できません！",
+                    style: TextStyle(fontSize: 10, color: Colors.red),
+                    textScaleFactor: 1),
+              SizedBox(width: 20),
+            ],
+          ),
         ),
-      ),
-      controller: _option3TextController,
-      onChanged: (text) {
-        model.changeValue("option3", text);
-        model.setUpdate();
-      },
+        Expanded(
+          flex: 2,
+          child: Row(
+            children: [
+              Switch(
+                value: _workshop.isExam,
+                activeColor: Colors.green,
+                activeTrackColor: Colors.grey,
+                inactiveThumbColor: Colors.white,
+                inactiveTrackColor: Colors.grey,
+                onChanged: (value) {
+                  if (_workshop.questionLength > 0) {
+                    _workshop.isExam = value;
+                    model.setUpdate();
+                  }
+                },
+              ),
+              Text(_workshop.isExam ? '実施する' : '実施しない',
+                  style: TextStyle(
+                      fontSize: 15,
+                      color:
+                          _workshop.isExam ? Colors.black87 : Colors.black26),
+                  textScaleFactor: 1),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _numOfExam(BuildContext context, WorkshopModel model) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Text("修了試験の問題数 :", style: cTextListM, textScaleFactor: 1),
+        Container(
+          child: _numCounter(
+            initNum: _workshop.numOfExam,
+            pressedMinus: () {
+              if (_workshop.numOfExam > 1) {
+                _workshop.numOfExam -= 1;
+                model.setUpdate();
+              }
+            },
+            pressedPlus: () {
+              if (_workshop.numOfExam < _workshop.questionLength) {
+                _workshop.numOfExam += 1;
+                model.setUpdate();
+              }
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _passingScore(BuildContext context, WorkshopModel model) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Text("修了試験の合格点 :", style: cTextListM, textScaleFactor: 1),
+        Container(
+          child: _numCounter(
+            initNum: _workshop.passingScore,
+            pressedMinus: () {
+              if (_workshop.passingScore > 0) {
+                _workshop.passingScore -= 5;
+                model.setUpdate();
+              }
+            },
+            pressedPlus: () {
+              if (_workshop.passingScore < 100) {
+                _workshop.passingScore += 5;
+                model.setUpdate();
+              }
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _numCounter(
+      {int initNum, Function pressedMinus, Function pressedPlus}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          width: 50,
+          child: IconButton(
+            icon: Icon(FontAwesomeIcons.minusCircle),
+            onPressed: pressedMinus,
+          ),
+        ),
+        Container(
+          width: 50,
+          child: Text("$initNum",
+              style: TextStyle(fontSize: 15, color: Colors.black87),
+              textAlign: TextAlign.center,
+              textScaleFactor: 1),
+        ),
+        Container(
+          width: 50,
+          child: IconButton(
+            icon: Icon(FontAwesomeIcons.plusCircle),
+            onPressed: pressedPlus,
+          ),
+        ),
+      ],
     );
   }
 
   Widget _saveButton(
-    BuildContext context,
-    WorkshopModel model,
-    TextEditingController titleTextController,
-    TextEditingController subTitleTextController,
-    TextEditingController option1TextController,
-    TextEditingController option2TextController,
-    TextEditingController option3TextController,
-  ) {
+      BuildContext context,
+      WorkshopModel model,
+      TextEditingController titleTextController,
+      TextEditingController subTitleTextController,
+      TextEditingController option1TextController,
+      TextEditingController option2TextController,
+      TextEditingController option3TextController) {
     return Container(
       height: 45,
       child: Row(
@@ -427,28 +585,30 @@ class WorkshopEdit extends StatelessWidget {
   }
 
   Future<void> _editProcess(
-    BuildContext context,
-    WorkshopModel model,
-    TextEditingController titleTextController,
-    TextEditingController subTitleTextController,
-    TextEditingController option1TextController,
-    TextEditingController option2TextController,
-    TextEditingController option3TextController,
-  ) async {
+      BuildContext context,
+      WorkshopModel model,
+      TextEditingController titleTextController,
+      TextEditingController subTitleTextController,
+      TextEditingController option1TextController,
+      TextEditingController option2TextController,
+      TextEditingController option3TextController) async {
     // グリグリを回す
     model.startLoading();
     // 更新処理
     model.workshop.title = titleTextController.text;
     model.workshop.subTitle = subTitleTextController.text;
-    model.workshop.option1 = option1TextController.text;
-    model.workshop.option2 = option2TextController.text;
+    model.workshop.information = option1TextController.text;
+    model.workshop.subInformation = option2TextController.text;
     model.workshop.option3 = option3TextController.text;
     model.workshop.isRelease = _workshop.isRelease;
+    model.workshop.isExam = _workshop.isExam;
     model.workshop.workshopId = _workshop.workshopId;
     model.workshop.workshopNo = _workshop.workshopNo;
     model.workshop.createAt = _workshop.createAt;
     model.workshop.updateAt = _workshop.updateAt;
     model.workshop.deadlineAt = _workshop.deadlineAt;
+    model.workshop.numOfExam = _workshop.numOfExam;
+    model.workshop.passingScore = _workshop.passingScore;
     try {
       await model.updateWorkshopFs(groupName, DateTime.now());
       await model.fetchWorkshopByOrganizer(groupName, _organizer.organizerId);
@@ -467,7 +627,7 @@ class WorkshopEdit extends StatelessWidget {
       elevation: 15,
 
       icon: Icon(FontAwesomeIcons.trashAlt),
-      label: Text(" この研修会を削除", style: cTextUpBarM, textScaleFactor: 1),
+      label: Text(" 削除", style: cTextUpBarM, textScaleFactor: 1),
       // todo 削除
       onPressed: () {
         MyDialog.instance.okShowDialogFunc(
@@ -490,12 +650,8 @@ class WorkshopEdit extends StatelessWidget {
     );
   }
 
-  Future<void> _deleteSave(
-    BuildContext context,
-    WorkshopModel model,
-    _categoryId,
-    _workshopId,
-  ) async {
+  Future<void> _deleteSave(BuildContext context, WorkshopModel model,
+      _categoryId, _workshopId) async {
     model.startLoading();
     try {
       // todo workShop以下のデータは消せていないから消す様にする

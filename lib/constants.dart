@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-int videoEndAt = 5;
+int videoEndAt = 1000;
 
 //FireBaseのID
 const String cQuizId = "Question:2020-08-18";
@@ -47,8 +47,34 @@ const cTextPopS = TextStyle(
   fontWeight: FontWeight.w600,
 );
 
-//Text
+// フローティングアクションボタンのshape
+final cFABShape = OutlineInputBorder(
+  borderSide: BorderSide(width: 3, color: Colors.white),
+  borderRadius: BorderRadius.all(Radius.circular(15.0)),
+);
 
+// リストカードのshape
+final cListCardShape = OutlineInputBorder(
+  borderSide: BorderSide(width: 0.5, color: Colors.grey),
+  borderRadius: BorderRadius.all(Radius.circular(10.0)),
+);
+
+// ボタンの色
+final cFAB = Colors.green[800];
+// ボトムシートのボタン
+final cBSButton = Colors.grey[50];
+// クイズの答えボタン
+final cQuizButton = Colors.grey[50];
+
+// ボトムシートのバック色
+final cBSBack = Colors.white;
+
+//Text
+final TextStyle cTextTitleLIndigo = TextStyle(
+  color: Colors.indigo,
+  fontSize: 16,
+  fontWeight: FontWeight.w600,
+);
 final TextStyle cTextTitleL = TextStyle(
   color: Colors.green[700],
   fontSize: 16,

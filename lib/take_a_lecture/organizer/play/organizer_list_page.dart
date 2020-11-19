@@ -49,7 +49,9 @@ class _OrganizerListPageState extends State<OrganizerListPage> {
   Widget build(BuildContext context) {
     final model = Provider.of<OrganizerModel>(context, listen: false);
     Future(() async {
+      model.startLoading();
       await model.fetchOrganizerList(widget._userData.userGroup);
+      model.stopLoading();
     });
     return Consumer<OrganizerModel>(builder: (context, model, child) {
       return Scaffold(
@@ -71,12 +73,10 @@ class _OrganizerListPageState extends State<OrganizerListPage> {
                     padding: const EdgeInsets.all(8.0),
                     child: ListView.builder(
                       itemCount: model.organizerList.length,
-                      itemBuilder: (context, index) {
+                      itemBuilder: (context, int index) {
                         return Card(
                           key: Key(model.organizerList[index].organizerId),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
+                          shape: cListCardShape,
                           elevation: 15,
                           child: ListTile(
                             dense: true,

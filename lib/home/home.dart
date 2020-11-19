@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/auth/email_signin.dart';
 import 'package:motokosan/auth/google_signin.dart';
+import 'package:motokosan/auth/google_signup.dart';
 import 'package:motokosan/auth/signout.dart';
-import 'package:motokosan/home/home_model.dart';
+import 'package:motokosan/home/home_info.dart';
 import 'package:motokosan/take_a_lecture/graduater/graduater_class.dart';
 import 'package:motokosan/take_a_lecture/graduater/graduater_firebase.dart';
 import 'package:motokosan/take_a_lecture/lecture/lecture_database.dart';
@@ -15,8 +16,8 @@ import 'package:motokosan/take_a_lecture/organizer/play/organizer_list_page.dart
 import 'package:motokosan/take_a_lecture/question/play/question_database.dart';
 import 'package:motokosan/take_a_lecture/target/target_page.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_database.dart';
+import 'package:motokosan/take_a_lecture/workshop/workshop_model.dart';
 import 'package:motokosan/user_data/userdata_firebase.dart';
-import 'package:motokosan/widgets/convert_items.dart';
 import 'package:motokosan/widgets/ok_show_dialog.dart';
 import 'package:provider/provider.dart';
 import '../constants.dart';
@@ -30,11 +31,13 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Size _size = MediaQuery.of(context).size;
-    final model = Provider.of<HomeModel>(context, listen: false);
+    final model = Provider.of<WorkshopModel>(context, listen: false);
     Future(() async {
-      model.fetchInfoList(_userData.userGroup);
+      model.startLoading();
+      await model.fetchLists(_userData.userGroup);
+      model.stopLoading();
     });
-    return Consumer<HomeModel>(builder: (context, model, child) {
+    return Consumer<WorkshopModel>(builder: (context, model, child) {
       return Scaffold(
         appBar: AppBar(
           title: barTitle(context),
@@ -48,84 +51,19 @@ class Home extends StatelessWidget {
               Column(
                 children: [
                   _imageArea(context, _size),
-                  _infoArea(context, model, _size),
+                  // _infoArea(context, model, _size),
+                  HomeInfo(_userData, model, _size),
                 ],
               ),
-              // Column(
-              //   children: [
-              //     SizedBox(height: 20),
-              //     _participationButton(context, model, _size),
-              //     SizedBox(height: 20),
-              //   ],
-              // ),
             ],
           ),
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: _floatingActionButton(context, model),
         bottomNavigationBar: _bottomNavigationBar(context, _userData),
       );
     });
   }
-
-  Widget _imageArea(BuildContext context, Size _size) {
-    return Container(
-      child: Image.asset(
-        "assets/images/workshop01.png",
-        width: _size.width,
-        fit: BoxFit.fitWidth,
-      ),
-    );
-  }
-
-  // Widget _participationButton(
-  //     BuildContext context, HomeModel model, Size _size) {
-  //   return SizedBox(
-  //     height: 50,
-  //     width: _size.width - 40,
-  //     child: RaisedButton.icon(
-  //       icon: Icon(
-  //         FontAwesomeIcons.chalkboardTeacher,
-  //         color: Colors.white,
-  //       ),
-  //       label: Text(
-  //         "　研修会に参加する",
-  //         style: TextStyle(
-  //           fontSize: 18,
-  //           fontWeight: FontWeight.bold,
-  //           color: Colors.white,
-  //         ),
-  //         textScaleFactor: 1,
-  //       ),
-  //       onPressed: () async {
-  //         if (FSUserData.instance.isCurrentUserSignIn()) {
-  //           final _organizers = await fetchOrganizerList(_userData.userGroup);
-  //           await Navigator.push(
-  //             context,
-  //             MaterialPageRoute(
-  //               builder: (context) =>
-  //                   OrganizerListPage(_userData, true, _organizers),
-  //             ),
-  //           );
-  //         } else {
-  //           _infoNotSignIn(
-  //               context,
-  //               "サインアウトしているので"
-  //                   "\n実行できません",
-  //               "サインインしますか？");
-  //         }
-  //       },
-  //       elevation: 10,
-  //       shape: OutlineInputBorder(
-  //         borderSide: BorderSide(color: Colors.white),
-  //         borderRadius: BorderRadius.all(Radius.circular(10.0)),
-  //       ),
-  //       color: Colors.green,
-  //       splashColor: Colors.white.withOpacity(0.5),
-  //       textColor: Colors.white,
-  //     ),
-  //   );
-  // }
 
   Future<List<Organizer>> fetchOrganizerList(String _groupName) async {
     final List<Organizer> _organizers =
@@ -146,7 +84,7 @@ class Home extends StatelessWidget {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => GoogleSignin(userData: _userData),
+              builder: (context) => GoogleSignup(),
             ),
           );
         } else {
@@ -162,111 +100,37 @@ class Home extends StatelessWidget {
     );
   }
 
-  Widget _infoArea(BuildContext context, HomeModel model, Size _size) {
+  Widget _imageArea(BuildContext context, Size _size) {
     return Container(
-      width: double.infinity,
-      // color: cContBg,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          _infoTitle(context, _size, _userData),
-          _infoList(context, model, _size, _userData),
-        ],
+      child: Image.asset(
+        "assets/images/workshop01.png",
+        width: _size.width,
+        fit: BoxFit.fitWidth,
       ),
     );
   }
 
-  Widget _infoTitle(BuildContext context, Size size, UserData userData) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-      width: size.width,
-      color: Colors.green,
-      child: Row(
-        children: [
-          Icon(FontAwesomeIcons.infoCircle, size: 15, color: Colors.white),
-          SizedBox(width: 5),
-          Text(
-            "Information",
-            style: cTextUpBarM,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _infoList(
-      BuildContext context, HomeModel model, Size size, UserData userData) {
-    return Container(
-      width: size.width,
-      height: size.width - 50,
-      // color: Colors.green.withOpacity(0.1),
-      child: ListView.builder(
-        itemCount: model.infoLists.length,
-        itemBuilder: (context, index) {
-          final bool _isInfoEmpty = model.infoLists[index].option1.isEmpty;
-          return _isInfoEmpty
-              ? Container()
-              : Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(width: 0.5, color: Colors.grey),
-                    ),
-                  ),
-                  child: ListTile(
-                    dense: true,
-                    title: _title(context, model, index),
-                    // onTap: () => _onTap(
-                    //     context, model, _lectureList, index, false),
-                  ),
-                );
-        },
-      ),
-    );
-  }
-
-  Widget _title(BuildContext context, HomeModel model, int index) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-                "${ConvertItems.instance.intToString(model.infoLists[index].updateAt)}",
-                style: cTextListM,
-                textScaleFactor: 1),
-            SizedBox(width: 10),
-            Container(
-                color: Colors.red.withOpacity(0.2),
-                child: Text(" ${model.infoLists[index].option2} ",
-                    style: cTextListS, textScaleFactor: 1)),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text("・${model.infoLists[index].option1}",
-                style: cTextListM, textScaleFactor: 1),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _floatingActionButton(BuildContext context, HomeModel model) {
+  Widget _floatingActionButton(BuildContext context, WorkshopModel model) {
     return FloatingActionButton.extended(
-      elevation: 20,
+      elevation: 30,
       icon: Icon(FontAwesomeIcons.chalkboardTeacher),
-      label: Text(" 研修会に参加する", style: cTextUpBarL, textScaleFactor: 1),
+      label: Text(" 研修会一覧へGo！", style: cTextUpBarL, textScaleFactor: 1),
+      backgroundColor: cFAB,
+      shape: cFABShape,
       onPressed: () async {
         if (FSUserData.instance.isCurrentUserSignIn()) {
           final _organizers = await fetchOrganizerList(_userData.userGroup);
           await Navigator.push(
             context,
             MaterialPageRoute(
+              settings: const RouteSettings(name: "/home"),
               builder: (context) =>
                   OrganizerListPage(_userData, true, _organizers),
             ),
           );
+          model.startLoading();
+          await model.fetchLists(_userData.userGroup);
+          model.stopLoading();
         } else {
           _infoNotSignIn(
               context,
@@ -335,7 +199,7 @@ class Home extends StatelessWidget {
     );
   }
 
-  Widget _drawer(BuildContext context, HomeModel model) {
+  Widget _drawer(BuildContext context, WorkshopModel model) {
     return SafeArea(
       child: ClipRRect(
         borderRadius: BorderRadius.only(topRight: Radius.circular(30)),
@@ -362,74 +226,74 @@ class Home extends StatelessWidget {
                   height: MediaQuery.of(context).size.height - 150,
                   child: ListView(
                     children: [
-                      _menuItem(
-                        context: context,
-                        title: "対象を編集",
-                        icon: Icon(FontAwesomeIcons.solidAddressCard,
-                            color: Colors.green[800]),
-                        onTap: () async {
-                          Navigator.pop(context);
-                          // model.isLoading = true;
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TargetPage(_userData),
+                      Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(8),
+                        child: Row(
+                          children: [
+                            Expanded(flex: 1, child: Icon(Icons.person)),
+                            Expanded(
+                              flex: 3,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Text("UID：${_userData.uid}",
+                                      style: cTextListSS),
+                                  Text("グループ名：${_userData.userGroup}",
+                                      style: cTextListSS),
+                                  Text("ユーザー名：${_userData.userName}",
+                                      style: cTextListSS),
+                                  Text("e-mail  ：${_userData.userEmail}",
+                                      style: cTextListSS),
+                                  Text("passWord：${_userData.userPassword}",
+                                      style: cTextListSS),
+                                ],
+                              ),
                             ),
-                          );
-                        },
+                          ],
+                        ),
                       ),
+                      Divider(height: 10, color: Colors.black),
                       _menuItem(
                         context: context,
                         title: "データを編集",
                         icon: Icon(FontAwesomeIcons.tools,
                             color: Colors.green[800]),
                         onTap: () async {
-                          Navigator.pop(context);
-                          // model.isLoading = true;
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => OrganizerPage(_userData),
-                            ),
-                          );
-                          await model.fetchInfoList(_userData.userGroup);
+                          if (FSUserData.instance.isCurrentUserSignIn()) {
+                            Navigator.pop(context);
+                            // model.isLoading = true;
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => OrganizerPage(_userData),
+                              ),
+                            );
+                            await model.fetchLists(_userData.userGroup);
+                          } else {
+                            _infoNotSignIn(
+                                context, "サインアウトしているので\n実行できません", "サインインしますか？");
+                          }
                         },
                       ),
                       _menuItem(
                         context: context,
-                        title: "受講済みをリセット",
-                        icon: Icon(Icons.restore, color: Colors.green[800]),
-                        onTap: () {
+                        title: "対象を編集",
+                        icon: Icon(FontAwesomeIcons.solidAddressCard,
+                            color: Colors.green[800]),
+                        onTap: () async {
                           if (FSUserData.instance.isCurrentUserSignIn()) {
-                            MyDialog.instance.okShowDialogFunc(
-                              context: context,
-                              mainTitle: "受講済みをリセット",
-                              subTitle: "実行しますか？",
-                              onPressed: () async {
-                                // Navigator.pop(context);
-                                await QuestionDatabase.instance
-                                    .deleteQuestionResults();
-                                await LectureDatabase.instance
-                                    .deleteLectureResults();
-                                await WorkshopDatabase.instance
-                                    .deleteWorkshopResults();
-                                // todo 消す前にGraduatesが有るか調べる
-                                final List<Graduater> _graduater =
-                                    await FSGraduater.instance
-                                        .fetchGraduater(_userData);
-                                if (_graduater.length != 0) {
-                                  for (Graduater _data in _graduater) {
-                                    await FSGraduater.instance.deleteGraduater(
-                                        _userData.userGroup, _data.graduaterId);
-                                    print("FSのGraduatesを削除しました");
-                                  }
-                                }
-                                Navigator.pop(context);
-                              },
+                            Navigator.pop(context);
+                            // model.isLoading = true;
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TargetPage(_userData),
+                              ),
                             );
                           } else {
                             _infoNotSignIn(
-                                context, "サインアウトしているので実行できません", "サインインしますか？");
+                                context, "サインアウトしているので\n実行できません", "サインインしますか？");
                           }
                         },
                       ),
@@ -452,27 +316,8 @@ class Home extends StatelessWidget {
                                 } else {
                                   videoEndAt = 5;
                                 }
-                                print("動画再生時間：$videoEndAt");
                                 Navigator.pop(context);
                               });
-                        },
-                      ),
-                      _menuItem(
-                        context: context,
-                        title: "サインアウト",
-                        icon: Icon(FontAwesomeIcons.doorOpen,
-                            color: Colors.green[800]),
-                        onTap: () {
-                          MyDialog.instance.okShowDialogFunc(
-                            context: context,
-                            mainTitle: "サインアウト",
-                            subTitle: "実行しますか？",
-                            onPressed: () {
-                              Navigator.pop(context);
-                              SignOut.instance.signOut();
-                              Navigator.pop(context);
-                            },
-                          );
                         },
                       ),
                       _menuItem(
@@ -508,34 +353,62 @@ class Home extends StatelessWidget {
                           );
                         },
                       ),
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(8),
-                        child: Row(
-                          children: [
-                            Expanded(flex: 1, child: Icon(Icons.person)),
-                            Expanded(
-                              flex: 3,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Text("UID：${_userData.uid}",
-                                      style: cTextListSS),
-                                  Text("グループ名：${_userData.userGroup}",
-                                      style: cTextListSS),
-                                  Text("ユーザー名：${_userData.userName}",
-                                      style: cTextListSS),
-                                  Text("e-mail  ：${_userData.userEmail}",
-                                      style: cTextListSS),
-                                  Text("passWord：${_userData.userPassword}",
-                                      style: cTextListSS),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+                      _menuItem(
+                        context: context,
+                        title: "サインアウト",
+                        icon: Icon(FontAwesomeIcons.doorOpen,
+                            color: Colors.green[800]),
+                        onTap: () {
+                          MyDialog.instance.okShowDialogFunc(
+                            context: context,
+                            mainTitle: "サインアウト",
+                            subTitle: "実行しますか？",
+                            onPressed: () {
+                              Navigator.pop(context);
+                              SignOut.instance.signOut();
+                              Navigator.pop(context);
+                            },
+                          );
+                        },
                       ),
-                      Divider(height: 5, color: Colors.grey),
+                      _menuItem(
+                        context: context,
+                        title: "受講済みをリセット",
+                        icon: Icon(Icons.restore, color: Colors.green[800]),
+                        onTap: () {
+                          if (FSUserData.instance.isCurrentUserSignIn()) {
+                            MyDialog.instance.okShowDialogFunc(
+                              context: context,
+                              mainTitle: "受講済みをリセット",
+                              subTitle: "実行しますか？",
+                              onPressed: () async {
+                                // Navigator.pop(context);
+                                await QuestionDatabase.instance
+                                    .deleteQuestionResults();
+                                await LectureDatabase.instance
+                                    .deleteLectureResults();
+                                await WorkshopDatabase.instance
+                                    .deleteWorkshopResults();
+                                // todo 消す前にGraduatesが有るか調べる
+                                final List<Graduater> _graduater =
+                                    await FSGraduater.instance
+                                        .fetchGraduater(_userData);
+                                if (_graduater.length != 0) {
+                                  for (Graduater _data in _graduater) {
+                                    await FSGraduater.instance.deleteGraduater(
+                                        _userData.userGroup, _data.graduaterId);
+                                  }
+                                }
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                              },
+                            );
+                          } else {
+                            _infoNotSignIn(
+                                context, "サインアウトしているので\n実行できません", "サインインしますか？");
+                          }
+                        },
+                      ),
                     ],
                   ),
                 ),
@@ -547,12 +420,8 @@ class Home extends StatelessWidget {
     );
   }
 
-  Widget _menuItem({
-    BuildContext context,
-    String title,
-    Icon icon,
-    Function onTap,
-  }) {
+  Widget _menuItem(
+      {BuildContext context, String title, Icon icon, Function onTap}) {
     return InkWell(
       child: Container(
           padding: EdgeInsets.all(8.0),

@@ -5,10 +5,10 @@ import 'package:motokosan/widgets/body_data.dart';
 import '../../../constants.dart';
 import '../lecture_model.dart';
 
-class BottomSheetInfoItemsLec extends StatelessWidget {
+class LectureListBottomSheetInfoItemsLec extends StatelessWidget {
   final LectureModel model;
   final bool _isHideBS;
-  BottomSheetInfoItemsLec(this.model, this._isHideBS);
+  LectureListBottomSheetInfoItemsLec(this.model, this._isHideBS);
 
   @override
   Widget build(BuildContext context) {

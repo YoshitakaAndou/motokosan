@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
 import 'package:motokosan/take_a_lecture/lecture/lecture_firebase.dart';
+import 'package:motokosan/take_a_lecture/lecture/make/lecture_add_main.dart';
+import 'package:motokosan/take_a_lecture/lecture/make/lecture_edit_main.dart';
 import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/widgets/bar_title.dart';
@@ -10,8 +12,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../widgets/ok_show_dialog.dart';
 import '../../../constants.dart';
 import '../../question/make/question_page.dart';
-import 'lecture_add.dart';
-import 'lecture_edit.dart';
 import '../lecture_model.dart';
 
 class LecturePage extends StatelessWidget {
@@ -233,7 +233,7 @@ class LecturePage extends StatelessWidget {
             await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => LectureEdit(
+                builder: (context) => LectureEditMain(
                   groupName,
                   _lecture,
                   _workshop,
@@ -310,7 +310,7 @@ class LecturePage extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) =>
-                  LectureAdd(groupName, _organizer, _workshop),
+                  LectureAddMain(groupName, _organizer, _workshop),
               fullscreenDialog: true,
             ));
         await model.fetchLecture(groupName, _workshop.workshopId);

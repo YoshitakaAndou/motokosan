@@ -4,7 +4,6 @@ import 'package:motokosan/auth/email_signin.dart';
 import 'package:motokosan/auth/email_signup.dart';
 import 'package:motokosan/auth/google_model.dart';
 import 'package:motokosan/widgets/flare_actors.dart';
-import 'package:motokosan/widgets/user_data.dart';
 import 'package:provider/provider.dart';
 import '../widgets/bar_title.dart';
 import '../widgets/ok_show_dialog.dart';
@@ -23,8 +22,6 @@ class GoogleSignup extends StatelessWidget {
     final Size _size = MediaQuery.of(context).size;
     groupController.text = model.userData.userGroup;
     nameController.text = model.userData.userName;
-    // todo print
-    userDataPrint(model.userData, "GoogleSignup");
     return Consumer<GoogleModel>(
       builder: (context, model, child) {
         return Scaffold(
@@ -67,22 +64,19 @@ class GoogleSignup extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             _loginTitle(context, model),
-                            Container(
+                            ListView(
+                              shrinkWrap: true,
                               padding: EdgeInsets.all(8),
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  SizedBox(height: 30),
-                                  _groupNameInput(context, model,
-                                      groupController, beforeGroup),
-                                  _nameInput(context, model, nameController,
-                                      beforeName),
-                                  SizedBox(height: 50),
-                                  _signupButton(context, model),
-                                  SizedBox(height: 20),
-                                ],
-                              ),
+                              children: [
+                                SizedBox(height: 30),
+                                _groupNameInput(context, model, groupController,
+                                    beforeGroup),
+                                _nameInput(
+                                    context, model, nameController, beforeName),
+                                SizedBox(height: 50),
+                                _signupButton(context, model),
+                                SizedBox(height: 20),
+                              ],
                             ),
                           ],
                         ),
@@ -147,7 +141,7 @@ class GoogleSignup extends StatelessWidget {
       ),
       child: Center(
         child: Text(
-          "Googleアカウントで新規登録",
+          "Googleアカウントでログイン",
           style: cTextUpBarL,
           textScaleFactor: 1,
         ),
@@ -268,21 +262,21 @@ class GoogleSignup extends StatelessWidget {
         icon: Icon(FontAwesomeIcons.signInAlt, color: Colors.white),
         color: Colors.green,
         disabledColor: Colors.white,
-        label: Text(model.isDisable ? "登録中です！" : "Googleアカウントで登録する",
-            style: cTextUpBarL, textScaleFactor: 1),
+        label:
+            Text("Googleアカウントでログインする", style: cTextUpBarL, textScaleFactor: 1),
         shape: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(10.0)),
           borderSide: BorderSide(color: Colors.green, width: 2),
         ),
         elevation: 15,
-        onPressed: () => model.isDisable ? null : _loginProcess(context, model),
+        onPressed: () => _loginProcess(context, model),
       ),
     );
   }
 
   Future<void> _loginProcess(BuildContext context, GoogleModel model) async {
+    model.setIsLoading(true);
     try {
-      model.setDisable(true);
       if (await model.googleSignin()) {
         // google認証成功
         await FlareActors.instance.done(context);
@@ -299,7 +293,6 @@ class GoogleSignup extends StatelessWidget {
           "google認証に失敗しました！"
           "\n新規登録画面へ戻って登録してください！",
         );
-        model.setDisable(false);
         await Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -307,7 +300,9 @@ class GoogleSignup extends StatelessWidget {
           ),
         );
       }
+      model.setIsLoading(false);
     } catch (e) {
+      model.setIsLoading(false);
       _errorMessage(context, e.toString());
     }
   }

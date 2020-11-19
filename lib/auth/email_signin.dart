@@ -11,6 +11,7 @@ import '../home/home.dart';
 import 'email_model.dart';
 import 'email_signup.dart';
 import '../user_data/userdata_firebase.dart';
+import 'google_signup.dart';
 
 class EmailSignin extends StatelessWidget {
   @override
@@ -51,8 +52,9 @@ class EmailSignin extends StatelessWidget {
                     flex: 2,
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
+                        _toGoogleSignIn(context, model, _size),
                         _toSignUpPage(context, model, _size),
                       ],
                     ),
@@ -69,30 +71,29 @@ class EmailSignin extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             _loginTitle(context, model),
-                            Container(
+                            ListView(
                               padding: EdgeInsets.all(8),
-                              child: Column(
-                                children: [
-                                  // _toSignUpPage(context, model),
-                                  _groupNameInput(context, model,
-                                      groupController, beforeGroup),
-                                  _mailAddressInput(
-                                    context,
-                                    model,
-                                    emailController,
-                                    beforeEmail,
-                                  ),
-                                  _passwordInput(
-                                    context,
-                                    model,
-                                    passwordController,
-                                    beforePassword,
-                                  ),
-                                  SizedBox(height: 30),
-                                  _loginButton(context, model),
-                                  SizedBox(height: 20),
-                                ],
-                              ),
+                              shrinkWrap: true,
+                              children: [
+                                // _toSignUpPage(context, model),
+                                _groupNameInput(context, model, groupController,
+                                    beforeGroup),
+                                _mailAddressInput(
+                                  context,
+                                  model,
+                                  emailController,
+                                  beforeEmail,
+                                ),
+                                _passwordInput(
+                                  context,
+                                  model,
+                                  passwordController,
+                                  beforePassword,
+                                ),
+                                SizedBox(height: 30),
+                                _loginButton(context, model),
+                                SizedBox(height: 20),
+                              ],
                             ),
                           ],
                         ),
@@ -161,6 +162,32 @@ class EmailSignin extends StatelessWidget {
     );
   }
 
+  Widget _toGoogleSignIn(BuildContext context, EmailModel model, Size _size) {
+    return Container(
+      height: 30,
+      width: _size.width / 2.2,
+      child: RaisedButton.icon(
+        color: Colors.white,
+        icon: Icon(FontAwesomeIcons.google, size: 18, color: Colors.indigo),
+        label: Text(
+          "googleでログイン",
+          style: TextStyle(
+              fontSize: 13, fontWeight: FontWeight.w500, color: Colors.black54),
+          textScaleFactor: 1,
+        ),
+        elevation: 10,
+        onPressed: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => GoogleSignup(),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Widget _toSignUpPage(BuildContext context, EmailModel model, Size _size) {
     return Container(
       height: 30,
@@ -206,13 +233,16 @@ class EmailSignin extends StatelessWidget {
               hintText: "グループ名",
               hintStyle: TextStyle(fontSize: 12),
             ),
+            onSubmitted: (text) {
+              model.userData.userGroup = text;
+            },
             onChanged: (text) {
+              model.userData.userGroup = text;
               if (beforeGroup != text) {
                 model.setIsUpdate(true);
               } else {
                 model.setIsUpdate(false);
               }
-              model.userData.userGroup = text;
             },
           ),
         ),
@@ -236,12 +266,12 @@ class EmailSignin extends StatelessWidget {
               hintStyle: TextStyle(fontSize: 12),
             ),
             onChanged: (text) {
+              model.userData.userEmail = text;
               if (beforeEmail != text) {
                 model.setIsUpdate(true);
               } else {
                 model.setIsUpdate(false);
               }
-              model.userData.userEmail = text;
             },
           ),
         ),
@@ -271,12 +301,12 @@ class EmailSignin extends StatelessWidget {
             ),
             obscureText: true,
             onChanged: (text) {
+              model.userData.userPassword = text;
               if (beforePassword != text) {
                 model.setIsUpdate(true);
               } else {
                 model.setIsUpdate(false);
               }
-              model.userData.userPassword = text;
             },
           ),
         ),
