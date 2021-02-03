@@ -4,6 +4,7 @@ class ConvertItems {
   static final ConvertItems instance = ConvertItems();
 
   int dateToInt(DateTime _timeStamp) {
+    // today is DateTime.now();
     var formatter = DateFormat('yyyyMMdd', "ja_JP");
     var formatted = formatter.format(_timeStamp); // DateからString
     return int.parse(formatted);

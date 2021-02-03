@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:motokosan/user_data/userdata_firebase.dart';
-import 'package:motokosan/widgets/body_data.dart';
+import 'package:motokosan/user_data/userdata_body.dart';
 import '../user_data/userdata_class.dart';
 
 class GoogleModel extends ChangeNotifier {
@@ -53,7 +53,7 @@ class GoogleModel extends ChangeNotifier {
         userData.uid = firebaseUser.uid;
         userData.userEmail = firebaseUser.email;
         userData.userPassword = "google認証";
-        BodyData.instance.saveDataToPhone(userData);
+        UserDataBody.instance.save(userData);
         // DataSave.saveString("_uid", userData.uid);
         // DataSave.saveString("_group", userData.userGroup);
         // DataSave.saveString("_name", userData.userName);

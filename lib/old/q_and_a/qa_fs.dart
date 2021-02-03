@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:motokosan/widgets/go_back.dart';
-import 'package:motokosan/widgets/ok_show_dialog.dart';
+import 'package:motokosan/widgets/show_dialog.dart';
 import 'package:provider/provider.dart';
-import '../../constants.dart';
+import '../../data/constants.dart';
 
 import 'qa_database_model.dart';
 import 'qa_add.dart';

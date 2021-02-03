@@ -1,10 +1,8 @@
 import 'dart:async';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:motokosan/user_data/userdata_firebase.dart';
-import 'package:motokosan/widgets/body_data.dart';
+import 'package:motokosan/user_data/userdata_body.dart';
 import '../user_data/userdata_class.dart';
 
 class EmailModel extends ChangeNotifier {
@@ -78,42 +76,55 @@ class EmailModel extends ChangeNotifier {
     if (userData.userPassword.length < 6) {
       throw ("パスワードは６文字以上で入力してください");
     }
-    final User _user = (await _auth.createUserWithEmailAndPassword(
-      email: userData.userEmail,
-      password: userData.userPassword,
-    ))
-        .user;
 
-    userData.uid = _user.uid;
-    userData.userEmail = _user.email;
+    // authへの登録
+    try {
+      final User _user = (await _auth.createUserWithEmailAndPassword(
+        email: userData.userEmail,
+        password: userData.userPassword,
+      ))
+          .user;
 
-    await BodyData.instance.saveDataToPhone(userData);
+      userData.uid = _user.uid;
+      userData.userEmail = _user.email;
+      await UserDataBody.instance.save(userData);
+      // Authへ登録した際に発行されたUIDを元にデータベースUsersに登録する
+      FSUserData.instance.setData(userData);
+    } catch (e) {
+      // authに登録済の場合はグループのUsersにのみ登録する
+      if (e.toString().contains("email-already-in-use")) {
+        // authにsignin
+        final User user = (await _auth.signInWithEmailAndPassword(
+          email: userData.userEmail,
+          password: userData.userPassword,
+        ))
+            .user;
+        // authから帰ってきたuid,emailを本体に保存
+        userData.uid = user.uid;
+        userData.userEmail = user.email;
+        print("authに登録済だった");
+        await UserDataBody.instance.save(userData);
+        // グループのUsersに登録していなかったら登録する
+        if (await FSUserData.instance
+            .isContainsGroupUsersEmpty(userData.uid, userData.userGroup)) {
+          print("Group.Usersに登録していなかったので登録する");
+          FSUserData.instance.setData(userData);
+        }
+      }
+    }
 
-    // Authへ登録した際に発行されたUIDを元にデータベースUsersに登録する
-    FirebaseFirestore.instance
-        .collection("Groups")
-        .doc(userData.userGroup)
-        .collection("Users")
-        .doc(userData.uid)
-        .set({
-      "uid": userData.uid,
-      "group": userData.userGroup,
-      "name": userData.userName,
-      "email": userData.userEmail,
-      "password": userData.userPassword,
-      "createdAt": Timestamp.now(),
-    });
-  }
-
-  void setEmail(String _email) {
-    userData.userEmail = _email;
     notifyListeners();
   }
-
-  void setPassword(String _password) {
-    userData.userPassword = _password;
-    notifyListeners();
-  }
+  //
+  // void setEmail(String _email) {
+  //   userData.userEmail = _email;
+  //   notifyListeners();
+  // }
+  //
+  // void setPassword(String _password) {
+  //   userData.userPassword = _password;
+  //   notifyListeners();
+  // }
 
   void setIsLoading(bool _setData) {
     isLoading = _setData;

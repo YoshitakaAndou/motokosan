@@ -6,10 +6,11 @@ import 'package:motokosan/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/flare_actors.dart';
 import 'package:provider/provider.dart';
 import '../widgets/bar_title.dart';
-import '../widgets/ok_show_dialog.dart';
+import '../widgets/show_dialog.dart';
 import '../widgets/bubble/bubble.dart';
-import '../constants.dart';
+import '../data/constants.dart';
 import '../home/home.dart';
+import 'group_button/google_group_button.dart';
 
 class GoogleSignin extends StatelessWidget {
   final UserData userData;
@@ -31,7 +32,7 @@ class GoogleSignin extends StatelessWidget {
       builder: (context, model, child) {
         return Scaffold(
           appBar: AppBar(
-            title: barTitle(context),
+            title: BarTitle.instance.barTitle(context),
             centerTitle: true,
           ),
           body: SafeArea(
@@ -74,6 +75,8 @@ class GoogleSignin extends StatelessWidget {
                               padding: EdgeInsets.all(8),
                               children: [
                                 SizedBox(height: 10),
+                                GoogleGroupButton(
+                                    context: context, model: model),
                                 _groupNameInput(context, model, groupController,
                                     beforeGroup),
                                 _nameInput(
@@ -128,7 +131,7 @@ class GoogleSignin extends StatelessWidget {
               ),
             ),
           Expanded(
-            child: Image.asset("assets/images/nurse02.png",
+            child: Image.asset("assets/images/protector.png",
                 fit: BoxFit.fitHeight, alignment: Alignment.bottomRight),
           ),
         ],

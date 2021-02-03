@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:motokosan/take_a_lecture/lecture/lecture_firebase.dart';
-import 'package:motokosan/take_a_lecture/question/play/question_firebase.dart';
+import 'package:motokosan/take_a_lecture/question/question_firebase.dart';
 import 'package:motokosan/widgets/convert_items.dart';
 
 import 'workshop_class.dart';
@@ -8,7 +8,7 @@ import 'workshop_class.dart';
 class FSWorkshop {
   static final FSWorkshop instance = FSWorkshop();
 
-  Future<void> deleteData(_groupName, _workshopId) async {
+  Future<void> deleteData(String _groupName, String _workshopId) async {
     await FirebaseFirestore.instance
         .collection("Groups")
         .doc(_groupName)
@@ -56,7 +56,8 @@ class FSWorkshop {
     });
   }
 
-  Future<List<Workshop>> fetchDates(_groupName, _organizerId) async {
+  Future<List<Workshop>> fetchDates(
+      String _groupName, String _organizerId) async {
     final _docs = await FirebaseFirestore.instance
         .collection("Groups")
         .doc(_groupName)
@@ -75,7 +76,8 @@ class FSWorkshop {
     return _results;
   }
 
-  Future<List<Workshop>> fetchDatesMake(_groupName, _organizerId) async {
+  Future<List<Workshop>> fetchDatesMake(
+      String _groupName, String _organizerId) async {
     final _docs = await FirebaseFirestore.instance
         .collection("Groups")
         .doc(_groupName)
@@ -90,7 +92,7 @@ class FSWorkshop {
     return _results;
   }
 
-  Future<List<Workshop>> fetchDatesAll(_groupName) async {
+  Future<List<Workshop>> fetchDatesAll(String _groupName) async {
     final _docs = await FirebaseFirestore.instance
         .collection("Groups")
         .doc(_groupName)
@@ -103,7 +105,18 @@ class FSWorkshop {
     return _results;
   }
 
-  Future<Workshop> fetchData(_groupName, _workshopId) async {
+  Future<List<Workshop>> fetchDatesDeadlineAt(String _groupName) async {
+    final int _todayInt = ConvertItems.instance.dateToInt(DateTime.now());
+    final _docs = await fetchDatesAll(_groupName);
+    // 期限が過ているものを弾きます
+    final List<Workshop> _results =
+        List.from(_docs.where((doc) => doc.deadlineAt >= _todayInt));
+    // // 番号順でソートして返す
+    _results.sort((a, b) => a.workshopNo.compareTo(b.workshopNo));
+    return _results;
+  }
+
+  Future<Workshop> fetchData(String _groupName, String _workshopId) async {
     final _doc = await FirebaseFirestore.instance
         .collection("Groups")
         .doc(_groupName)

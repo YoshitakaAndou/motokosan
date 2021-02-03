@@ -3,7 +3,7 @@ import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
 import 'package:motokosan/take_a_lecture/question/question_class.dart';
 
 import 'exam_class.dart';
-import 'play/exam_firebase.dart';
+import 'exam_firebase.dart';
 
 class ExamModel extends ChangeNotifier {
   List<Question> questions = List();

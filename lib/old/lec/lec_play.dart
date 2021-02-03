@@ -12,7 +12,7 @@ import 'package:motokosan/widgets/go_back.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-import '../../constants.dart';
+import '../../data/constants.dart';
 import 'lec_database_model.dart';
 import 'lec_model.dart';
 
@@ -204,7 +204,7 @@ class _LecPlayState extends State<LecPlay> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: barTitle(context),
+        title: BarTitle.instance.barTitle(context),
         leading: isPopWind
             ? Container()
             : GoBack.instance.goBack(
@@ -437,7 +437,7 @@ class _LecPlayState extends State<LecPlay> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: barTitle(context),
+        title: BarTitle.instance.barTitle(context),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios),
           color: Colors.black54,

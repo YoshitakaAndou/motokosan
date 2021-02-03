@@ -3,7 +3,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../constants.dart';
+import '../../data/constants.dart';
 import 'lec_edit.dart';
 import 'lec_database_model.dart';
 import 'lec_firestore_model.dart';

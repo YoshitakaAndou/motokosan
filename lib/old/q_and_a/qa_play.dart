@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:motokosan/widgets/bar_title.dart';
 import 'package:motokosan/widgets/go_back.dart';
 import 'package:photo_view/photo_view.dart';
-import '../../constants.dart';
+import '../../data/constants.dart';
 
 import 'package:soundpool/soundpool.dart';
 
@@ -99,7 +99,7 @@ class _QaPlayState extends State<QaPlay> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: barTitle(context),
+        title: BarTitle.instance.barTitle(context),
         leading: isPopWind
             ? Container()
             : GoBack.instance.goBack(

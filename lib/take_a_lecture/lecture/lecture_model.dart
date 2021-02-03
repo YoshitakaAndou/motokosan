@@ -294,7 +294,7 @@ class LectureModel extends ChangeNotifier {
             _groupName, _lectureId, slides[i].slideNo, slides[i].slideUrl);
       }
     }
-    lecture.slideLength = slides.length - 1;
+    lecture.slideLength = slides.length == 0 ? 0 : slides.length - 1;
   }
 
   // Edit起動時のSlideデータ取得
@@ -350,7 +350,8 @@ class LectureModel extends ChangeNotifier {
       }
     }
     // 配列の最後は「＋」で不要なので数えません
-    lecture.slideLength = slides.length - 1;
+    lecture.slideLength = slides.length == 0 ? 0 : slides.length - 1;
+    print("スライドの枚数は${lecture.slideLength}枚でした");
   }
 
   Future<void> sendGraduaterData(

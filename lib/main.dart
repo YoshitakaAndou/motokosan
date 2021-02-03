@@ -5,10 +5,11 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:motokosan/auth/email_signin.dart';
 import 'package:motokosan/auth/email_signup.dart';
 import 'package:motokosan/home/home.dart';
-import 'package:motokosan/user_data/userdata_class.dart';
+import 'package:motokosan/intro/top_page.dart';
 import 'package:motokosan/user_data/userdata_firebase.dart';
 import 'auth/google_model.dart';
 import 'auth/google_signin.dart';
+import 'data/data_save_body.dart';
 import 'home/home_model.dart';
 import 'take_a_lecture/exam/exam_model.dart';
 import 'take_a_lecture/graduater/graduater_model.dart';
@@ -19,11 +20,14 @@ import 'package:provider/provider.dart';
 import 'take_a_lecture/target/target_model.dart';
 import 'take_a_lecture/lecture/lecture_model.dart';
 import 'auth/email_model.dart';
-import 'widgets/datasave_widget.dart';
+import 'dart:io';
+
+import 'unconnect.dart';
 
 void main() async {
   //Future処理に必要
   WidgetsFlutterBinding.ensureInitialized();
+  //Firebaseの必須事項
   await Firebase.initializeApp();
 
   runApp((MultiProvider(providers: [
@@ -47,27 +51,57 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  // This widget is the root of your application.
   @override
   _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
+  bool _policy = false;
   String _uid = "";
   String _group = "";
   String _name = "";
   String _email = "";
   String _password = "";
+  bool _unConnect = false;
 
   @override
   void initState() {
-    //内蔵メモリ
+    checkNet();
+
+    super.initState();
+  }
+
+  checkNet() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        print('connected');
+        _unConnect = false;
+      }
+    } on SocketException catch (_) {
+      print('not connected');
+      _unConnect = true;
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    //内蔵メモリの読み出し
+    checkPolicy();
     checkUserId();
     checkUserGroup();
     checkUserName();
     checkEmail();
     checkPassword();
-    super.initState();
+    super.didChangeDependencies();
+  }
+
+  checkPolicy() async {
+    DataSave.getBool("_policy").then((value) {
+      setState(() {
+        _policy = value ?? false;
+      });
+    });
   }
 
   checkUserId() async {
@@ -124,7 +158,6 @@ class _MyAppState extends State<MyApp> {
         _isCurrentUserSignIn = false;
       }
     }
-
     return MaterialApp(
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
@@ -149,13 +182,37 @@ class _MyAppState extends State<MyApp> {
           iconTheme: IconThemeData(color: Colors.black87),
         ),
       ),
-      home: _isCurrentUserSignIn
-          ? Home(model.userData)
-          : model.userData.userPassword == "google認証"
-              ? GoogleSignin(userData: model.userData)
-              : model.userData.userEmail.isEmpty
-                  ? EmailSignup()
-                  : EmailSignin(),
+      home: !_policy
+          ? TopPage(
+              unConnect: _unConnect,
+              isCurrentUserSignIn: _isCurrentUserSignIn,
+              userData: model.userData,
+            )
+          : _unConnect
+              ? UnConnect()
+              : _isCurrentUserSignIn
+                  ? Home(model.userData)
+                  : model.userData.userPassword == "google認証"
+                      ? GoogleSignin(userData: model.userData)
+                      : model.userData.userEmail.isEmpty
+                          ? EmailSignup()
+                          : EmailSignin(),
+      // home: _unConnect
+      //     ? UnConnect()
+      //     : _isCurrentUserSignIn
+      //         ? Home(model.userData)
+      //         : model.userData.userPassword == "google認証"
+      //             ? GoogleSignin(userData: model.userData)
+      //             : model.userData.userEmail.isEmpty
+      //                 ? EmailSignup()
+      //                 : EmailSignin(),
+      // home: _isCurrentUserSignIn
+      //     ? Home(model.userData)
+      //     : model.userData.userPassword == "google認証"
+      //        ? GoogleSignin(userData: model.userData)
+      //        : model.userData.userEmail.isEmpty
+      //          ? EmailSignup()
+      //          : EmailSignin(),
     );
   }
 }

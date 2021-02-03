@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/auth/email_model.dart';
+import 'package:motokosan/auth/widgets/email_signup_password_text.dart';
 import 'package:provider/provider.dart';
 import '../widgets/bar_title.dart';
-import '../widgets/ok_show_dialog.dart';
+import '../widgets/show_dialog.dart';
 import 'email_signin.dart';
 import 'google_signup.dart';
-import '../constants.dart';
+import '../data/constants.dart';
 import '../home/home.dart';
+import 'group_button/email_group_button.dart';
+import 'widgets/login_button.dart';
 
 class EmailSignup extends StatelessWidget {
   @override
@@ -26,7 +29,7 @@ class EmailSignup extends StatelessWidget {
       builder: (context, model, child) {
         return Scaffold(
           appBar: AppBar(
-            title: barTitle(context),
+            title: BarTitle.instance.barTitle(context),
             centerTitle: true,
           ),
           body: SafeArea(
@@ -35,14 +38,12 @@ class EmailSignup extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    flex: 8,
-                    child: Container(
-                        // height: MediaQuery.of(context).size.height / 3,
-                        child: Image.asset("assets/images/nurse03.png")),
+                  Container(
+                    height: _size.height / 4,
+                    child: Image.asset("assets/images/nurse03.png"),
                   ),
                   Expanded(
-                    flex: 2,
+                    flex: 3,
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -53,7 +54,7 @@ class EmailSignup extends StatelessWidget {
                     ),
                   ),
                   Expanded(
-                    flex: 10,
+                    flex: 15,
                     child: SingleChildScrollView(
                       child: Card(
                         elevation: 15,
@@ -64,41 +65,37 @@ class EmailSignup extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             _title(context, model),
+                            SizedBox(height: 10),
                             ListView(
                               padding: EdgeInsets.all(8),
                               shrinkWrap: true,
                               children: [
-                                _groupNameInput(
-                                  context,
-                                  model,
-                                  groupController,
-                                ),
-                                _nameInput(
-                                  context,
-                                  model,
-                                  nameController,
-                                ),
+                                EmailGroupButton(
+                                    context: context, model: model),
+                                SizedBox(height: 10),
+                                _nameInput(context, model, nameController),
+                                SizedBox(height: 10),
                                 _mailAddressInput(
-                                  context,
-                                  model,
-                                  emailController,
-                                ),
+                                    context, model, emailController),
+                                SizedBox(height: 10),
                                 _passwordInput(
-                                  context,
-                                  model,
-                                  passwordController,
-                                ),
+                                    context, model, passwordController),
                               ],
                             ),
-                            SizedBox(height: 10),
-                            _signupButton(context, model),
-                            SizedBox(height: 10),
+                            SizedBox(height: 20),
+                            LoginButton(
+                              context: context,
+                              label: '新規登録する',
+                              onPressed: () {
+                                _loginProcess(context, model);
+                              },
+                            ),
+                            SizedBox(height: 20),
                           ],
                         ),
                       ),
                     ),
                   ),
-                  Expanded(flex: 1, child: Container()),
                 ],
               ),
             ),
@@ -114,6 +111,14 @@ class EmailSignup extends StatelessWidget {
       height: 30,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 15.0,
+            spreadRadius: 0.5,
+            offset: Offset(0.5, 0.5),
+          )
+        ],
         color: Colors.green,
       ),
       child: Center(
@@ -144,7 +149,10 @@ class EmailSignup extends StatelessWidget {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => GoogleSignup(),
+              builder: (context) => GoogleSignup(
+                groupName: model.userData.userGroup,
+                userName: model.userData.userName,
+              ),
             ),
           );
         },
@@ -165,9 +173,6 @@ class EmailSignup extends StatelessWidget {
                 fontWeight: FontWeight.w500),
             textScaleFactor: 1),
         color: Colors.white,
-        // shape: const OutlineInputBorder(
-        //   borderRadius: BorderRadius.all(Radius.circular(5)),
-        // ),
         elevation: 10,
         onPressed: () {
           Navigator.pushReplacement(
@@ -181,46 +186,13 @@ class EmailSignup extends StatelessWidget {
     );
   }
 
-  Widget _groupNameInput(BuildContext context, EmailModel model,
-      TextEditingController groupController) {
-    return Row(
-      children: [
-        Expanded(
-          flex: 1,
-          child: Icon(Icons.group, size: 20, color: Colors.black54),
-        ),
-        Expanded(
-          flex: 5,
-          child: TextField(
-            keyboardType: TextInputType.text,
-            controller: groupController,
-            decoration: InputDecoration(
-              hintText: "グループ名",
-              hintStyle: TextStyle(fontSize: 12),
-              suffixIcon: IconButton(
-                onPressed: () {
-                  groupController.text = "";
-                },
-                icon: Icon(Icons.clear, size: 15),
-              ),
-            ),
-            onChanged: (text) {
-              model.changeValue("userGroup", text);
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _nameInput(BuildContext context, EmailModel model,
       TextEditingController nameController) {
     return Row(
       children: [
         Expanded(
-          flex: 1,
-          child: Icon(Icons.person, size: 20, color: Colors.black54),
-        ),
+            flex: 1,
+            child: Icon(Icons.person, size: 20, color: Colors.black54)),
         Expanded(
           flex: 5,
           child: TextField(
@@ -237,7 +209,7 @@ class EmailSignup extends StatelessWidget {
               ),
             ),
             onChanged: (text) {
-              model.changeValue("userName", text);
+              model.changeValue("userName", text.trim());
             },
           ),
         ),
@@ -259,7 +231,7 @@ class EmailSignup extends StatelessWidget {
             keyboardType: TextInputType.emailAddress,
             controller: emailController,
             decoration: InputDecoration(
-              hintText: "aaa@bbb.ccc",
+              hintText: "メールアドレス",
               hintStyle: TextStyle(fontSize: 12),
               suffixIcon: IconButton(
                 onPressed: () {
@@ -269,7 +241,7 @@ class EmailSignup extends StatelessWidget {
               ),
             ),
             onChanged: (text) {
-              model.changeValue("userEmail", text);
+              model.changeValue("userEmail", text.trim());
             },
           ),
         ),
@@ -290,49 +262,16 @@ class EmailSignup extends StatelessWidget {
             )),
         Expanded(
           flex: 5,
-          child: TextField(
-            keyboardType: TextInputType.text,
-            controller: passwordController,
-            decoration: InputDecoration(
-              hintText: "password（６文字以上）",
-              hintStyle: TextStyle(fontSize: 12),
-              suffixIcon: IconButton(
-                onPressed: () {
-                  passwordController.text = "";
-                },
-                icon: Icon(Icons.clear, size: 15),
-              ),
-            ),
-            obscureText: true,
-            onChanged: (text) {
-              model.changeValue("userPassword", text);
-            },
+          child: EmailSignupPasswordText(
+            passwordController: passwordController,
+            model: model,
           ),
         ),
       ],
     );
   }
 
-  Widget _signupButton(BuildContext context, EmailModel model) {
-    return Container(
-      width: double.infinity,
-      height: 40,
-      padding: EdgeInsets.symmetric(horizontal: 10),
-      child: RaisedButton.icon(
-        icon: Icon(Icons.account_box, color: Colors.white),
-        color: Colors.green,
-        label: Text("新規登録する", style: cTextUpBarL, textScaleFactor: 1),
-        shape: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0)),
-          borderSide: BorderSide(color: Colors.green, width: 2),
-        ),
-        elevation: 15,
-        onPressed: () => _signupProcess(context, model),
-      ),
-    );
-  }
-
-  Future<void> _signupProcess(BuildContext context, EmailModel model) async {
+  Future<void> _loginProcess(BuildContext context, EmailModel model) async {
     try {
       await model.signUp();
       await MyDialog.instance.okShowDialog(context, "登録完了しました");

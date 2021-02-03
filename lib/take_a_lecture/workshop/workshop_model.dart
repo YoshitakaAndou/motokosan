@@ -113,7 +113,7 @@ class WorkshopModel extends ChangeNotifier {
   Future<void> fetchLists(String _groupName) async {
     final List<Workshop> _workshops =
         await FSWorkshop.instance.fetchDatesAll(_groupName);
-    if (_workshops.length > 0) {
+    if (_workshops.isNotEmpty) {
       // workshopListを作成
       // listNoはorganizerNo+workshopNoです
       // それを作ります
@@ -130,7 +130,7 @@ class WorkshopModel extends ChangeNotifier {
         final _organizerName = _doc["title"];
         final _workshopResults = await WorkshopDatabase.instance
             .getWorkshopResult(_workshop.workshopId);
-        if (_workshopResults.length == 0) {
+        if (_workshopResults.isEmpty) {
           // workshopResultが見つからなかった時
           workshopLists.add(WorkshopList(
             workshop: _workshop,
@@ -151,6 +151,55 @@ class WorkshopModel extends ChangeNotifier {
       }
       // workshopListsを番号順でソート
       workshopLists.sort((a, b) => a.listNo.compareTo(b.listNo));
+    } else {
+      workshopLists = List();
+    }
+    notifyListeners();
+  }
+
+  Future<void> fetchListsInfo(String _groupName) async {
+    final List<Workshop> _workshops =
+        await FSWorkshop.instance.fetchDatesDeadlineAt(_groupName);
+    if (_workshops.isNotEmpty) {
+      // workshopListを作成
+      // listNoはorganizerNo+workshopNoです
+      // それを作ります
+      workshopLists = List();
+      for (Workshop _workshop in _workshops) {
+        // OrganizerからorganizerNoを取る
+        final _doc = await FirebaseFirestore.instance
+            .collection("Groups")
+            .doc(_groupName)
+            .collection("Organizer")
+            .doc(_workshop.organizerId)
+            .get();
+        final _organizerNo = _doc["organizerNo"];
+        final _organizerName = _doc["title"];
+        final _workshopResults = await WorkshopDatabase.instance
+            .getWorkshopResult(_workshop.workshopId);
+        if (_workshopResults.isEmpty) {
+          // workshopResultが見つからなかった時
+          workshopLists.add(WorkshopList(
+            workshop: _workshop,
+            organizerName: _organizerName,
+            organizerTitle: "指定無し",
+            listNo: "$_organizerNo${_workshop.workshopNo}",
+            workshopResult: WorkshopResult(),
+          ));
+        } else {
+          workshopLists.add(WorkshopList(
+            workshop: _workshop,
+            organizerName: _organizerName,
+            organizerTitle: "指定無し",
+            listNo: "$_organizerNo${_workshop.workshopNo}",
+            workshopResult: _workshopResults[0],
+          ));
+        }
+      }
+      // workshopListsを番号順でソート
+      workshopLists.sort((a, b) => a.listNo.compareTo(b.listNo));
+    } else {
+      workshopLists = List();
     }
     notifyListeners();
   }

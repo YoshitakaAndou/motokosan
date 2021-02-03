@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:motokosan/make/target/target_edit.dart';
 import 'package:motokosan/take_a_lecture/target/target_firebase.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../widgets/bar_title.dart';
-import '../../widgets/ok_show_dialog.dart';
-import '../../constants.dart';
-import 'target_add.dart';
+import '../../widgets/show_dialog.dart';
+import '../../data/constants.dart';
+import '../../make/target/target_add.dart';
 import 'target_class.dart';
-import 'target_edit.dart';
 import 'target_model.dart';
 
 class TargetPage extends StatelessWidget {
@@ -29,7 +29,7 @@ class TargetPage extends StatelessWidget {
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
           toolbarHeight: cToolBarH,
-          title: barTitle(context),
+          title: BarTitle.instance.barTitle(context),
         ),
         body: Column(
           children: [

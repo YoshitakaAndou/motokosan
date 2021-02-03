@@ -3,7 +3,7 @@ import 'package:motokosan/widgets/bar_title.dart';
 import 'package:motokosan/widgets/bubble/bubble.dart';
 import 'package:motokosan/widgets/go_back.dart';
 import 'package:provider/provider.dart';
-import '../../constants.dart';
+import '../../data/constants.dart';
 import 'qa_database_model.dart';
 import 'qa_model.dart';
 import 'qa_play.dart';
@@ -23,7 +23,7 @@ class QaList extends StatelessWidget {
     return Consumer<QaModel>(builder: (context, model, child) {
       return Scaffold(
         appBar: AppBar(
-          title: barTitle(context),
+          title: BarTitle.instance.barTitle(context),
           centerTitle: true,
           leading: GoBack.instance
               .goBack(context: context, icon: Icon(Icons.home), num: 1),

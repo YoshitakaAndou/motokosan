@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'organizer_class.dart';
-import 'play/organizer_firebase.dart';
+import 'organizer_firebase.dart';
 
 class OrganizerModel extends ChangeNotifier {
   List<Organizer> organizers = [];
@@ -83,6 +83,7 @@ class OrganizerModel extends ChangeNotifier {
       title: "指定無し",
     );
     organizerList.insert(0, _organizer);
+    print("OrganizerList.Length:${organizerList.length}");
     notifyListeners();
   }
 

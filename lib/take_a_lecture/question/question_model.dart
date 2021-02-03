@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
 import 'package:motokosan/take_a_lecture/lecture/lecture_firebase.dart';
 import 'question_class.dart';
-import 'play/question_database.dart';
-import 'play/question_firebase.dart';
+import 'question_database.dart';
+import 'question_firebase.dart';
 
 class QuestionModel extends ChangeNotifier {
   List<Question> questions = List();

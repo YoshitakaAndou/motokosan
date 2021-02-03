@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:motokosan/buttons/white_button.dart';
 import 'package:motokosan/take_a_lecture/graduater/graduater_license.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
@@ -9,28 +10,27 @@ import 'package:motokosan/widgets/go_back.dart';
 import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
 
-import '../../constants.dart';
+import '../../data/constants.dart';
 import 'graduater_model.dart';
 
 class GraduaterListPage extends StatelessWidget {
   final UserData _userData;
   final WorkshopList _workshopList;
+
   GraduaterListPage(this._userData, this._workshopList);
 
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<GraduaterModel>(context, listen: false);
     Future(() async {
-      model.startLoading();
       await model.generateGraduaterList(_userData.userGroup, _workshopList);
-      model.stopLoading();
     });
     return Consumer<GraduaterModel>(builder: (context, model, child) {
       return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
           toolbarHeight: cToolBarH,
-          title: barTitle(context),
+          title: BarTitle.instance.barTitle(context),
           leading: Container(),
           actions: [
             GoBack.instance.goBack(
@@ -40,9 +40,8 @@ class GraduaterListPage extends StatelessWidget {
         body: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(flex: 1, child: _infoArea()),
+            _infoArea(),
             Expanded(
-              flex: 10,
               child: Stack(
                 children: [
                   Padding(
@@ -168,10 +167,23 @@ class GraduaterListPage extends StatelessWidget {
       child: Container(
         height: cBottomAppBarH,
         padding: EdgeInsets.all(10),
-        child: Text(
-          "",
-          style: cTextUpBarL,
-          textScaleFactor: 1,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              WhiteButton(
+                context: context,
+                title: '　閉じる',
+                icon: FontAwesomeIcons.times,
+                iconSize: 20,
+                onPress: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          ),
         ),
       ),
     );

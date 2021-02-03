@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:motokosan/widgets/go_back.dart';
 import 'package:native_pdf_view/native_pdf_view.dart';
-import '../../constants.dart';
+import '../../data/constants.dart';
 import 'pdf_data.dart';
 
 class Pdf extends StatefulWidget {

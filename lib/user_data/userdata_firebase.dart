@@ -8,7 +8,7 @@ class FSUserData {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<UserData> fetchUserData(_uid, _groupName) async {
+  Future<UserData> fetchUserData(String _uid, String _groupName) async {
     final doc = await FirebaseFirestore.instance
         .collection("Groups")
         .doc(_groupName)
@@ -28,6 +28,24 @@ class FSUserData {
     );
   }
 
+  Future<void> setData(UserData _userData) async {
+    await FirebaseFirestore.instance
+        .collection("Groups")
+        .doc(_userData.userGroup)
+        .collection("Users")
+        .doc(_userData.uid)
+        .set(
+      {
+        "uid": _userData.uid,
+        "group": _userData.userGroup,
+        "name": _userData.userName,
+        "email": _userData.userEmail,
+        "password": _userData.userPassword,
+        "createdAt": Timestamp.now(),
+      },
+    );
+  }
+
   Future<bool> searchUserInDb(User firebaseUser) async {
     final query = await _db
         .collection("Users")
@@ -37,6 +55,15 @@ class FSUserData {
       return true;
     }
     return false;
+  }
+
+  Future<bool> isContainsGroupUsersEmpty(String _uid, String _groupName) async {
+    final doc = await FirebaseFirestore.instance
+        .collection("Groups")
+        .doc(_groupName)
+        .collection("Users")
+        .get();
+    return doc.docs.where((element) => element.id == _uid).isEmpty;
   }
 
   bool isCurrentUserSignIn() {

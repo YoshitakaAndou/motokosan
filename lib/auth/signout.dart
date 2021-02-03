@@ -8,6 +8,7 @@ class SignOut {
 
   Future<void> signOut() async {
     await _auth.signOut();
+    print("サインアウトしました");
     // final _google = await _googleSignIn.isSignedIn();
   }
 }

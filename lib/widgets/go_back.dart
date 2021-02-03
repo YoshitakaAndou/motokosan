@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:motokosan/take_a_lecture/return_argument.dart';
+import 'package:motokosan/widgets/return_argument.dart';
 
 class GoBack {
   static final GoBack instance = GoBack();
 
-  Widget goBack({BuildContext context, Icon icon, int num}) {
+  Widget goBack({BuildContext context, Icon icon, String tooltip, int num}) {
     return IconButton(
       icon: icon,
       iconSize: 20,
       color: Colors.black54,
+      tooltip: tooltip,
       onPressed: () {
         if (num == 1) {
           Navigator.of(context).pop();

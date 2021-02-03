@@ -5,7 +5,7 @@ import 'package:motokosan/widgets/go_back.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
-import '../../constants.dart';
+import '../../data/constants.dart';
 import 'lec_category.dart';
 import 'lec_database_model.dart';
 import 'lec_model.dart';
@@ -86,7 +86,7 @@ class _LecListState extends State<LecList> {
     return Consumer<LecModel>(builder: (context, model, child) {
       return Scaffold(
         appBar: AppBar(
-          title: barTitle(context),
+          title: BarTitle.instance.barTitle(context),
           leading: GoBack.instance
               .goBack(context: context, icon: Icon(Icons.home), num: 1),
           actions: [
