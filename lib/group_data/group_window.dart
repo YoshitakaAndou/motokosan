@@ -2,14 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:motokosan/auth/auth_model.dart';
 import 'package:motokosan/buttons/white_button.dart';
+import 'package:motokosan/group_data/group_data_save_body.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
 import 'package:motokosan/user_data/userdata_firebase.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
+import 'package:provider/provider.dart';
 
-import '../../constants.dart';
-import '../signout.dart';
+import '../constants.dart';
+import '../auth/signout.dart';
 import 'group_data.dart';
+import 'group_data_firebase.dart';
 import 'group_password_input.dart';
 
 class GroupWindow extends StatefulWidget {
@@ -28,9 +32,8 @@ class _GroupWindowState extends State<GroupWindow> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
-    super.dispose();
     SignOut.instance.signOut();
+    super.dispose();
   }
 
   @override
@@ -121,6 +124,7 @@ class _GroupWindowState extends State<GroupWindow> {
   }
 
   Widget _buildListItem(BuildContext context, GroupData snap) {
+    final model = Provider.of<AuthModel>(context, listen: false);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
       child: Container(
@@ -151,6 +155,9 @@ class _GroupWindowState extends State<GroupWindow> {
                   Navigator.of(context).pop();
                   if (txt == snap.groupCode) {
                     widget.onTap(snap.name);
+                    // groupDataの処理
+                    model.groupData = snap;
+                    await GroupDataSaveBody.instance.save(snap);
                     Navigator.of(context).pop();
                   } else {
                     // グループコードが違う場合
@@ -273,27 +280,27 @@ class _GroupWindowState extends State<GroupWindow> {
           .user;
       if (user != null) {
         print("ダミーでログイン完了");
-        return await createDates();
+        return await FSGroupData.instance.createDates();
       } else {
         throw ('ログインできませんでした！');
       }
     } else {
       print("${widget.userData.userEmail}でログイン中");
-      return await createDates();
+      return await FSGroupData.instance.createDates();
     }
   }
 
-  Future<List<GroupData>> createDates() async {
-    print("${widget.userData.userEmail}でログイン中");
-    final _docs = await FirebaseFirestore.instance.collection("Groups").get();
-    final List<GroupData> groupDates = _docs.docs
-        .map((doc) => GroupData(
-              name: doc['name'] ?? "",
-              groupCode: doc['groupCode'] ?? "",
-            ))
-        .toList();
-    return groupDates;
-  }
+  // Future<List<GroupData>> createDates() async {
+  //   print("${widget.userData.userEmail}でログイン中");
+  //   final _docs = await FirebaseFirestore.instance.collection("Groups").get();
+  //   final List<GroupData> groupDates = _docs.docs
+  //       .map((doc) => GroupData(
+  //             name: doc['name'] ?? "",
+  //             groupCode: doc['groupCode'] ?? "",
+  //           ))
+  //       .toList();
+  //   return groupDates;
+  // }
 
   Future<Widget> _groupCodeDialog({
     BuildContext context,
@@ -511,8 +518,6 @@ class _GroupWindowState extends State<GroupWindow> {
     if (Future.value() != null) {
       isGroupCreate = true;
       createGroupName = groupName;
-      print("----------------------------isGroupCreate = $isGroupCreate");
-      print("----------------------------createGroupName = $createGroupName");
       setState(() {});
     }
   }

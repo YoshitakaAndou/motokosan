@@ -8,7 +8,7 @@ import 'package:motokosan/take_a_lecture/workshop/workshop_list_page.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_model.dart';
 import 'package:motokosan/user_data/userdata_firebase.dart';
 import 'package:provider/provider.dart';
-import '../data/constants.dart';
+import '../constants.dart';
 import '../user_data/userdata_class.dart';
 import '../widgets/bar_title.dart';
 import 'home_drawer.dart';
@@ -28,7 +28,7 @@ class Home extends StatelessWidget {
         title: BarTitle.instance.barTitle(context),
         centerTitle: true,
       ),
-      drawer: HomeDrawer(_userData),
+      drawer: HomeDrawer(_userData, _size),
       body: _body(context, model, _size),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: _floatingActionButton(context, model),
@@ -44,12 +44,11 @@ class Home extends StatelessWidget {
   Widget _body(BuildContext context, WorkshopModel model, Size _size) {
     return SafeArea(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            children: [
-              _imageArea(context, _size),
-              FutureBuilder(
+          Expanded(child: Container(child: _imageArea(context, _size))),
+          Expanded(
+            child: Container(
+              child: FutureBuilder(
                 future: _getWorkshopLists(model),
                 builder: (BuildContext context,
                     AsyncSnapshot<List<WorkshopList>> snapshot) {
@@ -62,21 +61,18 @@ class Home extends StatelessWidget {
                     return Container();
                   }
                 },
-              )
-            ],
-          ),
+              ),
+            ),
+          )
         ],
       ),
     );
   }
 
   Widget _imageArea(BuildContext context, Size _size) {
-    return Container(
-      child: Image.asset(
-        "assets/images/top.png",
-        width: _size.width,
-        fit: BoxFit.fitWidth,
-      ),
+    return Image.asset(
+      "assets/images/top.png",
+      fit: BoxFit.fitHeight,
     );
   }
 
@@ -122,49 +118,8 @@ class Home extends StatelessWidget {
           side: BorderSide(),
         ),
       ),
-      child: Container(
+      child: SizedBox(
         height: cBottomAppBarH,
-        padding: EdgeInsets.only(left: 15, right: 10, top: 3),
-        child: Column(
-          children: [
-            // Row(
-            //   children: [
-            //     Expanded(
-            //       flex: 1,
-            //       child: Text("グループ:", style: cTextUpBarS, textScaleFactor: 1),
-            //     ),
-            //     Expanded(
-            //         flex: 5,
-            //         child: Text("${_userData.userGroup}",
-            //             style: cTextUpBarS, textScaleFactor: 1)),
-            //   ],
-            // ),
-            // Row(
-            //   children: [
-            //     Expanded(
-            //         flex: 1,
-            //         child:
-            //             Text("Name:", style: cTextUpBarS, textScaleFactor: 1)),
-            //     Expanded(
-            //         flex: 5,
-            //         child: Text("${_userData.userName}",
-            //             style: cTextUpBarS, textScaleFactor: 1)),
-            //   ],
-            // ),
-            // Row(
-            //   children: [
-            //     Expanded(
-            //         flex: 1,
-            //         child:
-            //             Text("Uid:", style: cTextUpBarS, textScaleFactor: 1)),
-            //     Expanded(
-            //         flex: 5,
-            //         child: Text("${_userData.uid}",
-            //             style: cTextUpBarS, textScaleFactor: 1)),
-            //   ],
-            // ),
-          ],
-        ),
       ),
     );
   }

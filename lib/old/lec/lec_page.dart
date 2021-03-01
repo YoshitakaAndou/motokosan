@@ -5,7 +5,7 @@ import 'package:motokosan/widgets/go_back.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'lec_play.dart';
 import 'lec_database_model.dart';
 import 'lec_model.dart';

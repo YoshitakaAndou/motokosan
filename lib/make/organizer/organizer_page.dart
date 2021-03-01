@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../workshop/workshop_page.dart';
 import '../../widgets/show_dialog.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'organizer_add.dart';
 import 'organizer_edit.dart';
 import '../../take_a_lecture/organizer/organizer_model.dart';
@@ -103,7 +103,7 @@ class OrganizerPage extends StatelessWidget {
       //一通り終わったらFsから読み込んで再描画させる
       await model.fetchOrganizer(_userData.userGroup);
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
     }
   }
 

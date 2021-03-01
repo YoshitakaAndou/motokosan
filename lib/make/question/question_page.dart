@@ -9,7 +9,7 @@ import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../widgets/show_dialog.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'question_add.dart';
 import 'question_edit.dart';
 import '../../take_a_lecture/question/question_model.dart';
@@ -169,7 +169,7 @@ class QuestionPage extends StatelessWidget {
       //一通り終わったらFsから読み込んで再描画させる
       await model.fetchQuestion(_userData.userGroup, _lecture.lectureId);
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
     }
   }
 

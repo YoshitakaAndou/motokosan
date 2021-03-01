@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:motokosan/widgets/go_back.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 import 'package:provider/provider.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'lec_database_model.dart';
 import 'lec_firestore_model.dart';
 import 'lec_model.dart';
@@ -198,7 +198,7 @@ class LecFs extends StatelessWidget {
       await model.fetchLecsFsCloud(lecsId);
       model.setDatesDb(await database.getLecs());
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
     }
     //datesDbに読み込んで、同じカテゴリー内のlecNoを書き換える
   }
@@ -236,7 +236,7 @@ class LecFs extends StatelessWidget {
       model.stopLoading();
       Navigator.pop(context);
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
     }
   }
 }

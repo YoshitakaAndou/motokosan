@@ -11,7 +11,7 @@ import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/constants.dart';
+import '../../constants.dart';
 import '../../take_a_lecture/lecture/lecture_class.dart';
 import '../../take_a_lecture/lecture/lecture_firebase.dart';
 import '../../take_a_lecture/lecture/lecture_model.dart';
@@ -305,10 +305,10 @@ class LectureEditMain extends StatelessWidget {
       await model.updateLectureFs(groupName, DateTime.now());
       await model.fetchLecture(groupName, _workshop.workshopId);
       model.stopLoading();
-      await MyDialog.instance.okShowDialog(context, "更新しました");
+      await MyDialog.instance.okShowDialog(context, "更新しました", Colors.black);
       Navigator.pop(context);
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
       model.stopLoading();
     }
     model.resetUpdate();
@@ -350,7 +350,7 @@ class LectureEditMain extends StatelessWidget {
       //一通り終わったらFsから読み込んで再描画させる
       await model.fetchLecture(groupName, _workshop.workshopId);
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
     }
     model.stopLoading();
   }

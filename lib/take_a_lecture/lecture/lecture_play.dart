@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/take_a_lecture/lecture/bottomsheet_play_items.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_play_info.dart';
 import 'package:motokosan/take_a_lecture/lecture/lecture_play_slides.dart';
 import 'package:motokosan/widgets/return_argument.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
@@ -9,7 +10,7 @@ import 'package:motokosan/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/convert_items.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:flutter/services.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'lecture_class.dart';
 import '../../widgets/bar_title.dart';
 import '../../widgets/go_back.dart';
@@ -105,7 +106,7 @@ class _LecturePlayState extends State<LecturePlay> {
         toolbarHeight: cToolBarH,
         centerTitle: true,
         title: BarTitle.instance.barTitle(context),
-        leading: GoBack.instance.goBackWithReturArg(
+        leading: GoBack.instance.goBackWithReturnArg(
           context: context,
           icon: Icon(FontAwesomeIcons.arrowLeft),
           returnArgument: ReturnArgument(isNextQuestion: false),
@@ -114,7 +115,7 @@ class _LecturePlayState extends State<LecturePlay> {
         actions: [
           widget._isLast
               ? Container()
-              : GoBack.instance.goBackWithReturArg(
+              : GoBack.instance.goBackWithReturnArg(
                   context: context,
                   icon: Icon(FontAwesomeIcons.chevronRight),
                   returnArgument: ReturnArgument(isNextQuestion: true),
@@ -136,7 +137,7 @@ class _LecturePlayState extends State<LecturePlay> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    _infoArea(),
+                    _infoArea(context),
                     SizedBox(height: 2),
                     if (widget._lectureList.lecture.videoUrl.isNotEmpty)
                       _videoTile(true, _size),
@@ -214,59 +215,87 @@ class _LecturePlayState extends State<LecturePlay> {
     );
   }
 
-  Widget _infoArea() {
-    return Container(
-      width: double.infinity,
-      height: cInfoAreaH,
-      color: cContBg,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(widget._workshopList.workshop.title,
-                    style: cTextUpBarS, textScaleFactor: 1),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+  Widget _infoArea(BuildContext context) {
+    return GestureDetector(
+      //タップすると講義の情報をダイアログに表示
+      onTap: () async {
+        if (_controller.value.isPlaying) {
+          _controller.pause();
+          isVideoStop = true;
+          await LecturePlayInfo.instance.lecturePlayInfo(
+              context, widget._workshopList, widget._lectureList);
+          _controller.play();
+          isVideoStop = false;
+          setState(() {});
+        } else {
+          await LecturePlayInfo.instance.lecturePlayInfo(
+              context, widget._workshopList, widget._lectureList);
+          setState(() {});
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        height: cInfoAreaH,
+        color: cContBg,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 5,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Text("主催者：", style: cTextUpBarSS, textScaleFactor: 1),
-                    Text(widget._workshopList.organizerName,
-                        style: cTextUpBarSS, textScaleFactor: 1),
+                    Text(
+                      widget._lectureList.lecture.title,
+                      style: cTextUpBarM,
+                      textScaleFactor: 1,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(
+                          "再生時間（${widget._lectureList.lecture.videoDuration}）",
+                          style: cTextUpBarM,
+                          textScaleFactor: 1,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Container(
+                          color: Colors.white.withOpacity(0.3),
+                          child: Text(
+                            widget._lectureList.lectureResult.isTaken == "受講済"
+                                ? "受講済"
+                                : widget._lectureList.lecture.allAnswers ==
+                                        "全問解答が必要"
+                                    ? "テスト解答必須"
+                                    : "",
+                            style: cTextUpBarS,
+                            textAlign: TextAlign.center,
+                            textScaleFactor: 1,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: Text(
-                    "${widget._lectureList.lecture.title}（${widget._lectureList.lecture.videoDuration}）",
-                    style: cTextUpBarM,
-                    textScaleFactor: 1,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+              ),
+              Expanded(
+                flex: 1,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Image.asset(
+                      "assets/images/nurse_quiz.png",
+                      fit: BoxFit.fitHeight,
+                    ),
+                  ],
                 ),
-                Container(
-                  color: Colors.white.withOpacity(0.3),
-                  child: Text(
-                    widget._lectureList.lectureResult.isTaken == "受講済"
-                        ? "受講済"
-                        : widget._lectureList.lecture.allAnswers == "全問解答が必要"
-                            ? "テスト解答必須"
-                            : "",
-                    style: cTextUpBarS,
-                    textAlign: TextAlign.center,
-                    textScaleFactor: 1,
-                  ),
-                ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );

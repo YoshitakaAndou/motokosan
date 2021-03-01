@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'lec_database_model.dart';
 import 'lec_model.dart';
 
@@ -141,10 +141,14 @@ class LecAdd extends StatelessWidget {
       model.setDatesDb(await _database.getLecs());
       // model.setDates(await _database.getLecs());
       model.stopLoading();
-      await MyDialog.instance.okShowDialog(context, "登録完了しました");
+      await MyDialog.instance.okShowDialog(
+        context,
+        "登録完了しました",
+        Colors.black,
+      );
       Navigator.pop(context);
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
       model.stopLoading();
     }
   }

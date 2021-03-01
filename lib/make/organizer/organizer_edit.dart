@@ -5,7 +5,7 @@ import 'package:motokosan/take_a_lecture/organizer/organizer_firebase.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../widgets/show_dialog.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 import '../../take_a_lecture/organizer/organizer_model.dart';
 
 class OrganizerEdit extends StatelessWidget {
@@ -401,10 +401,10 @@ class OrganizerEdit extends StatelessWidget {
       await model.updateOrganizerFs(groupName, DateTime.now());
       await model.fetchOrganizer(groupName);
       model.stopLoading();
-      await MyDialog.instance.okShowDialog(context, "更新しました");
+      await MyDialog.instance.okShowDialog(context, "更新しました", Colors.black);
       Navigator.pop(context);
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
       model.stopLoading();
     }
     model.resetUpdate();
@@ -456,7 +456,7 @@ class OrganizerEdit extends StatelessWidget {
       //一通り終わったらFsから読み込んで再描画させる
       await model.fetchOrganizer(groupName);
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
     }
     model.stopLoading();
   }

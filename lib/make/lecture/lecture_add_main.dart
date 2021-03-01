@@ -5,7 +5,7 @@ import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/constants.dart';
+import '../../constants.dart';
 import '../../take_a_lecture/lecture/lecture_model.dart';
 import 'lecture_add_image.dart';
 import 'lecture_add_question.dart';
@@ -200,10 +200,10 @@ class LectureAddMain extends StatelessWidget {
       await model.addLectureFs(groupName, _timeStamp);
       // グリグリを止める
       model.stopLoading();
-      await MyDialog.instance.okShowDialog(context, "登録完了しました");
+      await MyDialog.instance.okShowDialog(context, "登録完了しました", Colors.black);
       Navigator.pop(context);
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
       model.stopLoading();
     }
   }

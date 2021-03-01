@@ -4,6 +4,9 @@ class UserData {
   String userName;
   String userEmail;
   String userPassword;
+  String groupPassword;
+  String groupCode;
+  String groupEmail;
 
   UserData({
     this.uid = "",
@@ -11,5 +14,8 @@ class UserData {
     this.userName = "",
     this.userEmail = "",
     this.userPassword = "",
+    this.groupCode = "",
+    this.groupPassword = "",
+    this.groupEmail = "",
   });
 }

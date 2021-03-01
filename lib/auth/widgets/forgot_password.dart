@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:motokosan/data/constants.dart';
+import 'package:motokosan/constants.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 
-import '../email_model.dart';
+import '../auth_model.dart';
 
 class ForgotPassword extends StatelessWidget {
   const ForgotPassword({
@@ -13,7 +13,7 @@ class ForgotPassword extends StatelessWidget {
   });
 
   final BuildContext context;
-  final EmailModel model;
+  final AuthModel model;
 
   @override
   Widget build(BuildContext context) {
@@ -40,12 +40,13 @@ class ForgotPassword extends StatelessWidget {
     );
   }
 
-  Future<Widget> _emailDialog(
-      {BuildContext context,
-      EmailModel model,
-      String email,
-      String mainTitle,
-      Function okProcess}) {
+  Future<Widget> _emailDialog({
+    BuildContext context,
+    AuthModel model,
+    String email,
+    String mainTitle,
+    Function okProcess,
+  }) {
     final emailController = TextEditingController();
     emailController.text = email;
     return showDialog(
@@ -86,8 +87,11 @@ class ForgotPassword extends StatelessWidget {
     );
   }
 
-  Widget _mailAddressInput(BuildContext context, EmailModel model,
-      TextEditingController emailController) {
+  Widget _mailAddressInput(
+    BuildContext context,
+    AuthModel model,
+    TextEditingController emailController,
+  ) {
     return Row(
       children: [
         Expanded(

@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 import '../../widgets/bar_title.dart';
 import '../../widgets/go_back.dart';
 import 'package:soundpool/soundpool.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 
 class ExamPlay extends StatefulWidget {
   final UserData _userData;
@@ -20,8 +20,13 @@ class ExamPlay extends StatefulWidget {
   final int index;
   final bool isShowOnly;
 
-  ExamPlay(this._userData, this.datesQs, this.workshopList, this.index,
-      this.isShowOnly);
+  ExamPlay(
+    this._userData,
+    this.datesQs,
+    this.workshopList,
+    this.index,
+    this.isShowOnly,
+  );
 
   @override
   _ExamPlayState createState() => _ExamPlayState();
@@ -202,7 +207,10 @@ class _ExamPlayState extends State<ExamPlay> {
                     SizedBox(height: 30)
                   ],
                 ),
-                _correctImage(),
+                Container(
+                  height: MediaQuery.of(context).size.height / 2,
+                  child: _correctImage(),
+                ),
               ],
             ),
           ],

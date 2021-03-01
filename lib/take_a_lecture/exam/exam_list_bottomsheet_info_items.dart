@@ -8,7 +8,7 @@ import 'package:motokosan/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/convert_items.dart';
 import 'package:motokosan/widgets/flare_actors.dart';
 
-import '../../data/constants.dart';
+import '../../constants.dart';
 
 class ExamListBottomSheetInfoItems extends StatelessWidget {
   final ExamModel model;
@@ -167,7 +167,6 @@ class ExamListBottomSheetInfoItems extends StatelessWidget {
               ),
               onPressed: () async {
                 // 修了試験へ
-
                 await Navigator.push(
                   context,
                   MaterialPageRoute(

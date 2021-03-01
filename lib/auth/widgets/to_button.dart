@@ -1,33 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:motokosan/auth/auth_model.dart';
 
-class TogoButton extends StatelessWidget {
+class ToButton extends StatelessWidget {
   final BuildContext context;
   final AuthModel model;
-  final Widget icon;
-  final Widget label;
+  final Widget child;
   final double elevation;
-  final Size size;
+  final double height;
+  final double width;
   final Function onPressed;
 
-  TogoButton({
+  ToButton({
     this.context,
     this.model,
-    this.icon,
-    this.label,
+    this.child,
     this.elevation: 10,
-    this.size,
+    this.height: 30,
+    this.width,
     this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 30,
-      width: size.width / 2.2,
-      child: RaisedButton.icon(
-        icon: icon,
-        label: label,
+      height: height,
+      width: width / 2.2,
+      child: RaisedButton(
+        child: child,
         color: Colors.white,
         shape: const OutlineInputBorder(
           borderSide: BorderSide(color: Colors.grey, width: 1),

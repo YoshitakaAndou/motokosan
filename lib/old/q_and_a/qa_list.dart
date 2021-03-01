@@ -3,7 +3,7 @@ import 'package:motokosan/widgets/bar_title.dart';
 import 'package:motokosan/widgets/bubble/bubble.dart';
 import 'package:motokosan/widgets/go_back.dart';
 import 'package:provider/provider.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'qa_database_model.dart';
 import 'qa_model.dart';
 import 'qa_play.dart';

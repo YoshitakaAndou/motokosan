@@ -11,7 +11,7 @@ import 'package:motokosan/widgets/convert_items.dart';
 import '../../widgets/bar_title.dart';
 import '../../widgets/go_back.dart';
 import 'package:soundpool/soundpool.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'question_class.dart';
 
 class QuestionPlay extends StatefulWidget {
@@ -46,7 +46,7 @@ class _QuestionPlayState extends State<QuestionPlay> {
   bool isAnswered = false;
   bool isCorrectImage = false;
   bool isDescription = false;
-  bool isPlaying = false;
+  bool isPlay = false;
   bool isButton = false;
   String lastTimeResult = "";
 
@@ -56,7 +56,7 @@ class _QuestionPlayState extends State<QuestionPlay> {
   void initState() {
     super.initState();
     print(widget._userData.userGroup);
-    isPlaying = !widget.isShowOnly;
+    isPlay = !widget.isShowOnly;
     _dataQs = widget.dataQs;
     isButton = true;
     _lectureList = widget.lectureList;
@@ -102,7 +102,7 @@ class _QuestionPlayState extends State<QuestionPlay> {
     if (_dataQs.choices4.isNotEmpty) {
       choices.add(_dataQs.choices4);
     }
-    if (isPlaying) {
+    if (isPlay) {
       isAnswered = false;
       choices.shuffle();
       nextTitle = "正解と解説を見る";
@@ -141,7 +141,7 @@ class _QuestionPlayState extends State<QuestionPlay> {
         toolbarHeight: cToolBarH,
         centerTitle: true,
         title: BarTitle.instance.barTitle(context),
-        leading: GoBack.instance.goBackWithReturArg(
+        leading: GoBack.instance.goBackWithReturnArg(
           context: context,
           icon: Icon(Icons.arrow_back_ios),
           returnArgument: ReturnArgument(isNextQuestion: false),
@@ -188,7 +188,10 @@ class _QuestionPlayState extends State<QuestionPlay> {
                     SizedBox(height: 30)
                   ],
                 ),
-                _correctImage(),
+                Container(
+                  height: MediaQuery.of(context).size.height / 2,
+                  child: _correctImage(),
+                ),
               ],
             ),
           ],
@@ -426,11 +429,17 @@ class _QuestionPlayState extends State<QuestionPlay> {
     if (isCorrectImage) {
       if (isCorrect) {
         return Center(
-          child: Image.asset("assets/images/nurse_ok.png"),
+          child: Image.asset(
+            "assets/images/nurse_ok.png",
+            fit: BoxFit.fitHeight,
+          ),
         );
       } else {
         return Center(
-          child: Image.asset("assets/images/nurse_ng.png"),
+          child: Image.asset(
+            "assets/images/nurse_ng.png",
+            fit: BoxFit.fitHeight,
+          ),
         );
       }
     } else {
@@ -439,12 +448,12 @@ class _QuestionPlayState extends State<QuestionPlay> {
   }
 
   Widget _nextButton(bool _isButton) {
-    final bool _isElevation = nextTitle == "正解と解説を見る" ? false : true;
+    final bool _isShowOnly = nextTitle == "正解と解説を見る" ? false : true;
     return Container(
       height: 60,
       width: MediaQuery.of(context).size.width,
       child: RaisedButton.icon(
-        elevation: _isElevation ? 30 : 0,
+        elevation: _isShowOnly ? 30 : 0,
         icon: nextIcon,
         color: Colors.green[500],
         label: Text(

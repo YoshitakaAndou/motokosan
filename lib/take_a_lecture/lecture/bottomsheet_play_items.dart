@@ -4,7 +4,7 @@ import 'package:motokosan/take_a_lecture/question/question_list_page.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/convert_items.dart';
 
-import '../../data/constants.dart';
+import '../../constants.dart';
 import '../../widgets/return_argument.dart';
 import 'lecture_class.dart';
 import 'lecture_database.dart';
@@ -28,7 +28,7 @@ class BottomSheetPlayItems extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _bottomSheetTitle(),
-        SizedBox(height: 10),
+        constHeight10,
         if (_lectureList.lecture.questionLength != 0 &&
             _lectureList.lectureResult.isTakenAt == 0 &&
             _lectureList.lecture.allAnswers == "全問解答が必要")

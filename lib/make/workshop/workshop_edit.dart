@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../take_a_lecture/workshop/workshop_model.dart';
 import '../../widgets/show_dialog.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'dart:async';
 
@@ -653,10 +653,10 @@ class WorkshopEdit extends StatelessWidget {
       await model.updateWorkshopFs(groupName, DateTime.now());
       await model.fetchWorkshopByOrganizer(groupName, _organizer.organizerId);
       model.stopLoading();
-      await MyDialog.instance.okShowDialog(context, "更新しました");
+      await MyDialog.instance.okShowDialog(context, "更新しました", Colors.black);
       Navigator.pop(context);
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
       model.stopLoading();
     }
     model.resetUpdate();
@@ -710,7 +710,7 @@ class WorkshopEdit extends StatelessWidget {
       //一通り終わったらFsから読み込んで再描画させる
       await model.fetchWorkshopByOrganizer(groupName, _organizer.organizerId);
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
     }
     model.stopLoading();
   }

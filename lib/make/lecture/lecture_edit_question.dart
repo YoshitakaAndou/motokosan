@@ -3,7 +3,7 @@ import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/constants.dart';
+import '../../constants.dart';
 import '../../take_a_lecture/lecture/lecture_class.dart';
 import '../../take_a_lecture/lecture/lecture_model.dart';
 

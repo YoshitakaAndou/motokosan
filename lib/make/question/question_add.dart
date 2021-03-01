@@ -4,7 +4,7 @@ import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
 import 'package:provider/provider.dart';
 import '../../take_a_lecture/question/question_model.dart';
 import '../../widgets/show_dialog.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 
 class QuestionAdd extends StatelessWidget {
   final String groupName;
@@ -325,7 +325,11 @@ class QuestionAdd extends StatelessWidget {
       ),
       onPressed: () {
         if (option.isEmpty) {
-          MyDialog.instance.okShowDialog(context, "$choiceが入力されていません！");
+          MyDialog.instance.okShowDialog(
+            context,
+            "$choiceが入力されていません！",
+            Colors.red,
+          );
         } else {
           model.setCorrectChoices(choice);
         }
@@ -341,10 +345,10 @@ class QuestionAdd extends StatelessWidget {
       model.inputCheck();
       await model.addQuestionFs(groupName, _timeStamp, _lecture);
       model.stopLoading();
-      await MyDialog.instance.okShowDialog(context, "登録完了しました");
+      await MyDialog.instance.okShowDialog(context, "登録完了しました", Colors.black);
       Navigator.pop(context);
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
       model.stopLoading();
     }
   }

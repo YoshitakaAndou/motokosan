@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:motokosan/constants.dart';
 import 'package:motokosan/widgets/return_argument.dart';
 
 class GoBack {
@@ -7,8 +8,8 @@ class GoBack {
   Widget goBack({BuildContext context, Icon icon, String tooltip, int num}) {
     return IconButton(
       icon: icon,
-      iconSize: 20,
-      color: Colors.black54,
+      iconSize: cAppBarLBSize,
+      color: cAppBarLBColor,
       tooltip: tooltip,
       onPressed: () {
         if (num == 1) {
@@ -40,15 +41,15 @@ class GoBack {
     );
   }
 
-  Widget goBackWithReturArg(
+  Widget goBackWithReturnArg(
       {BuildContext context,
       Icon icon,
       int num,
       ReturnArgument returnArgument}) {
     return IconButton(
       icon: icon,
-      iconSize: 20,
-      color: Colors.black54,
+      iconSize: cAppBarLBSize,
+      color: cAppBarLBColor,
       onPressed: () {
         if (num == 1) {
           Navigator.of(context).pop(returnArgument);

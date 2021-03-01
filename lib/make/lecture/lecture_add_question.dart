@@ -3,7 +3,7 @@ import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/constants.dart';
+import '../../constants.dart';
 import '../../take_a_lecture/lecture/lecture_model.dart';
 
 class LectureAddQuestion extends StatelessWidget {
@@ -11,6 +11,11 @@ class LectureAddQuestion extends StatelessWidget {
   final Organizer _organizer;
   final Workshop _workshop;
   LectureAddQuestion(this.groupName, this._organizer, this._workshop);
+
+  final BoxDecoration _boxDecoration = BoxDecoration(
+    border: Border.all(color: cPopWindow),
+    borderRadius: BorderRadius.circular(5),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -128,10 +133,7 @@ class LectureAddQuestion extends StatelessWidget {
 
   Widget _testAllAnswers(BuildContext context, LectureModel model) {
     return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: cPopWindow),
-        borderRadius: BorderRadius.circular(5),
-      ),
+      decoration: _boxDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -175,10 +177,7 @@ class LectureAddQuestion extends StatelessWidget {
 
   Widget _testPassingScore(BuildContext context, LectureModel model) {
     return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: cPopWindow),
-        borderRadius: BorderRadius.circular(5),
-      ),
+      decoration: _boxDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[

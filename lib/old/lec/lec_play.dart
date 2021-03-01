@@ -12,7 +12,7 @@ import 'package:motokosan/widgets/go_back.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'lec_database_model.dart';
 import 'lec_model.dart';
 

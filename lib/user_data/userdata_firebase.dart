@@ -24,7 +24,7 @@ class FSUserData {
       userGroup: doc["group"],
       userName: doc["name"],
       userEmail: doc["email"],
-      userPassword: doc["password"],
+      // userPassword: doc["password"],
     );
   }
 
@@ -40,7 +40,7 @@ class FSUserData {
         "group": _userData.userGroup,
         "name": _userData.userName,
         "email": _userData.userEmail,
-        "password": _userData.userPassword,
+        // "password": _userData.userPassword,
         "createdAt": Timestamp.now(),
       },
     );

@@ -6,7 +6,7 @@ import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../widgets/bar_title.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'organizer_model.dart';
 import 'organizer_list_bottomsheet_info_items.dart';
 

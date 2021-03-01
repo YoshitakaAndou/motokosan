@@ -4,7 +4,7 @@ import 'package:motokosan/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/convert_items.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
-import '../../data/constants.dart';
+import '../../constants.dart';
 import '../../widgets/return_argument.dart';
 import 'workshop_model.dart';
 

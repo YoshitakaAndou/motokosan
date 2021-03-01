@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:motokosan/data/constants.dart';
+import 'package:motokosan/constants.dart';
 import 'package:motokosan/data/data_save_body.dart';
 import 'package:motokosan/make/lecture/lecture_youtube_api.dart';
 import 'package:motokosan/widgets/guriguri.dart';
@@ -80,7 +80,11 @@ class _LectureWebState extends State<LectureWeb> {
           final _url = await _controller.currentUrl();
           final videoId = YoutubePlayer.convertUrlToId(_url);
           if (videoId == null) {
-            MyDialog.instance.okShowDialog(context, "動画ページではありません");
+            MyDialog.instance.okShowDialog(
+              context,
+              "動画ページではありません",
+              Colors.red,
+            );
           } else {
             final _videoSnippet =
                 await APIService.instance.fetchVideoSnippet(videoId: videoId);

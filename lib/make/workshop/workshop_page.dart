@@ -9,7 +9,7 @@ import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 import '../../widgets/show_dialog.dart';
 import '../lecture/lecture_page.dart';
 import '../../take_a_lecture/workshop/workshop_model.dart';
@@ -328,7 +328,7 @@ class WorkshopPage extends StatelessWidget {
       await model.fetchWorkshopByOrganizer(
           _userData.userGroup, _organizer.organizerId);
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
     }
   }
 }

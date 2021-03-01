@@ -10,7 +10,7 @@ import 'package:motokosan/widgets/flare_actors.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:motokosan/widgets/guriguri.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'exam_model.dart';
 import 'exam_list_bottomsheet_info_items.dart';
 import 'exam_play.dart';

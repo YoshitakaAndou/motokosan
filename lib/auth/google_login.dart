@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:motokosan/auth/email_signin.dart';
 import 'package:motokosan/auth/email_signup.dart';
-import 'package:motokosan/auth/google_model.dart';
+import 'package:motokosan/group_data/group_data_save_body.dart';
 import 'package:motokosan/widgets/flare_actors.dart';
 import 'package:provider/provider.dart';
 import '../widgets/bar_title.dart';
@@ -9,27 +8,29 @@ import '../widgets/show_dialog.dart';
 import '../widgets/bubble/bubble.dart';
 import '../constants.dart';
 import '../home/home.dart';
-import 'group_button/google_group_button.dart';
-import 'widgets/login_button.dart';
+import 'auth_model.dart';
+import 'widgets/auth_title.dart';
+import 'widgets/group_button.dart';
+import 'widgets/name_input.dart';
+import 'widgets/save_group_email.dart';
+import 'widgets/auth_button.dart';
+import 'widgets/to_signIn_button.dart';
 
-class GoogleSignup extends StatelessWidget {
+class GoogleLogin extends StatelessWidget {
   final String userName;
   final String groupName;
 
-  GoogleSignup({this.userName, this.groupName});
+  GoogleLogin({this.userName, this.groupName});
 
   @override
   Widget build(BuildContext context) {
-    final model = Provider.of<GoogleModel>(context, listen: false);
+    final model = Provider.of<AuthModel>(context, listen: false);
     final groupController = TextEditingController();
     final nameController = TextEditingController();
-    final beforeName = model.userData.userName;
     final Size _size = MediaQuery.of(context).size;
-    model.userData.userGroup = groupName;
-    model.userData.userName = userName;
     groupController.text = model.userData.userGroup;
     nameController.text = model.userData.userName;
-    return Consumer<GoogleModel>(
+    return Consumer<AuthModel>(
       builder: (context, model, child) {
         return Scaffold(
           appBar: AppBar(
@@ -51,44 +52,65 @@ class GoogleSignup extends StatelessWidget {
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          _toSignInPage(context, model, _size),
+                          ToSignInButton(
+                            context: context,
+                            model: model,
+                            height: 30,
+                            width: _size.width,
+                          ),
                         ],
                       ),
                     ),
                     Expanded(
                       flex: 15,
                       child: SingleChildScrollView(
-                        child: Card(
-                          elevation: 15,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              _loginTitle(context, model),
-                              SizedBox(height: 10),
-                              ListView(
-                                padding: EdgeInsets.all(8),
-                                shrinkWrap: true,
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(maxWidth: 600),
+                          child: Container(
+                            child: Card(
+                              elevation: 15,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  GoogleGroupButton(
-                                      context: context, model: model),
-                                  SizedBox(height: 20),
-                                  _nameInput(context, model, nameController,
-                                      beforeName),
+                                  AuthTitle(
+                                      context: context,
+                                      model: model,
+                                      title: "Googleアカウントでログイン"),
+                                  constHeight10,
+                                  ListView(
+                                    padding: EdgeInsets.all(8),
+                                    shrinkWrap: true,
+                                    children: [
+                                      GroupButton(
+                                          context: context, model: model),
+                                      constHeight10,
+                                      constHeight10,
+                                      NameInput(
+                                          context: context,
+                                          model: model,
+                                          nameController: nameController),
+                                    ],
+                                  ),
+                                  constHeight10,
+                                  constHeight10,
+                                  constHeight10,
+                                  constHeight10,
+                                  AuthButton(
+                                    context: context,
+                                    label: 'Googleアカウントでログイン',
+                                    onPressed: () {
+                                      _loginProcess(context, model);
+                                    },
+                                  ),
+                                  constHeight10,
+                                  constHeight10,
                                 ],
                               ),
-                              SizedBox(height: 40),
-                              LoginButton(
-                                context: context,
-                                label: 'Googleアカウントでログイン',
-                                onPressed: () {
-                                  _loginProcess(context, model);
-                                },
-                              ),
-                              SizedBox(height: 20),
-                            ],
+                            ),
                           ),
                         ),
                       ),
@@ -106,7 +128,7 @@ class GoogleSignup extends StatelessWidget {
     );
   }
 
-  Widget _imageArea(BuildContext context, GoogleModel model) {
+  Widget _imageArea(BuildContext context, AuthModel model) {
     return Container(
       height: MediaQuery.of(context).size.height / 3,
       padding: EdgeInsets.all(5),
@@ -138,102 +160,16 @@ class GoogleSignup extends StatelessWidget {
     );
   }
 
-  Widget _loginTitle(BuildContext context, GoogleModel model) {
-    return Container(
-      width: double.infinity,
-      height: 30,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 15.0,
-            spreadRadius: 0.5,
-            offset: Offset(0.5, 0.5),
-          )
-        ],
-        color: Colors.green,
-      ),
-      child: Center(
-        child: Text(
-          "Googleアカウントでログイン",
-          style: cTextUpBarL,
-          textScaleFactor: 1,
-        ),
-      ),
-    );
-  }
-
-  Widget _toSignInPage(BuildContext context, GoogleModel model, Size _size) {
-    return Container(
-      height: 30,
-      width: _size.width / 2.2,
-      child: RaisedButton.icon(
-        icon: Icon(Icons.account_box, size: 18, color: Colors.black54),
-        label: Text("ログイン画面へ→",
-            style: TextStyle(
-                color: Colors.black54,
-                fontSize: 13,
-                fontWeight: FontWeight.w500),
-            textScaleFactor: 1),
-        color: Colors.white,
-        elevation: 10,
-        onPressed: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EmailSignin(
-                groupName: model.userData.userGroup,
-                userName: model.userData.userName,
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _nameInput(BuildContext context, GoogleModel model,
-      TextEditingController nameController, beforeName) {
-    return Row(
-      children: [
-        Expanded(
-            flex: 1,
-            child: Icon(Icons.person, size: 20, color: Colors.black54)),
-        Expanded(
-          flex: 5,
-          child: TextField(
-            keyboardType: TextInputType.text,
-            controller: nameController,
-            decoration: InputDecoration(
-              hintText: "name",
-              hintStyle: TextStyle(fontSize: 12),
-              suffixIcon: IconButton(
-                onPressed: () {
-                  nameController.text = "";
-                  model.changeValue("userName", "");
-                },
-                icon: Icon(Icons.clear, size: 15),
-              ),
-            ),
-            onChanged: (text) {
-              if (beforeName != text) {
-                model.setIsUpdate(true);
-              } else {
-                model.setIsUpdate(false);
-              }
-              model.userData.userName = text;
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Future<void> _loginProcess(BuildContext context, GoogleModel model) async {
+  Future<void> _loginProcess(BuildContext context, AuthModel model) async {
     model.setIsLoading(true);
     try {
-      if (await model.googleSignin()) {
+      if (await model.googleLogin()) {
+        // 新規にグループを作ったらここでemailをグループデータに登録
+        if (isGroupCreate) {
+          await saveGroupEmail(createGroupName, model.userData.userEmail);
+          model.groupData.email = model.userData.userEmail;
+          await GroupDataSaveBody.instance.save(model.groupData);
+        }
         // google認証成功
         await FlareActors.instance.done(context);
         await Navigator.pushReplacement(
@@ -245,10 +181,10 @@ class GoogleSignup extends StatelessWidget {
       } else {
         // google認証失敗
         await MyDialog.instance.okShowDialog(
-          context,
-          "google認証に失敗しました！"
-          "\n新規登録画面へ戻って登録してください！",
-        );
+            context,
+            "google認証に失敗しました！"
+            "\n新規登録画面へ戻って登録してください！",
+            Colors.red);
         await Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -277,11 +213,11 @@ class GoogleSignup extends StatelessWidget {
       _error = "指定したユーザーが無効になっています！";
     }
     if (_error.contains("too-many-requests")) {
-      _error = "指定したユーザーとしてサインインする試みが多すぎます！";
+      _error = "指定したユーザーとしてログインする試みが多すぎます！";
     }
     if (_error.contains("operation-not-allowed")) {
       _error = "指定したユーザのログインが許されていません！";
     }
-    return await MyDialog.instance.okShowDialog(context, _error);
+    return await MyDialog.instance.okShowDialog(context, _error, Colors.red);
   }
 }

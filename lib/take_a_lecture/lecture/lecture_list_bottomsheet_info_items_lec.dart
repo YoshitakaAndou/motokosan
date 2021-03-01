@@ -3,7 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/data/data_save_body.dart';
 import 'package:motokosan/buttons/custom_button.dart';
 
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'lecture_model.dart';
 
 class LectureListBottomSheetInfoItemsLec extends StatelessWidget {

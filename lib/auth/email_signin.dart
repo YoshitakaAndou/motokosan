@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:motokosan/auth/widgets/email_signin_password_text.dart';
+import 'package:motokosan/auth/auth_model.dart';
+import 'package:motokosan/auth/widgets/save_group_email.dart';
+import 'package:motokosan/group_data/group_data_save_body.dart';
 import 'package:motokosan/user_data/userdata_body.dart';
 import 'package:motokosan/widgets/flare_actors.dart';
 import 'package:provider/provider.dart';
 import '../widgets/bar_title.dart';
 import '../widgets/show_dialog.dart';
 import '../widgets/bubble/bubble.dart';
-import '../data/constants.dart';
+import '../constants.dart';
 import '../home/home.dart';
-import 'email_model.dart';
 import 'email_signup.dart';
 import '../user_data/userdata_firebase.dart';
-import 'google_signup.dart';
-import 'group_button/email_group_button.dart';
+import 'widgets/auth_title.dart';
+import 'widgets/group_button.dart';
 import 'widgets/forgot_password.dart';
-import 'widgets/login_button.dart';
+import 'widgets/auth_button.dart';
+import 'widgets/mail_address_input.dart';
+import 'widgets/password_input.dart';
+import 'widgets/to_google_button.dart';
+import 'widgets/to_signUp_button.dart';
 
 class EmailSignin extends StatelessWidget {
   final String userName;
@@ -24,20 +28,20 @@ class EmailSignin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = Provider.of<EmailModel>(context, listen: false);
+    final model = Provider.of<AuthModel>(context, listen: false);
     final groupController = TextEditingController();
     final emailController = TextEditingController();
     final passwordController = TextEditingController();
-    final beforeEmail = model.userData.userEmail;
-    final beforePassword = model.userData.userPassword;
     final Size _size = MediaQuery.of(context).size;
 
     groupController.text = model.userData.userGroup;
-    emailController.text = model.userData.userEmail;
+    emailController.text = model.userData.userPassword == "google認証"
+        ? ""
+        : model.userData.userEmail;
     passwordController.text = model.userData.userPassword == "google認証"
         ? ""
         : model.userData.userPassword;
-    return Consumer<EmailModel>(
+    return Consumer<AuthModel>(
       builder: (context, model, child) {
         return Scaffold(
           appBar: AppBar(
@@ -49,60 +53,81 @@ class EmailSignin extends StatelessWidget {
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(flex: 2, child: Container()),
-                  Expanded(flex: 10, child: _imageArea(context, model)),
+                  // Expanded(flex: 2, child: Container()),
                   Expanded(
-                    flex: 3,
+                      flex: _size.height >= 800 ? 8 : 7,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 10.0),
+                        child: _imageArea(context, model),
+                      )),
+                  Expanded(
+                    flex: _size.height >= 800 ? 2 : 1,
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _toGoogleSignIn(context, model, _size),
-                        _toSignUpPage(context, model, _size),
+                        ToGoogleButton(
+                          context: context,
+                          model: model,
+                          height: 30,
+                          width: _size.width,
+                        ),
+                        ToSignUpButton(
+                          context: context,
+                          model: model,
+                          height: 30,
+                          width: _size.width,
+                        ),
                       ],
                     ),
                   ),
                   Expanded(
-                    flex: 15,
+                    flex: _size.height >= 800 ? 9 : 10,
                     child: SingleChildScrollView(
-                      child: Card(
-                        elevation: 15,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _loginTitle(context, model),
-                            SizedBox(height: 10),
-                            ListView(
-                              padding:
-                                  EdgeInsets.only(top: 8, left: 8, right: 8),
-                              shrinkWrap: true,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: 600),
+                        child: Container(
+                          child: Card(
+                            elevation: 15,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                EmailGroupButton(
-                                    context: context, model: model),
-                                SizedBox(height: 10),
-                                _mailAddressInput(context, model,
-                                    emailController, beforeEmail),
-                                SizedBox(height: 10),
-                                _passwordInput(context, model,
-                                    passwordController, beforePassword),
+                                AuthTitle(
+                                    context: context,
+                                    model: model,
+                                    title: "ログイン画面"),
+                                constHeight10,
+                                GroupButton(context: context, model: model),
+                                constHeight10,
+                                MailAddressInput(
+                                  context: context,
+                                  model: model,
+                                  emailController: emailController,
+                                ),
+                                constHeight10,
+                                PasswordInput(
+                                    context: context,
+                                    model: model,
+                                    passwordController: passwordController),
                                 ForgotPassword(
                                   context: context,
                                   model: model,
                                 ),
+                                AuthButton(
+                                  context: context,
+                                  label: 'ログインする',
+                                  onPressed: () {
+                                    _loginProcess(context, model);
+                                  },
+                                ),
+                                constHeight10,
+                                constHeight10,
                               ],
                             ),
-                            LoginButton(
-                              context: context,
-                              label: 'ログインする',
-                              onPressed: () {
-                                _loginProcess(context, model);
-                              },
-                            ),
-                            SizedBox(height: 20),
-                          ],
+                          ),
                         ),
                       ),
                     ),
@@ -119,7 +144,7 @@ class EmailSignin extends StatelessWidget {
     );
   }
 
-  Widget _imageArea(BuildContext context, EmailModel model) {
+  Widget _imageArea(BuildContext context, AuthModel model) {
     return Container(
       height: MediaQuery.of(context).size.height / 3,
       padding: EdgeInsets.all(5),
@@ -145,161 +170,28 @@ class EmailSignin extends StatelessWidget {
             ),
           Expanded(
             flex: 1,
-            child: Image.asset("assets/images/protector.png",
-                fit: BoxFit.fitHeight, alignment: Alignment.bottomCenter),
+            child: Image.asset(
+              "assets/images/protector.png",
+              fit: BoxFit.fitHeight,
+              alignment: Alignment.bottomCenter,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _loginTitle(BuildContext context, EmailModel model) {
-    return Container(
-      width: double.infinity,
-      height: 30,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 15.0,
-            spreadRadius: 0.5,
-            offset: Offset(0.5, 0.5),
-          )
-        ],
-        color: Colors.green,
-      ),
-      child: Center(
-        child: Text(
-          "ログイン画面",
-          style: cTextUpBarL,
-          textScaleFactor: 1,
-        ),
-      ),
-    );
-  }
-
-  Widget _toGoogleSignIn(BuildContext context, EmailModel model, Size _size) {
-    return Container(
-      height: 30,
-      width: _size.width / 2.2,
-      child: RaisedButton.icon(
-        color: Colors.white,
-        icon: Icon(FontAwesomeIcons.google, size: 18, color: Colors.indigo),
-        label: Text(
-          "googleでログイン",
-          style: TextStyle(
-              fontSize: 13, fontWeight: FontWeight.w500, color: Colors.black54),
-          textScaleFactor: 1,
-        ),
-        elevation: 10,
-        onPressed: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => GoogleSignup(
-                groupName: model.userData.userGroup,
-                userName: model.userData.userName,
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _toSignUpPage(BuildContext context, EmailModel model, Size _size) {
-    return Container(
-      height: 30,
-      width: _size.width / 2.2,
-      child: RaisedButton.icon(
-        icon: Icon(Icons.account_box, size: 18, color: Colors.black54),
-        label: Text("新規登録する→",
-            style: TextStyle(
-                color: Colors.black54,
-                fontSize: 13,
-                fontWeight: FontWeight.w500),
-            textScaleFactor: 1),
-        color: Colors.white,
-        // shape: const OutlineInputBorder(
-        //   borderRadius: BorderRadius.all(Radius.circular(5)),
-        // ),
-        elevation: 10,
-        onPressed: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EmailSignup(),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _mailAddressInput(BuildContext context, EmailModel model,
-      TextEditingController emailController, beforeEmail) {
-    return Row(
-      children: [
-        Expanded(
-            flex: 1, child: Icon(Icons.email, size: 20, color: Colors.black54)),
-        Expanded(
-          flex: 5,
-          child: TextField(
-            keyboardType: TextInputType.emailAddress,
-            controller: emailController,
-            decoration: InputDecoration(
-              hintText: "メールアドレス",
-              hintStyle: TextStyle(fontSize: 12),
-              suffixIcon: IconButton(
-                onPressed: () {
-                  emailController.text = "";
-                },
-                icon: Icon(Icons.clear, size: 15),
-              ),
-            ),
-            onChanged: (text) {
-              model.userData.userEmail = text.trim();
-              if (beforeEmail != text.trim()) {
-                model.setIsUpdate(true);
-              } else {
-                model.setIsUpdate(false);
-              }
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _passwordInput(BuildContext context, EmailModel model,
-      TextEditingController passwordController, beforePassword) {
-    return Row(
-      children: [
-        Expanded(
-            flex: 1,
-            child: Icon(
-              Icons.vpn_key,
-              size: 20,
-              color: Colors.black54,
-            )),
-        Expanded(
-          flex: 5,
-          child: EmailSigninPasswordText(
-            passwordController: passwordController,
-            model: model,
-            beforePassword: beforePassword,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Future<void> _loginProcess(BuildContext context, EmailModel model) async {
+  Future<void> _loginProcess(BuildContext context, AuthModel model) async {
     model.setIsLoading(true);
     try {
       //Authにログインしてuidを取得
       final _uid = await model.signIn();
+      // 新規にグループを作ったらここでemailをグループデータに登録
+      if (isGroupCreate) {
+        await saveGroupEmail(createGroupName, model.userData.userEmail);
+        model.groupData.email = model.userData.userEmail;
+        await GroupDataSaveBody.instance.save(model.groupData);
+      }
       //本体が空だったらFSUserの情報を本体に登録
       if (model.userData.uid.isEmpty) {
         model.userData = await FSUserData.instance
@@ -341,9 +233,11 @@ class EmailSignin extends StatelessWidget {
           .toString()
           .contains("cannot get a field on a DocumentSnapshotPlatform")) {
         await MyDialog.instance.okShowDialog(
-            context,
-            '${model.userData.userGroup}に未登録なので、'
-            '新規登録画面に移動します！');
+          context,
+          '${model.userData.userGroup}に未登録なので、'
+          '新規登録画面に移動します！',
+          Colors.blue,
+        );
         await Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -370,11 +264,11 @@ class EmailSignin extends StatelessWidget {
       _error = "指定したユーザーが無効になっています！";
     }
     if (_error.contains("too-many-requests")) {
-      _error = "指定したユーザーとしてサインインする試みが多すぎます！";
+      _error = "指定したユーザーとしてログインする試みが多すぎます！";
     }
     if (_error.contains("operation-not-allowed")) {
       _error = "指定したユーザのログインが許されていません！";
     }
-    return await MyDialog.instance.okShowDialog(context, _error);
+    return await MyDialog.instance.okShowDialog(context, _error, Colors.red);
   }
 }

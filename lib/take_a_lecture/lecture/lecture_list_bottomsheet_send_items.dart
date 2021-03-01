@@ -9,7 +9,7 @@ import 'package:motokosan/widgets/convert_items.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'lecture_model.dart';
 
 class LectureListBottomSheetSendItems extends StatelessWidget {
@@ -201,7 +201,11 @@ class LectureListBottomSheetSendItems extends StatelessWidget {
                 // todo DBのworkshopResultも更新
                 await _saveWorkshopResult(
                     context, model, graduater.sendAt, graduater.graduaterId);
-                await MyDialog.instance.okShowDialog(context, "登録完了しました");
+                await MyDialog.instance.okShowDialog(
+                  context,
+                  "登録完了しました",
+                  Colors.black,
+                );
                 model.stopLoading();
                 Navigator.of(context).pop();
               },

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/take_a_lecture/organizer/organizer_model.dart';
 
-import '../../data/constants.dart';
+import '../../constants.dart';
 
 class OrganizerListBottomSheetInfoItems extends StatelessWidget {
   final OrganizerModel model;

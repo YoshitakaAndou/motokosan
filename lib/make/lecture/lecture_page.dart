@@ -12,7 +12,7 @@ import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../widgets/show_dialog.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 import '../question/question_page.dart';
 import '../../take_a_lecture/lecture/lecture_model.dart';
 
@@ -103,7 +103,7 @@ class LecturePage extends StatelessWidget {
                     // border: Border.all(color: Colors.white),
                     borderRadius: BorderRadius.circular(5),
                   ),
-                  padding: EdgeInsets.all(5),
+                  padding: EdgeInsets.all(2),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,7 +157,7 @@ class LecturePage extends StatelessWidget {
       //一通り終わったらFsから読み込んで再描画させる
       await model.fetchLecture(_userData.userGroup, _workshop.workshopId);
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
     }
   }
 

@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:motokosan/widgets/bar_title.dart';
 import 'package:motokosan/widgets/go_back.dart';
 import 'package:photo_view/photo_view.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 
 import 'package:soundpool/soundpool.dart';
 

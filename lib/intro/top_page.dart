@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/auth/email_signin.dart';
 import 'package:motokosan/auth/email_signup.dart';
-import 'package:motokosan/auth/google_signin.dart';
+import 'package:motokosan/auth/google_login.dart';
+import 'package:motokosan/constants.dart';
 import 'package:motokosan/data/data_save_body.dart';
 import 'package:motokosan/home/home.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
@@ -46,7 +47,10 @@ class TopPage extends StatelessWidget {
                         : isCurrentUserSignIn
                             ? Home(userData)
                             : userData.userPassword == "google認証"
-                                ? GoogleSignin(userData: userData)
+                                ? GoogleLogin(
+                                    userName: userData.userName,
+                                    groupName: userData.userGroup,
+                                  )
                                 : userData.userEmail.isEmpty
                                     ? EmailSignup()
                                     : EmailSignin(),
@@ -96,8 +100,9 @@ class TopPage extends StatelessWidget {
                 ),
                 Column(
                   children: [
-                    HeroImage(img: boardItem.image),
-                    SizedBox(height: 20),
+                    HeroImage(img: boardItem.image, height: _size.height),
+                    constHeight10,
+                    constHeight10,
                     Text(
                       boardItem.title,
                       style: TextStyle(
@@ -107,7 +112,8 @@ class TopPage extends StatelessWidget {
                       ),
                       textScaleFactor: 1,
                     ),
-                    SizedBox(height: 20),
+                    constHeight10,
+                    constHeight10,
                     boardItem.widget,
                     Text(
                       boardItem.subtitle,
@@ -118,7 +124,10 @@ class TopPage extends StatelessWidget {
                       ),
                       textScaleFactor: 1,
                     ),
-                    SizedBox(height: 50),
+                    if (index == totalPages - 1)
+                      constHeight10
+                    else
+                      SizedBox(height: 30),
                     if (index == totalPages - 1)
                       IntroButton(
                         context: context,
@@ -132,6 +141,7 @@ class TopPage extends StatelessWidget {
                           await _showDialog();
                         },
                       ),
+                    if (index == totalPages - 1) SizedBox(height: 20),
                   ],
                 ),
                 Row(
@@ -197,6 +207,7 @@ class TopPage extends StatelessWidget {
                     ),
                   ],
                 ),
+                // if (index == totalPages - 1) SizedBox(height: 10),
               ],
             ),
           );
@@ -208,15 +219,19 @@ class TopPage extends StatelessWidget {
 
 class HeroImage extends StatelessWidget {
   final String img;
-  HeroImage({this.img});
+  final double height;
+  HeroImage({this.img, this.height});
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.all(Radius.circular(15)),
-      child: Align(
-        alignment: Alignment.topCenter,
-        child: Image.asset(img, fit: BoxFit.fitWidth),
+    return Container(
+      height: height / 2,
+      child: ClipRRect(
+        borderRadius: BorderRadius.all(Radius.circular(15)),
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: Image.asset(img, fit: BoxFit.fitHeight),
+        ),
       ),
     );
   }

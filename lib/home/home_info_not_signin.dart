@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:motokosan/auth/email_signin.dart';
-import 'package:motokosan/auth/google_signup.dart';
+import 'package:motokosan/auth/google_login.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 
@@ -23,7 +23,7 @@ class InfoNotSignin {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => GoogleSignup(),
+              builder: (context) => GoogleLogin(),
             ),
           );
         } else {

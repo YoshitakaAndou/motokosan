@@ -10,7 +10,7 @@ import 'package:motokosan/widgets/go_back.dart';
 import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'graduater_model.dart';
 
 class GraduaterListPage extends StatelessWidget {

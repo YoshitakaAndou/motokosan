@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 import 'package:provider/provider.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'qa_database_model.dart';
 import 'qa_model.dart';
 
@@ -65,7 +65,11 @@ class QaEdit extends StatelessWidget {
                       await _database.updateQaAtQId(model.datesFb);
                       model.setDatesDb(await _database.getQas());
                       model.stopLoading();
-                      await MyDialog.instance.okShowDialog(context, "更新しました");
+                      await MyDialog.instance.okShowDialog(
+                        context,
+                        "更新しました",
+                        Colors.black,
+                      );
                       Navigator.pop(context);
                     } catch (e) {
                       Navigator.pop(context);

@@ -9,7 +9,7 @@ import 'package:motokosan/user_data/userdata_firebase.dart';
 import 'package:motokosan/widgets/convert_items.dart';
 import 'package:provider/provider.dart';
 
-import '../data/constants.dart';
+import '../constants.dart';
 import 'home_info_not_signin.dart';
 
 class HomeInfo extends StatelessWidget {
@@ -42,7 +42,7 @@ class HomeInfo extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           _infoTitle(context, _size, _userData),
-          _infoList(context, _workshopLists, _size, _userData),
+          Expanded(child: _infoList(context, _workshopLists, _size, _userData)),
         ],
       ),
     );

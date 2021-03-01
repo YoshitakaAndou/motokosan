@@ -3,6 +3,12 @@ import 'package:flutter/material.dart';
 // youtubeの再生時間（短い値）
 int videoEndAt = 5;
 
+// グループを作成したかどうか
+bool isGroupCreate = false;
+String createGroupName = "";
+String groupPassword = "";
+String groupEmail = "";
+
 //FireBaseのID
 const String cQuizId = "Question:2020-08-18";
 const String cQasId = "QA:2020-08-29";
@@ -13,6 +19,8 @@ const String CATEGORY02 = "放射線診療の正当化";
 const String CATEGORY03 = "放射線診療の防護の最適化";
 const String CATEGORY04 = "放射線障害が生じた場合の対応";
 const String CATEGORY05 = "患者への情報提供";
+
+Widget constHeight10 = const SizedBox(height: 10);
 
 // toolBarの高さ
 const double cToolBarH = 40.0;
@@ -32,6 +40,19 @@ const double cEditOffsetW = 20;
 const cContBg = Colors.green;
 // Data編集リストのCardの左端の色
 const cCardLeft = Colors.green; //編集画面
+
+// ------------------------------- ボタン
+
+// ダイアログの決定ボタン
+const OutlineInputBorder cAlertDialogButtonShape = OutlineInputBorder(
+  borderRadius: BorderRadius.all(Radius.circular(5)),
+  borderSide: BorderSide(color: Colors.black26),
+);
+
+const OutlineInputBorder cAlertDialogShape = OutlineInputBorder(
+  borderRadius: BorderRadius.all(Radius.circular(5)),
+  borderSide: BorderSide(color: Colors.black),
+);
 
 //Edit/AddのpopWindow
 const cPopWindow = Colors.black26;
@@ -59,6 +80,11 @@ final cListCardShape = OutlineInputBorder(
   borderRadius: BorderRadius.all(Radius.circular(10.0)),
 );
 
+// AppBarのアイテム
+// leadingButton
+const Color cAppBarLBColor = Colors.black54;
+const double cAppBarLBSize = 20;
+
 // FABの色
 final cFAB = Colors.green[800];
 
@@ -70,7 +96,7 @@ final cQuizButton = Colors.grey[50];
 // ボトムシートのバック色
 final cBSBack = Colors.white;
 
-//Text
+// ----------------------------------------------Text
 final TextStyle cTextTitleLIndigo = TextStyle(
   color: Colors.indigo,
   fontSize: 16,
@@ -168,6 +194,11 @@ const cTextListSR = TextStyle(
 );
 const cTextListSS = TextStyle(
   color: Colors.black,
+  fontSize: 8,
+  fontWeight: FontWeight.w300,
+);
+const cTextListSSR = TextStyle(
+  color: Colors.red,
   fontSize: 8,
   fontWeight: FontWeight.w300,
 );

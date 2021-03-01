@@ -6,7 +6,7 @@ import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/constants.dart';
+import '../../constants.dart';
 import '../../take_a_lecture/lecture/lecture_model.dart';
 import 'lecture_video.dart';
 import 'lecture_web.dart';
@@ -254,7 +254,11 @@ class LectureAddTextMovie extends StatelessWidget {
         if (model.isVideoUrl(text)) {
           model.changeValue("videoUrl", text);
         } else {
-          MyDialog.instance.okShowDialog(context, "YouTubeのURLを\n入力してください！");
+          MyDialog.instance.okShowDialog(
+            context,
+            "YouTubeのURLを\n入力してください！",
+            Colors.red,
+          );
           // _videoUrlTextController.text = "";
           // model.changeValue("videoUrl", "");
         }

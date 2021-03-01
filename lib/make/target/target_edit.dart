@@ -6,7 +6,7 @@ import 'package:motokosan/take_a_lecture/target/target_model.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../widgets/show_dialog.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 
 class TargetEdit extends StatelessWidget {
   final String groupName;
@@ -416,10 +416,10 @@ class TargetEdit extends StatelessWidget {
       await model.updateTargetFs(groupName, DateTime.now());
       await model.fetchTarget(groupName);
       model.stopLoading();
-      await MyDialog.instance.okShowDialog(context, "更新しました");
+      await MyDialog.instance.okShowDialog(context, "更新しました", Colors.black);
       Navigator.pop(context);
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
       model.stopLoading();
     }
     model.resetUpdate();
@@ -472,7 +472,7 @@ class TargetEdit extends StatelessWidget {
       //一通り終わったらFsから読み込んで再描画させる
       await model.fetchTarget(groupName);
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
     }
     model.stopLoading();
   }

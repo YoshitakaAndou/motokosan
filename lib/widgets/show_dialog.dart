@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../data/constants.dart';
+import '../constants.dart';
 
 class MyDialog {
   static final MyDialog instance = MyDialog();
@@ -7,11 +7,16 @@ class MyDialog {
   Future<Widget> okShowDialog(
     BuildContext context,
     String title,
+    Color color,
   ) async {
     return await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          shape: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+            borderSide: BorderSide(color: color),
+          ),
           elevation: 20,
           title: Text(title ?? "", style: cTextListM, textScaleFactor: 1),
           actions: [

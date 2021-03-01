@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'lec_database_model.dart';
 import 'lec_model.dart';
 
@@ -83,7 +83,11 @@ class LecEdit extends StatelessWidget {
                       await _database.updateLecAtLecId(model.datesFb);
                       model.setDatesDb(await _database.getLecs());
                       model.stopLoading();
-                      await MyDialog.instance.okShowDialog(context, "更新しました");
+                      await MyDialog.instance.okShowDialog(
+                        context,
+                        "更新しました",
+                        Colors.black,
+                      );
                       Navigator.pop(context);
                     } catch (e) {
                       Navigator.pop(context);

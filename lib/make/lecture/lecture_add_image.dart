@@ -6,7 +6,7 @@ import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/constants.dart';
+import '../../constants.dart';
 import '../../take_a_lecture/lecture/lecture_class.dart';
 import '../../take_a_lecture/lecture/lecture_model.dart';
 
@@ -149,7 +149,6 @@ class LectureAddImage extends StatelessWidget {
     return Container(
       width: MediaQuery.of(context).size.width - cEditOffsetW,
       height: (MediaQuery.of(context).size.width) / 3 * b,
-      // color: Colors.greenAccent.withOpacity(0.2),
       padding: EdgeInsets.only(top: 10, left: 5, right: 5, bottom: 5),
       child: GridView.builder(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

@@ -3,7 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/constants.dart';
+import '../../constants.dart';
 import '../../take_a_lecture/target/target_model.dart';
 
 class TargetAdd extends StatelessWidget {
@@ -329,10 +329,14 @@ class TargetAdd extends StatelessWidget {
       model.startLoading();
       await model.addTargetFs(groupName, _timeStamp);
       model.stopLoading();
-      await MyDialog.instance.okShowDialog(context, "登録完了しました");
+      await MyDialog.instance.okShowDialog(
+        context,
+        "登録完了しました",
+        Colors.black,
+      );
       Navigator.pop(context);
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
       model.stopLoading();
     }
   }

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:motokosan/auth/auth_model.dart';
 import 'package:motokosan/auth/signout.dart';
+import 'package:motokosan/group_data/group_data.dart';
 import 'package:motokosan/user_data/userdata_body.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
 import 'package:motokosan/user_data/userdata_firebase.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
+import 'package:provider/provider.dart';
 
-import '../data/constants.dart';
+import '../constants.dart';
 import 'home_info_not_signin.dart';
 import 'widgets/change_name_dialog.dart';
 
@@ -25,13 +28,17 @@ class _HomeUserDataState extends State<HomeUserData> {
 
   @override
   void initState() {
-    // TODO: implement initState
-    super.initState();
     _userData = widget._userData;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    final Color _iconColor = Colors.green[800];
+    final GroupData _groupData =
+        Provider.of<AuthModel>(context, listen: false).groupData;
+    final bool _showGroupData =
+        _groupData.email == _userData.userEmail ? true : false;
     return Column(
       children: [
         Container(
@@ -54,18 +61,18 @@ class _HomeUserDataState extends State<HomeUserData> {
                     children: [
                       Icon(
                         FontAwesomeIcons.userCog,
-                        color: Colors.green[800],
+                        color: _iconColor,
                       ),
                       SizedBox(height: 5),
                       if (isEdit)
                         Icon(
                           FontAwesomeIcons.caretDown,
-                          color: Colors.green[800],
+                          color: _iconColor,
                         ),
                       if (!isEdit)
                         Icon(
                           FontAwesomeIcons.caretRight,
-                          color: Colors.green[800],
+                          color: _iconColor,
                         ),
                     ],
                   ),
@@ -84,52 +91,67 @@ class _HomeUserDataState extends State<HomeUserData> {
                       padding: EdgeInsets.all(5),
                       decoration: BoxDecoration(
                         border: Border.all(width: 0.5, color: Colors.green),
-                        borderRadius:
-                            const BorderRadius.all(const Radius.circular(3.0)),
+                        borderRadius: const BorderRadius.all(
+                          const Radius.circular(3.0),
+                        ),
                         color: Colors.grey[100],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: [
-                              Text("UID：", style: cTextListSS),
-                              Text("${_userData.uid}", style: cTextListSS),
-                            ],
+                          _userDataRow(
+                            "UID：",
+                            _userData.uid,
+                            cTextListSS,
                           ),
-                          Row(
-                            children: [
-                              Text("グループ：", style: cTextListSS),
-                              Text("${_userData.userGroup}",
-                                  style: cTextListSS),
-                            ],
+                          _userDataRow(
+                            "グループ：",
+                            _userData.userGroup,
+                            cTextListSS,
                           ),
-                          Row(
-                            children: [
-                              Text("ユーザー：", style: cTextListSS),
-                              Text("${_userData.userName}", style: cTextListSS),
-                            ],
+                          _userDataRow(
+                            "ユーザー名：",
+                            _userData.userName,
+                            cTextListSS,
                           ),
-                          Row(
-                            children: [
-                              Text("e-mail：", style: cTextListSS),
-                              Text("${_userData.userEmail}",
-                                  style: cTextListSS),
-                            ],
+                          _userDataRow(
+                            "e-mail：",
+                            _userData.userEmail,
+                            cTextListSS,
                           ),
-                          Row(
-                            children: [
-                              Text("password：", style: cTextListSS),
-                              Text("${_userData.userPassword}",
-                                  style: cTextListSS),
-                            ],
+                          _userDataRow(
+                            "グループコード:",
+                            _groupData.groupCode,
+                            cTextListSS,
                           ),
+                          if (_showGroupData && isEdit)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Divider(
+                                  color: Colors.grey,
+                                  height: 5,
+                                  thickness: 2,
+                                ),
+                                _userDataRow(
+                                  "group_email :",
+                                  _groupData.email,
+                                  cTextListSSR,
+                                ),
+                                _userDataRow(
+                                  "group_password :",
+                                  _groupData.password,
+                                  cTextListSSR,
+                                ),
+                              ],
+                            ),
                         ],
                       ),
                     ),
                   ),
                   if (isEdit)
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         RaisedButton.icon(
                           icon: const Icon(
@@ -138,7 +160,7 @@ class _HomeUserDataState extends State<HomeUserData> {
                             color: Colors.white,
                           ),
                           label: const Text(
-                            ' ユーザー名称を変更',
+                            ' ユーザー名を変更',
                             style: cTextUpBarM,
                           ),
                           shape: RoundedRectangleBorder(
@@ -149,7 +171,7 @@ class _HomeUserDataState extends State<HomeUserData> {
                               await ChangeNameDialog.instance.changeNameDialog(
                                 context: context,
                                 userName: _userData.userName,
-                                mainTitle: "ユーザー名称を入力してください",
+                                mainTitle: "ユーザー名を入力してください",
                                 okProcess: (String txt) async {
                                   if (txt.isNotEmpty) {
                                     Navigator.pop(context);
@@ -168,7 +190,8 @@ class _HomeUserDataState extends State<HomeUserData> {
                                   } else {
                                     await MyDialog.instance.okShowDialog(
                                       context,
-                                      "ユーザー名が空白です！",
+                                      "ユーザー名が空欄です！",
+                                      Colors.red,
                                     );
                                   }
                                 },
@@ -230,93 +253,15 @@ class _HomeUserDataState extends State<HomeUserData> {
             ],
           ),
         ),
-        if (_userData.userName == "${_userData.userGroup}の素子です")
-          FutureBuilder(
-            future: UserDataBody.instance.loadUserData(),
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if (snapshot.connectionState != ConnectionState.done) {
-                return Container();
-              }
-              if (snapshot.hasData) {
-                return Container(
-                  padding: EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(width: 1.0, color: Colors.grey)),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.all(10.0),
-                        child: Icon(
-                          FontAwesomeIcons.mobileAlt,
-                          color: Colors.deepOrange,
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      Column(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                  width: 0.5, color: Colors.deepOrange),
-                              borderRadius: const BorderRadius.all(
-                                  const Radius.circular(3.0)),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text("UID：${snapshot.data.uid}",
-                                        style: cTextListSS),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Text("グループ：${snapshot.data.userGroup}",
-                                        style: cTextListSS),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Text("ユーザー：${snapshot.data.userName}",
-                                        style: cTextListSS),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Text("e-mail：${snapshot.data.userEmail}",
-                                        style: cTextListSS),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Text(
-                                        "password：${snapshot.data.userPassword}",
-                                        style: cTextListSS),
-                                    // Icon(
-                                    //   FontAwesomeIcons.arrowRight,
-                                    //   size: 15,
-                                    //   color: Colors.black54,
-                                    // ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              } else {
-                return Container();
-              }
-            },
-          ),
+      ],
+    );
+  }
+
+  Widget _userDataRow(String label, String data, TextStyle style) {
+    return Row(
+      children: [
+        Text(label, style: style, textScaleFactor: 1),
+        Text(data, style: style, textScaleFactor: 1),
       ],
     );
   }

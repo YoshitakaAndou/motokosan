@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 import 'package:provider/provider.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'qa_database_model.dart';
 import 'qa_model.dart';
 
@@ -51,10 +51,15 @@ class QaAdd extends StatelessWidget {
                     model.setDatesDb(await _database.getQas());
                     model.setDates(await _database.getQas());
                     model.stopLoading();
-                    await MyDialog.instance.okShowDialog(context, "登録完了しました");
+                    await MyDialog.instance.okShowDialog(
+                      context,
+                      "登録完了しました",
+                      Colors.black,
+                    );
                     Navigator.pop(context);
                   } catch (e) {
-                    MyDialog.instance.okShowDialog(context, e.toString());
+                    MyDialog.instance
+                        .okShowDialog(context, e.toString(), Colors.red);
                     model.stopLoading();
                   }
                 },

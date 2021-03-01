@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/data/data_save_body.dart';
 
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'workshop_model.dart';
 
 class WorkshopListBottomSheetInfoItems extends StatelessWidget {

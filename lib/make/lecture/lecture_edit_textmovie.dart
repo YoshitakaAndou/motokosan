@@ -5,7 +5,7 @@ import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 
-import '../../data/constants.dart';
+import '../../constants.dart';
 import '../../take_a_lecture/lecture/lecture_class.dart';
 import '../../take_a_lecture/lecture/lecture_model.dart';
 import 'lecture_video.dart';
@@ -259,7 +259,11 @@ class LectureEditTextMovie extends StatelessWidget {
           model.changeValue("videoUrl", text);
           // model.isUpdate = true;
         } else {
-          MyDialog.instance.okShowDialog(context, "YouTubeのURLを\n入力してください！");
+          MyDialog.instance.okShowDialog(
+            context,
+            "YouTubeのURLを\n入力してください！",
+            Colors.red,
+          );
           _videoUrlTextController.text = "";
         }
       },
@@ -374,7 +378,11 @@ class LectureEditTextMovie extends StatelessWidget {
           if (model.isVideoUrl(model.lecture.videoUrl)) {
             await _checkVideoSheet(context, model.lecture.videoUrl);
           } else {
-            MyDialog.instance.okShowDialog(context, "URL が変です！");
+            MyDialog.instance.okShowDialog(
+              context,
+              "URL が変です！",
+              Colors.red,
+            );
           }
         },
       ),

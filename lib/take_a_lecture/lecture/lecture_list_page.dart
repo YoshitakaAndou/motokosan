@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:motokosan/take_a_lecture/exam/exam_List_page.dart';
 import 'package:motokosan/take_a_lecture/graduater/graduater_list_page.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_list_info.dart';
 import 'package:motokosan/widgets/return_argument.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
@@ -12,7 +13,7 @@ import 'package:motokosan/widgets/go_back.dart';
 import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'lecture_model.dart';
 import 'lecture_list_bottomsheet_info_items_lec.dart';
 import 'lecture_list_bottomsheet_send_items.dart';
@@ -37,7 +38,7 @@ class LectureListPage extends StatelessWidget {
         appBar: AppBar(
           toolbarHeight: cToolBarH,
           title: BarTitle.instance.barTitle(context),
-          leading: GoBack.instance.goBackWithReturArg(
+          leading: GoBack.instance.goBackWithReturnArg(
             context: context,
             icon: Icon(FontAwesomeIcons.arrowLeft),
             returnArgument: ReturnArgument(
@@ -54,7 +55,8 @@ class LectureListPage extends StatelessWidget {
                   _showModalBottomSheetInfo(context, model, _isHideBS),
             ),
             if (_routeName == "fromWorkshop")
-              GoBack.instance.goBackWithReturArg(
+              //研修会一覧から来たら研修会一覧へ帰る
+              GoBack.instance.goBackWithReturnArg(
                 context: context,
                 icon: Icon(FontAwesomeIcons.home),
                 returnArgument: ReturnArgument(
@@ -63,7 +65,8 @@ class LectureListPage extends StatelessWidget {
                 num: 2,
               ),
             if (_routeName == "fromHome")
-              GoBack.instance.goBackWithReturArg(
+              //ホームページから来たらホームページに帰る
+              GoBack.instance.goBackWithReturnArg(
                 context: context,
                 icon: Icon(FontAwesomeIcons.home),
                 returnArgument: ReturnArgument(
@@ -76,7 +79,7 @@ class LectureListPage extends StatelessWidget {
         body: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(flex: 1, child: _infoArea()),
+            Expanded(flex: 1, child: _infoArea(context)),
             Expanded(
               flex: 10,
               child: Stack(
@@ -118,87 +121,100 @@ class LectureListPage extends StatelessWidget {
     }
   }
 
-  Widget _infoArea() {
-    final String _isExam = _workshopList.workshop.isExam ? " 修了試験 " : "";
+  Widget _infoArea(BuildContext context) {
+    final String _isExam = _workshopList.workshop.isExam ? "修了試験：未受験" : "";
     final String _isExamResult =
-        _workshopList.workshopResult.graduaterId.isNotEmpty ? "済 " : "";
-    return Container(
-      width: double.infinity,
-      height: cInfoAreaH,
-      color: cContBg,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    _workshopList.workshop.title,
-                    style: cTextUpBarM,
-                    textScaleFactor: 1,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (_workshopList.workshop.isExam)
-                    Container(
-                      color: Colors.green[600],
-                      child: Row(
-                        children: [
-                          Text("$_isExam",
-                              style: cTextUpBarS,
-                              textScaleFactor: 1,
-                              maxLines: 1),
-                          Text("$_isExamResult",
-                              style: cTextListSR,
-                              textScaleFactor: 1,
-                              maxLines: 1),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  child: Row(
-                    children: [
-                      Icon(FontAwesomeIcons.chalkboardTeacher,
-                          size: 18, color: Colors.white),
-                      SizedBox(width: 10),
-                      Text(" 講義一覧", style: cTextUpBarL, textScaleFactor: 1),
-                    ],
-                  ),
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+        _workshopList.workshopResult.graduaterId.isNotEmpty ? "修了試験：受験済" : "";
+    return GestureDetector(
+      onTap: () {
+        //タップすると研修会の情報をダイアログに表示
+        LectureListInfo.instance.lectureListInfo(context, _workshopList);
+      },
+      child: Container(
+        width: double.infinity,
+        height: cInfoAreaH,
+        color: cContBg,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 5,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Text("主催  ", style: cTextUpBarS, textScaleFactor: 1),
                         Text(
-                          _workshopList.organizerName,
-                          style: cTextUpBarS,
+                          _workshopList.workshop.title,
+                          style: cTextUpBarM,
                           textScaleFactor: 1,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          child: Row(
+                            children: [
+                              Icon(FontAwesomeIcons.chalkboardTeacher,
+                                  size: 18, color: Colors.white),
+                              SizedBox(width: 10),
+                              Text(" 講義一覧",
+                                  style: cTextUpBarL, textScaleFactor: 1),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            if (_workshopList.workshop.isExam)
+                              Container(
+                                color: Colors.green[600],
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "$_isExam",
+                                      style: cTextUpBarM,
+                                      textScaleFactor: 1,
+                                      maxLines: 1,
+                                    ),
+                                    Text(
+                                      "$_isExamResult",
+                                      style: cTextListM,
+                                      textScaleFactor: 1,
+                                      maxLines: 1,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        )
+                      ],
+                    ),
                   ],
-                )
-              ],
-            ),
-          ],
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Image.asset(
+                      "assets/images/nurse_quiz.png",
+                      fit: BoxFit.fitHeight,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

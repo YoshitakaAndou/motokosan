@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../widgets/bar_title.dart';
 import '../../widgets/show_dialog.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 import '../../make/target/target_add.dart';
 import 'target_class.dart';
 import 'target_model.dart';
@@ -85,7 +85,7 @@ class TargetPage extends StatelessWidget {
       //一通り終わったらFsから読み込んで再描画させる
       await model.fetchTarget(_userData.userGroup);
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
     }
   }
 

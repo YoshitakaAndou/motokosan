@@ -12,7 +12,7 @@ import 'package:motokosan/widgets/convert_items.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:motokosan/widgets/guriguri.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'question_play.dart';
 
 class QuestionListPage extends StatelessWidget {
@@ -44,7 +44,14 @@ class QuestionListPage extends StatelessWidget {
         appBar: AppBar(
           toolbarHeight: cToolBarH,
           title: BarTitle.instance.barTitle(context),
-          // leading: _appBarLeadingButton(context, ReturnArgument()),
+          leading: IconButton(
+            icon: Icon(
+              FontAwesomeIcons.times,
+              size: cAppBarLBSize,
+              color: cAppBarLBColor,
+            ),
+            onPressed: () => _backListButtonPressed(context, model),
+          ),
           actions: [],
         ),
         body: Stack(
@@ -60,15 +67,24 @@ class QuestionListPage extends StatelessWidget {
                   child: ListView.builder(
                     itemCount: model.questionLists.length,
                     itemBuilder: (context, int index) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(width: 0.5, color: Colors.grey),
-                          ),
-                        ),
+                      return Card(
+                        shape: cListCardShape,
+                        elevation: 20,
                         child: ListTile(
                           dense: true,
                           title: _title(context, model, index),
+                          onTap: () => _onTap(
+                            context,
+                            model,
+                            _lectureList,
+                            index,
+                            false,
+                            model.questionLists[index].questionResult
+                                        .answerResult ==
+                                    "○"
+                                ? true
+                                : false,
+                          ),
                           // onTap: () => _onTap(
                           //     context, model, _lectureList, index, false),
                         ),
@@ -77,7 +93,7 @@ class QuestionListPage extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  flex: 3,
+                  flex: 4,
                   child: Stack(
                     children: [
                       Container(
@@ -203,7 +219,7 @@ class QuestionListPage extends StatelessWidget {
         color: cFAB,
         splashColor: Colors.white.withOpacity(0.5),
         textColor: Colors.white,
-        onPressed: () => _onTap(context, model, _lectureList, 0, true),
+        onPressed: () => _onTap(context, model, _lectureList, 0, true, false),
       ),
     );
   }
@@ -303,7 +319,7 @@ class QuestionListPage extends StatelessWidget {
   }
 
   Future<void> _onTap(BuildContext context, QuestionModel model, _lectureList,
-      int index, bool fromButton) async {
+      int index, bool fromButton, bool isShowOnly) async {
     ReturnArgument lectureArgument = ReturnArgument();
     lectureArgument.isNextQuestion = true;
 
@@ -316,8 +332,8 @@ class QuestionListPage extends StatelessWidget {
             _userData,
             model.questions[index],
             _lectureList,
-            model.questions.length - index,
-            false,
+            fromButton ? model.questions.length - index : 1,
+            isShowOnly,
           ),
         ),
       );
@@ -326,8 +342,12 @@ class QuestionListPage extends StatelessWidget {
         lectureArgument = ReturnArgument();
       }
       index = index + 1;
-      // todo リストの最後まで来たら終わり
+      // todo ボタン経由の場合リストの最後まで来たら終わり
       if (index == model.questions.length) {
+        lectureArgument.isNextQuestion = false;
+      }
+      // todo リストタップ経由の場合はその問題のみで終わり
+      if (!fromButton) {
         lectureArgument.isNextQuestion = false;
       }
     }
@@ -413,43 +433,46 @@ class QuestionListPage extends StatelessWidget {
               shape: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
               ),
-              onPressed: () async {
-                if (model.isClear == false) {
-                  MyDialog.instance.okShowDialogFunc(
-                    context: context,
-                    mainTitle: "一覧に戻ると受講完了になりません！",
-                    subTitle: "次回、講義動画を最初から見ることになりますが"
-                        "よろしいですか？",
-                    onPressed: () {
-                      // todo _lectureListを返す
-                      model.setIsStack(true);
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop(
-                        ReturnArgument(
-                          lectureList: _lectureList,
-                          isNextQuestion: false,
-                        ),
-                      );
-                    },
-                  );
-                } else {
-                  // todo _lectureListを返す
-                  model.setIsStack(true);
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop(
-                    ReturnArgument(
-                      lectureList: _lectureList,
-                      isNextQuestion: false,
-                    ),
-                  );
-                }
-              },
+              onPressed: () => _backListButtonPressed(context, model),
             ),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _backListButtonPressed(
+      BuildContext context, QuestionModel model) async {
+    if (model.isClear == false) {
+      MyDialog.instance.okShowDialogFunc(
+        context: context,
+        mainTitle: "一覧に戻ると受講完了になりません！",
+        subTitle: "次回、講義動画を最初から見ることになりますが"
+            "よろしいですか？",
+        onPressed: () {
+          // todo _lectureListを返す
+          model.setIsStack(true);
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+          Navigator.of(context).pop(
+            ReturnArgument(
+              lectureList: _lectureList,
+              isNextQuestion: false,
+            ),
+          );
+        },
+      );
+    } else {
+      // todo _lectureListを返す
+      model.setIsStack(true);
+      Navigator.of(context).pop();
+      Navigator.of(context).pop(
+        ReturnArgument(
+          lectureList: _lectureList,
+          isNextQuestion: false,
+        ),
+      );
+    }
   }
 
   Widget _nextButton(BuildContext context, QuestionModel model) {

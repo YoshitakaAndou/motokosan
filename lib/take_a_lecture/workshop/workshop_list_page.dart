@@ -10,7 +10,7 @@ import 'package:motokosan/widgets/go_back.dart';
 import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 import 'workshop_list_bottomsheet_info_items.dart';
 import 'workshop_list_tile_body.dart';
 

@@ -5,7 +5,7 @@ import 'package:motokosan/widgets/convert_items.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/constants.dart';
+import '../../constants.dart';
 import '../../take_a_lecture/workshop/workshop_model.dart';
 
 class WorkshopAdd extends StatelessWidget {
@@ -393,10 +393,14 @@ class WorkshopAdd extends StatelessWidget {
       model.startLoading();
       await model.addWorkshopFs(groupName, _timeStamp);
       model.stopLoading();
-      await MyDialog.instance.okShowDialog(context, "登録完了しました");
+      await MyDialog.instance.okShowDialog(
+        context,
+        "登録完了しました",
+        Colors.black,
+      );
       Navigator.pop(context);
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
       model.stopLoading();
     }
   }

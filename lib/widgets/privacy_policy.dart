@@ -49,6 +49,7 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
 
   @override
   Widget build(BuildContext context) {
+    final Size _size = MediaQuery.of(context).size;
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(widget.radius),
@@ -122,7 +123,7 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
               },
             ),
           ),
-          if (_isBottom)
+          if (_isBottom || _size.height > 1000)
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(

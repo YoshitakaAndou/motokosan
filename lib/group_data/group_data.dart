@@ -1,13 +1,14 @@
 class GroupData {
-  final String name;
-  final String password;
-  final String groupCode;
-  final String email;
+  
+  String name;
+  String password;
+  String groupCode;
+  String email;
 
   GroupData({
-    this.name,
-    this.password,
-    this.groupCode,
-    this.email,
+    this.name = "",
+    this.password = "",
+    this.groupCode = "",
+    this.email = "",
   });
 }

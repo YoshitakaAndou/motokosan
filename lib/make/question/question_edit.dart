@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../take_a_lecture/question/question_model.dart';
 import '../../widgets/show_dialog.dart';
-import '../../data/constants.dart';
+import '../../constants.dart';
 
 class QuestionEdit extends StatelessWidget {
   final String groupName;
@@ -365,7 +365,11 @@ class QuestionEdit extends StatelessWidget {
       onPressed: () {
         print("$choice:$option");
         if (option.isEmpty) {
-          MyDialog.instance.okShowDialog(context, "$choiceが入力されていません！");
+          MyDialog.instance.okShowDialog(
+            context,
+            "$choiceが入力されていません！",
+            Colors.red,
+          );
         } else {
           model.isUpdate = true;
           model.setCorrectChoices(choice);
@@ -513,10 +517,10 @@ class QuestionEdit extends StatelessWidget {
       await model.updateQuestionFs(groupName, DateTime.now(), _lecture);
       await model.fetchQuestion(groupName, _question.questionId);
       model.stopLoading();
-      await MyDialog.instance.okShowDialog(context, "更新しました");
+      await MyDialog.instance.okShowDialog(context, "更新しました", Colors.black);
       Navigator.pop(context);
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
       model.stopLoading();
     }
     model.resetUpdate();
@@ -570,7 +574,7 @@ class QuestionEdit extends StatelessWidget {
       //一通り終わったらFsから読み込んで再描画させる
       await model.fetchQuestion(groupName, _lecture.lectureId);
     } catch (e) {
-      MyDialog.instance.okShowDialog(context, e.toString());
+      MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
     }
     model.stopLoading();
   }
