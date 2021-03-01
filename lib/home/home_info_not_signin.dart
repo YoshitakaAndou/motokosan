@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:motokosan/auth/email_signin.dart';
 import 'package:motokosan/auth/google_login.dart';
-import 'package:motokosan/user_data/userdata_class.dart';
+import 'package:motokosan/data/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 
 class InfoNotSignin {

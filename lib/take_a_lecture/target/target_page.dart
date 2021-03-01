@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:motokosan/make/target/target_edit.dart';
 import 'package:motokosan/take_a_lecture/target/target_firebase.dart';
-import 'package:motokosan/user_data/userdata_class.dart';
+import 'package:motokosan/data/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';

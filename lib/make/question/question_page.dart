@@ -3,7 +3,7 @@ import 'package:motokosan/home/home.dart';
 import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
 import 'package:motokosan/take_a_lecture/question/question_class.dart';
 import 'package:motokosan/take_a_lecture/question/question_firebase.dart';
-import 'package:motokosan/user_data/userdata_class.dart';
+import 'package:motokosan/data/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/bar_title.dart';
 import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';

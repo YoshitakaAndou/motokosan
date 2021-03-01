@@ -6,7 +6,7 @@ import 'package:motokosan/auth/google_login.dart';
 import 'package:motokosan/constants.dart';
 import 'package:motokosan/data/data_save_body.dart';
 import 'package:motokosan/home/home.dart';
-import 'package:motokosan/user_data/userdata_class.dart';
+import 'package:motokosan/data/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/privacy_policy.dart';
 
 import '../unconnect.dart';

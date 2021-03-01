@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:motokosan/take_a_lecture/lecture/lecture_list_page.dart';
-import 'package:motokosan/user_data/userdata_class.dart';
+import 'package:motokosan/data/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/convert_items.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 

@@ -5,7 +5,7 @@ import 'package:motokosan/take_a_lecture/graduater/graduater_list_page.dart';
 import 'package:motokosan/take_a_lecture/lecture/lecture_list_info.dart';
 import 'package:motokosan/widgets/return_argument.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
-import 'package:motokosan/user_data/userdata_class.dart';
+import 'package:motokosan/data/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/bar_title.dart';
 import 'package:motokosan/data/data_save_body.dart';
 import 'package:motokosan/widgets/check_deadline_at.dart';

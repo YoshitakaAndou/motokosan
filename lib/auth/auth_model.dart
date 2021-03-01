@@ -2,10 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:motokosan/group_data/group_data.dart';
-import 'package:motokosan/user_data/userdata_body.dart';
-import 'package:motokosan/user_data/userdata_class.dart';
-import 'package:motokosan/user_data/userdata_firebase.dart';
+import 'package:motokosan/data/group_data/group_data.dart';
+import 'package:motokosan/data/user_data/userdata_body.dart';
+import 'package:motokosan/data/user_data/userdata_class.dart';
+import 'package:motokosan/data/user_data/userdata_firebase.dart';
 
 class AuthModel extends ChangeNotifier {
   UserData userData = UserData();

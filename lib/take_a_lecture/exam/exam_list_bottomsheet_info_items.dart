@@ -4,7 +4,7 @@ import 'package:motokosan/take_a_lecture/exam/exam_model.dart';
 import 'package:motokosan/take_a_lecture/exam/exam_play.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_database.dart';
-import 'package:motokosan/user_data/userdata_class.dart';
+import 'package:motokosan/data/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/convert_items.dart';
 import 'package:motokosan/widgets/flare_actors.dart';
 

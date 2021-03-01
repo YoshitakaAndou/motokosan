@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:motokosan/auth/auth_model.dart';
 import 'package:motokosan/auth/widgets/save_group_email.dart';
 import 'package:motokosan/auth/widgets/to_signIn_button.dart';
-import 'package:motokosan/group_data/group_data_save_body.dart';
+import 'package:motokosan/data/group_data/group_data_save_body.dart';
 import 'package:provider/provider.dart';
 import '../widgets/bar_title.dart';
 import '../widgets/show_dialog.dart';

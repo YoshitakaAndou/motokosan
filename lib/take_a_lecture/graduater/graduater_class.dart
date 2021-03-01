@@ -1,4 +1,4 @@
-import 'package:motokosan/user_data/userdata_class.dart';
+import 'package:motokosan/data/user_data/userdata_class.dart';
 
 class Graduater {
   String graduaterId;

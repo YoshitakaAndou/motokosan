@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:motokosan/user_data/userdata_class.dart';
+import 'package:motokosan/data/user_data/userdata_class.dart';
 
 import '../auth_model.dart';
-import '../../group_data/group_window.dart';
+import '../../data/group_data/group_window.dart';
 
 class GroupButton extends StatelessWidget {
   final BuildContext context;

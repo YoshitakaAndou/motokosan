@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_list_page.dart';
-import 'package:motokosan/user_data/userdata_class.dart';
+import 'package:motokosan/data/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/go_back.dart';
 import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';

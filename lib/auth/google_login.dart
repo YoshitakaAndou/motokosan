@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:motokosan/auth/email_signup.dart';
-import 'package:motokosan/group_data/group_data_save_body.dart';
+import 'package:motokosan/data/group_data/group_data_save_body.dart';
 import 'package:motokosan/widgets/flare_actors.dart';
 import 'package:provider/provider.dart';
 import '../widgets/bar_title.dart';

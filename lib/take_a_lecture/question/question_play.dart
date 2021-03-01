@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
 import 'package:motokosan/widgets/return_argument.dart';
 import 'package:motokosan/take_a_lecture/question/question_database.dart';
-import 'package:motokosan/user_data/userdata_class.dart';
+import 'package:motokosan/data/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/convert_items.dart';
 import '../../widgets/bar_title.dart';
 import '../../widgets/go_back.dart';
