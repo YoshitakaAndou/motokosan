@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import '../../data/constants.dart';
+import '../../constants.dart';
 
-class PasswordText extends StatefulWidget {
+class GroupPasswordInput extends StatefulWidget {
   final TextEditingController textEditingController;
+  final String hintText;
 
-  PasswordText({this.textEditingController});
+  GroupPasswordInput({
+    this.textEditingController,
+    this.hintText,
+  });
 
   @override
-  _PasswordTextState createState() => _PasswordTextState();
+  _GroupPasswordInputState createState() => _GroupPasswordInputState();
 }
 
-class _PasswordTextState extends State<PasswordText> {
+class _GroupPasswordInputState extends State<GroupPasswordInput> {
   bool _passwordHide = true;
 
   @override
@@ -23,7 +27,7 @@ class _PasswordTextState extends State<PasswordText> {
       keyboardType: TextInputType.text,
       controller: widget.textEditingController,
       decoration: InputDecoration(
-        hintText: "password",
+        hintText: widget.hintText,
         hintStyle: TextStyle(fontSize: 12),
         suffixIcon: IconButton(
           icon: Icon(

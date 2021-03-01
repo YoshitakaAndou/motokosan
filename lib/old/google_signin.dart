@@ -1,31 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:motokosan/auth/email_signin.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/auth/email_signup.dart';
 import 'package:motokosan/auth/google_model.dart';
+import 'package:motokosan/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/flare_actors.dart';
 import 'package:provider/provider.dart';
 import '../widgets/bar_title.dart';
 import '../widgets/show_dialog.dart';
 import '../widgets/bubble/bubble.dart';
-import '../data/constants.dart';
+import '../constants.dart';
 import '../home/home.dart';
 import 'group_button/google_group_button.dart';
-import 'widgets/login_button.dart';
 
-class GoogleSignup extends StatelessWidget {
-  final String userName;
-  final String groupName;
+class GoogleSignin extends StatelessWidget {
+  final UserData userData;
 
-  GoogleSignup({this.userName, this.groupName});
+  GoogleSignin({this.userData});
 
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<GoogleModel>(context, listen: false);
     final groupController = TextEditingController();
     final nameController = TextEditingController();
+    final beforeGroup = model.userData.userGroup;
     final beforeName = model.userData.userName;
     final Size _size = MediaQuery.of(context).size;
-    model.userData.userGroup = groupName;
+    model.userData = userData;
     groupController.text = model.userData.userGroup;
     nameController.text = model.userData.userName;
     return Consumer<GoogleModel>(
@@ -37,63 +37,65 @@ class GoogleSignup extends StatelessWidget {
           ),
           body: SafeArea(
             child: Stack(children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(flex: 2, child: Container()),
-                    Expanded(flex: 10, child: _imageArea(context, model)),
-                    Expanded(
-                      flex: 2,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          _toSignInPage(context, model, _size),
-                        ],
-                      ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Container(),
+                  ),
+                  Expanded(
+                    flex: 10,
+                    child: _imageArea(context, model),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        _toSignUpPage(context, _size),
+                      ],
                     ),
-                    Expanded(
-                      flex: 15,
-                      child: SingleChildScrollView(
-                        child: Card(
-                          elevation: 15,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              _loginTitle(context, model),
-                              SizedBox(height: 10),
-                              ListView(
-                                padding: EdgeInsets.all(8),
-                                shrinkWrap: true,
-                                children: [
-                                  GoogleGroupButton(
-                                      context: context, model: model),
-                                  SizedBox(height: 20),
-                                  _nameInput(context, model, nameController,
-                                      beforeName),
-                                ],
-                              ),
-                              SizedBox(height: 40),
-                              LoginButton(
-                                context: context,
-                                label: 'Googleアカウントでログイン',
-                                onPressed: () {
-                                  _loginProcess(context, model);
-                                },
-                              ),
-                              SizedBox(height: 20),
-                            ],
-                          ),
+                  ),
+                  Expanded(
+                    flex: 12,
+                    child: SingleChildScrollView(
+                      child: Card(
+                        elevation: 15,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _loginTitle(context, model),
+                            ListView(
+                              shrinkWrap: true,
+                              padding: EdgeInsets.all(8),
+                              children: [
+                                SizedBox(height: 10),
+                                GoogleGroupButton(
+                                    context: context, model: model),
+                                _groupNameInput(context, model, groupController,
+                                    beforeGroup),
+                                _nameInput(
+                                    context, model, nameController, beforeName),
+                                SizedBox(height: 30),
+                                _loginButton(context, model),
+                                SizedBox(height: 20),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  //   Expanded(
+                  //     flex: 1,
+                  //     child: Container(),
+                  //   ),
+                ],
               ),
               if (model.isLoading)
                 Container(color: Colors.black.withOpacity(0.7)),
@@ -143,19 +145,11 @@ class GoogleSignup extends StatelessWidget {
       height: 30,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 15.0,
-            spreadRadius: 0.5,
-            offset: Offset(0.5, 0.5),
-          )
-        ],
         color: Colors.green,
       ),
       child: Center(
         child: Text(
-          "Googleアカウントでログイン",
+          "Googleログイン画面",
           style: cTextUpBarL,
           textScaleFactor: 1,
         ),
@@ -163,32 +157,69 @@ class GoogleSignup extends StatelessWidget {
     );
   }
 
-  Widget _toSignInPage(BuildContext context, GoogleModel model, Size _size) {
+  Widget _toSignUpPage(BuildContext context, Size _size) {
     return Container(
       height: 30,
       width: _size.width / 2.2,
       child: RaisedButton.icon(
         icon: Icon(Icons.account_box, size: 18, color: Colors.black54),
-        label: Text("ログイン画面へ→",
+        label: Text("新規登録する→",
             style: TextStyle(
                 color: Colors.black54,
                 fontSize: 13,
                 fontWeight: FontWeight.w500),
             textScaleFactor: 1),
         color: Colors.white,
+        // shape: const OutlineInputBorder(
+        //   borderRadius: BorderRadius.all(Radius.circular(5)),
+        // ),
         elevation: 10,
         onPressed: () {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => EmailSignin(
-                groupName: model.userData.userGroup,
-                userName: model.userData.userName,
-              ),
+              builder: (context) => EmailSignup(),
             ),
           );
         },
       ),
+    );
+  }
+
+  Widget _groupNameInput(
+      BuildContext context, GoogleModel model, groupController, beforeGroup) {
+    return Row(
+      children: [
+        Expanded(
+            flex: 1, child: Icon(Icons.group, size: 20, color: Colors.black54)),
+        Expanded(
+          flex: 5,
+          child: TextField(
+            keyboardType: TextInputType.text,
+            textInputAction: TextInputAction.done,
+            controller: groupController,
+            decoration: InputDecoration(
+              hintText: "グループ名",
+              hintStyle: TextStyle(fontSize: 12),
+              // suffixIcon: IconButton(
+              //   onPressed: () {
+              //     groupController.text = "";
+              //     model.changeValue("userGroup", "");
+              //   },
+              //   icon: Icon(Icons.clear, size: 15),
+              // ),
+            ),
+            onChanged: (text) {
+              if (beforeGroup != text) {
+                model.setIsUpdate(true);
+              } else {
+                model.setIsUpdate(false);
+              }
+              model.userData.userGroup = text;
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -197,8 +228,9 @@ class GoogleSignup extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-            flex: 1,
-            child: Icon(Icons.person, size: 20, color: Colors.black54)),
+          flex: 1,
+          child: Icon(Icons.person, size: 20, color: Colors.black54),
+        ),
         Expanded(
           flex: 5,
           child: TextField(
@@ -207,13 +239,13 @@ class GoogleSignup extends StatelessWidget {
             decoration: InputDecoration(
               hintText: "name",
               hintStyle: TextStyle(fontSize: 12),
-              suffixIcon: IconButton(
-                onPressed: () {
-                  nameController.text = "";
-                  model.changeValue("userName", "");
-                },
-                icon: Icon(Icons.clear, size: 15),
-              ),
+              // suffixIcon: IconButton(
+              //   onPressed: () {
+              //     nameController.text = "";
+              //     model.changeValue("userName", "");
+              //   },
+              //   icon: Icon(Icons.clear, size: 15),
+              // ),
             ),
             onChanged: (text) {
               if (beforeName != text) {
@@ -226,6 +258,26 @@ class GoogleSignup extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _loginButton(BuildContext context, GoogleModel model) {
+    return Container(
+      width: double.infinity,
+      height: 40,
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      child: RaisedButton.icon(
+        icon: Icon(FontAwesomeIcons.signInAlt, color: Colors.white),
+        color: Colors.green,
+        label:
+            Text("Googleアカウントでログインする", style: cTextUpBarL, textScaleFactor: 1),
+        shape: OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+          borderSide: BorderSide(color: Colors.green, width: 2),
+        ),
+        elevation: 15,
+        onPressed: () => _loginProcess(context, model),
+      ),
     );
   }
 
@@ -248,6 +300,7 @@ class GoogleSignup extends StatelessWidget {
           "google認証に失敗しました！"
           "\n新規登録画面へ戻って登録してください！",
         );
+        // Navigator.pop(context);
         await Navigator.pushReplacement(
           context,
           MaterialPageRoute(

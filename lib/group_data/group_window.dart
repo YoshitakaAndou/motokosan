@@ -7,23 +7,23 @@ import 'package:motokosan/user_data/userdata_class.dart';
 import 'package:motokosan/user_data/userdata_firebase.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 
-import '../../data/constants.dart';
+import '../../constants.dart';
 import '../signout.dart';
 import 'group_data.dart';
-import 'passwrod_text.dart';
+import 'group_password_input.dart';
 
-class UserGroup extends StatefulWidget {
+class GroupWindow extends StatefulWidget {
   final double radius;
   final UserData userData;
   final Function onTap;
 
-  UserGroup({this.radius = 15, this.userData, this.onTap});
+  GroupWindow({this.radius = 15, this.userData, this.onTap});
 
   @override
-  _UserGroupState createState() => _UserGroupState();
+  _GroupWindowState createState() => _GroupWindowState();
 }
 
-class _UserGroupState extends State<UserGroup> {
+class _GroupWindowState extends State<GroupWindow> {
   List<GroupData> groupDates = List();
 
   @override
@@ -87,7 +87,7 @@ class _UserGroupState extends State<UserGroup> {
                 textScaleFactor: 1,
               ),
               Text(
-                '選択するとパスワードを聞かれます',
+                '選択するとグループコードを聞かれます',
                 style: TextStyle(fontSize: 12, color: Colors.white),
                 textScaleFactor: 1,
               ),
@@ -140,27 +140,33 @@ class _UserGroupState extends State<UserGroup> {
             textScaleFactor: 1,
           ),
           onTap: () async {
-            // グループ名をタップしたらパスワードを聞く
-            await _passwordDialog(
+            // グループ名をタップしたらグループコードを聞く
+            await _groupCodeDialog(
               context: context,
-              password: '',
-              mainTitle: 'パスワードを入力して下さい',
+              groupCode: '',
+              mainTitle: '${snap.name}の\nグループコードを入力して下さい',
               okProcess: (String txt) async {
                 if (txt.isNotEmpty) {
-                  // パスワードが合致した場合
+                  // グループコードが合致した場合
                   Navigator.of(context).pop();
-                  if (txt == snap.password) {
+                  if (txt == snap.groupCode) {
                     widget.onTap(snap.name);
                     Navigator.of(context).pop();
                   } else {
-                    // パスワードが違う場合
-                    await MyDialog.instance
-                        .okShowDialog(context, "passwordが違いました！");
+                    // グループコードが違う場合
+                    await MyDialog.instance.okShowDialog(
+                      context,
+                      "グループコードが違いました！",
+                      Colors.red,
+                    );
                   }
                 } else {
                   // 入力が空白の場合
-                  await MyDialog.instance
-                      .okShowDialog(context, "passwordが空白です！");
+                  await MyDialog.instance.okShowDialog(
+                    context,
+                    "グループコードが空白です！",
+                    Colors.red,
+                  );
                 }
               },
             );
@@ -199,30 +205,44 @@ class _UserGroupState extends State<UserGroup> {
             icon: FontAwesomeIcons.plusCircle,
             iconSize: 18,
             onPress: () async {
-              await _addGroupNameDialog(
+              await _addGroupDialog(
                 context: context,
-                name: '',
-                mainTitle: "Step1  グループ名称の入力",
-                okProcess: (String txt) async {
-                  if (txt.isNotEmpty) {
-                    Navigator.of(context).pop();
-                    // groupDatesの中に同じ名前があるかチェック
-                    final _result = groupDates.where((e) => e.name == txt);
-                    if (_result.isEmpty) {
-                      // 同じ名前がなかったらパスワードの入力
-                      _addPasswordDialog(
-                          context: context,
-                          groupName: txt,
-                          mainTitle: 'Step2  Passwordの設定');
-                    } else {
-                      // 同じ名前があったら
-                      await MyDialog.instance
-                          .okShowDialog(context, "同じグループ名が登録済です！");
-                    }
-                  } else {
-                    await MyDialog.instance
-                        .okShowDialog(context, "グループ名が空白です！");
-                  }
+                mainTitle: "グループ作る作業をします",
+                subTitle: "作ったグループの管理人になりますがよろしいですか？",
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  await _addGroupNameDialog(
+                    context: context,
+                    name: '',
+                    mainTitle: "【Step1】\nグループ名称の入力",
+                    okProcess: (String txt) async {
+                      if (txt.isNotEmpty) {
+                        Navigator.of(context).pop();
+                        // groupDatesの中に同じ名前があるかチェック
+                        final _result = groupDates.where((e) => e.name == txt);
+                        if (_result.isEmpty) {
+                          // 同じ名前がなかったらグループコードの入力
+                          _addGropeCodeDialog(
+                              context: context,
+                              groupName: txt,
+                              mainTitle: '【Step2】\nグループコードとパスワードの設定');
+                        } else {
+                          // 同じ名前があったら
+                          await MyDialog.instance.okShowDialog(
+                            context,
+                            "同じグループ名が登録済です！",
+                            Colors.red,
+                          );
+                        }
+                      } else {
+                        await MyDialog.instance.okShowDialog(
+                          context,
+                          "グループ名が空欄です！",
+                          Colors.red,
+                        );
+                      }
+                    },
+                  );
                 },
               );
             },
@@ -241,8 +261,6 @@ class _UserGroupState extends State<UserGroup> {
       ),
     );
   }
-
-  Future<void> createGroup() async {}
 
   Future<List<GroupData>> dummySignIn() async {
     if (!FSUserData.instance.isCurrentUserSignIn()) {
@@ -271,41 +289,88 @@ class _UserGroupState extends State<UserGroup> {
     final List<GroupData> groupDates = _docs.docs
         .map((doc) => GroupData(
               name: doc['name'] ?? "",
-              password: doc['password'] ?? "",
+              groupCode: doc['groupCode'] ?? "",
             ))
         .toList();
     return groupDates;
   }
 
-  Future<Widget> _passwordDialog(
-      {BuildContext context,
-      String password,
-      String mainTitle,
-      Function okProcess}) {
+  Future<Widget> _groupCodeDialog({
+    BuildContext context,
+    String groupCode,
+    String mainTitle,
+    Function okProcess,
+  }) {
     final textEditingController = TextEditingController();
-    textEditingController.text = password;
+    textEditingController.text = groupCode;
+
     return showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text("$mainTitle" ?? "", textScaleFactor: 1, style: cTextAlertL),
-        content: PasswordText(
+        shape: cAlertDialogShape,
+        titlePadding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        title: Column(
+          children: [
+            Text("$mainTitle" ?? "", textScaleFactor: 1, style: cTextAlertL),
+            Divider(
+              height: 2,
+              color: Colors.grey,
+              thickness: 0.5,
+            ),
+          ],
+        ),
+        content: GroupPasswordInput(
           textEditingController: textEditingController,
         ),
         elevation: 20,
         actions: <Widget>[
-          MaterialButton(
+          RaisedButton(
             child: Text("キャンセル", textScaleFactor: 1, style: cTextAlertNo),
             elevation: 10,
+            color: Colors.white,
+            shape: cAlertDialogButtonShape,
             onPressed: () {
               Navigator.pop(context);
               // Navigator.pop(context);
             },
           ),
-          MaterialButton(
+          RaisedButton(
             child: Text("確定", textScaleFactor: 1, style: cTextAlertYes),
             elevation: 10,
-            onPressed: () async {
-              await okProcess(textEditingController.text);
+            color: Colors.white,
+            shape: cAlertDialogButtonShape,
+            onPressed: () {
+              okProcess(textEditingController.text);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<Widget> _addGroupDialog({
+    BuildContext context,
+    String mainTitle,
+    String subTitle,
+    VoidCallback onPressed,
+  }) {
+    return showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text("$mainTitle" ?? "", textScaleFactor: 1, style: cTextAlertL),
+        content: Text("$subTitle", textScaleFactor: 1, style: cTextAlertMes),
+        elevation: 20,
+        actions: <Widget>[
+          MaterialButton(
+            child: Text("はい", textScaleFactor: 1, style: cTextAlertYes),
+            elevation: 10,
+            onPressed: onPressed,
+          ),
+          MaterialButton(
+            child: Text("いいえ", textScaleFactor: 1, style: cTextAlertNo),
+            elevation: 10,
+            onPressed: () {
+              Navigator.pop(context);
             },
           ),
         ],
@@ -363,19 +428,32 @@ class _UserGroupState extends State<UserGroup> {
     );
   }
 
-  Future<Widget> _addPasswordDialog({
+  Future<Widget> _addGropeCodeDialog({
     BuildContext context,
     String groupName,
     String mainTitle,
   }) {
-    final textEditingController = TextEditingController();
-    textEditingController.text = '';
+    final groupCodeEditingController = TextEditingController();
+    final passwordEditingController = TextEditingController();
+    groupCodeEditingController.text = '';
+    passwordEditingController.text = '';
     return showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: Text("$mainTitle" ?? "", textScaleFactor: 1, style: cTextAlertL),
-        content: PasswordText(
-          textEditingController: textEditingController,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            GroupPasswordInput(
+              textEditingController: groupCodeEditingController,
+              hintText: "グループコード",
+            ),
+            SizedBox(height: 5),
+            GroupPasswordInput(
+              textEditingController: passwordEditingController,
+              hintText: "管理用パスワード",
+            ),
+          ],
         ),
         elevation: 20,
         actions: <Widget>[
@@ -384,16 +462,35 @@ class _UserGroupState extends State<UserGroup> {
             elevation: 10,
             onPressed: () {
               Navigator.pop(context);
-              // Navigator.pop(context);
             },
           ),
           MaterialButton(
             child: Text("登録", textScaleFactor: 1, style: cTextAlertYes),
             elevation: 10,
             onPressed: () async {
-              await _saveGroupData(
-                  groupName, textEditingController.text.trim());
-              Navigator.pop(context);
+              if (groupCodeEditingController.text.isNotEmpty &&
+                  passwordEditingController.text.isNotEmpty) {
+                await _saveGroupData(
+                  groupName,
+                  groupCodeEditingController.text.trim(),
+                  passwordEditingController.text.trim(),
+                );
+                Navigator.pop(context);
+              } else {
+                if (groupCodeEditingController.text.isEmpty) {
+                  await MyDialog.instance.okShowDialog(
+                    context,
+                    "グループコードが空欄です！",
+                    Colors.red,
+                  );
+                } else {
+                  await MyDialog.instance.okShowDialog(
+                    context,
+                    "管理用パスワードが空欄です！",
+                    Colors.red,
+                  );
+                }
+              }
             },
           ),
         ],
@@ -401,15 +498,21 @@ class _UserGroupState extends State<UserGroup> {
     );
   }
 
-  Future<void> _saveGroupData(String groupName, String passWord) async {
+  Future<void> _saveGroupData(
+      String groupName, String groupCode, String password) async {
     await FirebaseFirestore.instance.collection('Groups').doc(groupName).set({
       'name': groupName,
-      'password': passWord,
+      'groupCode': groupCode,
+      'password': password,
       'email': "",
     }).catchError((onError) {
       print(onError.toString());
     });
     if (Future.value() != null) {
+      isGroupCreate = true;
+      createGroupName = groupName;
+      print("----------------------------isGroupCreate = $isGroupCreate");
+      print("----------------------------createGroupName = $createGroupName");
       setState(() {});
     }
   }

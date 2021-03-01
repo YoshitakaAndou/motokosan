@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/user_data/userdata_class.dart';
 
-import '../google_model.dart';
-import 'group_button.dart';
+import '../auth_model.dart';
+import 'user_group.dart';
 
-class GoogleGroupButton extends StatelessWidget {
+class GroupButton extends StatelessWidget {
   final BuildContext context;
-  final GoogleModel model;
+  final AuthModel model;
 
-  GoogleGroupButton({this.context, this.model});
+  GroupButton({this.context, this.model});
 
   @override
   Widget build(BuildContext context) {
