@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:motokosan/group_data/group_data.dart';
+import 'package:motokosan/data/group_data/group_data.dart';
 
 class FSGroupData {
   static final FSGroupData instance = FSGroupData();
