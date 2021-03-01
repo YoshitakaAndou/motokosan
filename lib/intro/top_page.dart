@@ -9,7 +9,7 @@ import 'package:motokosan/home/home.dart';
 import 'package:motokosan/data/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/privacy_policy.dart';
 
-import '../unconnect.dart';
+import '../widgets/unconnect.dart';
 import 'data.dart';
 
 class TopPage extends StatelessWidget {

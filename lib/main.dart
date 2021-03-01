@@ -21,7 +21,7 @@ import 'take_a_lecture/target/target_model.dart';
 import 'take_a_lecture/lecture/lecture_model.dart';
 import 'dart:io';
 
-import 'unconnect.dart';
+import 'widgets/unconnect.dart';
 
 void main() async {
   //Future処理に必要
