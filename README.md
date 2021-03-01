@@ -1,6 +1,5 @@
-# motokosan
-
-A new Flutter application.
+# 研修会の素子さん
+YouTube動画を使った研修会を開催するためのツールです。
 
 ## Getting Started
 
