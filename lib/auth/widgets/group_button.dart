@@ -14,7 +14,7 @@ class GroupButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String _groupName = model.userData.userGroup.isEmpty
-        ? 'グループ名を選択(tapして下さい）'
+        ? 'Tapしてグループを選択'
         : model.userData.userGroup;
     final double _width = MediaQuery.of(context).size.width;
 

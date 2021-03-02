@@ -16,6 +16,7 @@ import 'home_info_not_signin.dart';
 
 class Home extends StatelessWidget {
   final UserData _userData;
+
   Home(this._userData);
 
   @override
@@ -83,29 +84,32 @@ class Home extends StatelessWidget {
       label: Text(" 研修会一覧", style: cTextUpBarL, textScaleFactor: 1),
       backgroundColor: cFAB,
       // shape: cFABShape,
-      onPressed: () async {
-        if (FSUserData.instance.isCurrentUserSignIn()) {
-          List<Organizer> _organizers = List();
-          Organizer _organizer = Organizer(title: "指定無し");
-          _organizers.add(_organizer);
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => WorkshopListPage(_userData, _organizers[0]),
-            ),
-          );
-          await model.fetchListsInfo(_userData.userGroup);
-          // model.stopLoading();
-        } else {
-          InfoNotSignin.instance.function(
-            context,
-            "サインアウトしているので\n実行できません",
-            "サインインしますか？",
-            _userData,
-          );
-        }
-      },
+      onPressed: () => _floatABOnPressed(context, model),
     );
+  }
+
+  Future<void> _floatABOnPressed(
+      BuildContext context, WorkshopModel model) async {
+    if (FSUserData.instance.isCurrentUserSignIn()) {
+      List<Organizer> _organizers = List();
+      Organizer _organizer = Organizer(title: "指定無し");
+      _organizers.add(_organizer);
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => WorkshopListPage(_userData, _organizers[0]),
+        ),
+      );
+      await model.fetchListsInfo(_userData.userGroup);
+      // model.stopLoading();
+    } else {
+      InfoNotSignin.instance.function(
+        context,
+        "サインアウトしているので\n実行できません",
+        "サインインしますか？",
+        _userData,
+      );
+    }
   }
 
   Widget _bottomNavigationBar(BuildContext context, UserData _userData) {

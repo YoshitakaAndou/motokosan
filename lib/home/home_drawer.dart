@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:motokosan/auth/auth_model.dart';
 import 'package:motokosan/auth/email_signin.dart';
 import 'package:motokosan/auth/google_login.dart';
 import 'package:motokosan/auth/signout.dart';
 import 'package:motokosan/data/data_save_body.dart';
-import 'package:motokosan/data/group_data/group_data_firebase.dart';
 import 'package:motokosan/data/group_data/group_password_input.dart';
 import 'package:motokosan/home/home_info_not_signin.dart';
 import 'package:motokosan/home/home_policy.dart';
@@ -21,8 +21,7 @@ import 'package:motokosan/data/user_data/userdata_class.dart';
 import 'package:motokosan/data/user_data/userdata_firebase.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 import 'package:provider/provider.dart';
-
-import '../constants.dart';
+import 'package:motokosan/constants.dart';
 import 'widgets/drawer_menu_item.dart';
 
 class HomeDrawer extends StatefulWidget {
@@ -60,24 +59,34 @@ class _HomeDrawerState extends State<HomeDrawer> {
                         DrawerMenuItem(
                           context: context,
                           title: "プライバシーポリシー",
-                          icon: Icon(FontAwesomeIcons.handshake,
-                              color: Colors.green[800]),
+                          icon: Icon(
+                            FontAwesomeIcons.handshake,
+                            color: Colors.green[800],
+                          ),
+                          child: Container(),
                           onTap: () => _plivacyOnTap(context),
                         ),
                         if (!FSUserData.instance.isCurrentUserSignIn())
                           DrawerMenuItem(
                             context: context,
                             title: "ログイン",
-                            icon: Icon(FontAwesomeIcons.signInAlt,
-                                color: Colors.green[800]),
+                            icon: Icon(
+                              FontAwesomeIcons.signInAlt,
+                              color: Colors.green[800],
+                            ),
+                            child: Container(),
                             onTap: () => _loginOnTap(context),
                           ),
                         if (FSUserData.instance.isCurrentUserSignIn())
                           DrawerMenuItem(
                             context: context,
                             title: "ログアウト",
-                            icon: Icon(FontAwesomeIcons.doorOpen,
-                                color: Colors.green[800]),
+                            titleSize: 14,
+                            icon: Icon(
+                              FontAwesomeIcons.doorOpen,
+                              color: Colors.green[800],
+                            ),
+                            child: _logOutMenuSubTitle(),
                             onTap: () => _logOutOnTap(context),
                           ),
                         HomeUserData(
@@ -87,46 +96,82 @@ class _HomeDrawerState extends State<HomeDrawer> {
                             model.setUpdate();
                           },
                         ),
-                        if(_isToolsShow)
+                        if (_isToolsShow)
+                          DrawerMenuItem(
+                            context: context,
+                            title: "普通のメニュに戻す",
+                            icon: Icon(
+                              FontAwesomeIcons.undo,
+                              color: Colors.green[800],
+                            ),
+                            child: Container(),
+                            onTap: () {
+                              setState(() {
+                                _isToolsShow = false;
+                                _menuTitle = "メニュー";
+                              });
+                            },
+                          ),
+                        if (_isToolsShow)
                           DrawerMenuItem(
                             context: context,
                             title: "データを編集",
+                            titleColor: Colors.blue[700],
                             icon: Icon(
                               FontAwesomeIcons.tools,
-                              color: Colors.green[800],
+                              color: Colors.blue[800],
                             ),
+                            child: Container(),
                             onTap: () => _editDataOnTap(context),
                           ),
-                        if(_isToolsShow)
+                        if (_isToolsShow)
                           DrawerMenuItem(
                             context: context,
                             title: "対象を編集",
-                            icon: Icon(FontAwesomeIcons.solidAddressCard,
-                                color: Colors.green[800]),
+                            titleColor: Colors.blue[700],
+                            icon: Icon(
+                              FontAwesomeIcons.solidAddressCard,
+                              color: Colors.blue[800],
+                            ),
+                            child: Container(),
                             onTap: () => _editTargetOnTap(context),
                           ),
                         if (_isToolsShow)
                           DrawerMenuItem(
                             context: context,
                             title: "再生時間を変更する",
-                            icon: Icon(FontAwesomeIcons.film,
-                                color: Colors.green[800]),
+                            titleColor: Colors.blue[700],
+                            icon: Icon(
+                              FontAwesomeIcons.film,
+                              color: Colors.blue[800],
+                            ),
+                            child: Container(),
                             onTap: () => _editPlayTimeOnTap(context),
                           ),
                         if (_isToolsShow)
                           DrawerMenuItem(
                             context: context,
                             title: "受講済みをリセット",
-                            icon: Icon(Icons.restore, color: Colors.green[800]),
+                            titleColor: Colors.blue[700],
+                            icon: Icon(
+                              Icons.restore,
+                              color: Colors.blue[800],
+                            ),
+                            child: Container(),
                             onTap: () => _resetLectureDataOnTap(
                                 context, widget._userData),
                           ),
                         if (!_isToolsShow)
                           DrawerMenuItem(
                             context: context,
-                            title: "データの編集（要パスワード）",
-                            icon: Icon(FontAwesomeIcons.tools,
-                                color: Colors.green[800]),
+                            title: "拡張メニュー",
+                            titleColor: Colors.blue[700],
+                            titleSize: 14,
+                            icon: Icon(
+                              FontAwesomeIcons.tools,
+                              color: Colors.blue[800],
+                            ),
+                            child: _extendMenuSubTitle(),
                             onTap: () => _editToolOnTap(context),
                           ),
                       ],
@@ -139,6 +184,53 @@ class _HomeDrawerState extends State<HomeDrawer> {
         ),
       );
     });
+  }
+
+  Widget _logOutMenuSubTitle() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'ログアウトすることで',
+          style: TextStyle(
+            color: Colors.red[900],
+            fontSize: 10,
+          ),
+          textScaleFactor: 1,
+        ),
+        Text(
+          'グループの変更が行えます',
+          style: TextStyle(
+            color: Colors.red[900],
+            fontSize: 10,
+          ),
+          textScaleFactor: 1,
+        ),
+      ],
+    );
+  }
+
+  Widget _extendMenuSubTitle() {
+    return Column(
+      children: [
+        Text(
+          'グループパスワードの',
+          style: TextStyle(
+            color: Colors.red[900],
+            fontSize: 10,
+          ),
+          textScaleFactor: 1,
+        ),
+        Text(
+          '入力が必要になります',
+          style: TextStyle(
+            color: Colors.red[900],
+            fontSize: 10,
+          ),
+          textScaleFactor: 1,
+        ),
+      ],
+    );
   }
 
   Widget _title(BuildContext context) {
@@ -158,9 +250,9 @@ class _HomeDrawerState extends State<HomeDrawer> {
                   color: Colors.white, size: 20),
             ),
             Expanded(
-                flex: 2,
-                child:
-                    Text(_menuTitle, style: cTextUpBarLL, textScaleFactor: 1)),
+              flex: 2,
+              child: Text(_menuTitle, style: cTextUpBarLL, textScaleFactor: 1),
+            ),
           ],
         ),
       ),
@@ -170,14 +262,12 @@ class _HomeDrawerState extends State<HomeDrawer> {
   Future<void> _editDataOnTap(BuildContext context) async {
     if (FSUserData.instance.isCurrentUserSignIn()) {
       Navigator.of(context).pop();
-      // model.isLoading = true;
       await Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => OrganizerPage(widget._userData),
         ),
       );
-      // await model.fetchListsInfo(_userData.userGroup);
     } else {
       InfoNotSignin.instance.function(
         context,
@@ -191,7 +281,6 @@ class _HomeDrawerState extends State<HomeDrawer> {
   Future<void> _editTargetOnTap(BuildContext context) async {
     if (FSUserData.instance.isCurrentUserSignIn()) {
       Navigator.of(context).pop();
-      // model.isLoading = true;
       await Navigator.push(
         context,
         MaterialPageRoute(
@@ -200,7 +289,11 @@ class _HomeDrawerState extends State<HomeDrawer> {
       );
     } else {
       InfoNotSignin.instance.function(
-          context, "ログアウトしているので\n実行できません", "ログインしますか？", widget._userData);
+        context,
+        "ログアウトしているので\n実行できません",
+        "ログインしますか？",
+        widget._userData,
+      );
     }
   }
 
@@ -326,8 +419,9 @@ class _HomeDrawerState extends State<HomeDrawer> {
   }
 
   Future<void> _editToolOnTap(BuildContext context) async {
-    final _groupData =
-        await FSGroupData.instance.fetchGroupData(widget._userData.userGroup);
+    // final _groupData =
+    //     await FSGroupData.instance.fetchGroupData(widget._userData.userGroup);
+    final _groupData = Provider.of<AuthModel>(context, listen: false).groupData;
     if (_groupData.email == widget._userData.userEmail) {
       setState(() {
         _isToolsShow = !_isToolsShow;
@@ -389,11 +483,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
         title: Column(
           children: [
             Text("$mainTitle" ?? "", textScaleFactor: 1, style: cTextAlertL),
-            Divider(
-              height: 2,
-              color: Colors.grey,
-              thickness: 0.5,
-            ),
+            Divider(height: 2, color: Colors.grey, thickness: 0.5),
           ],
         ),
         content: GroupPasswordInput(

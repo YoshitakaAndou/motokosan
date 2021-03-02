@@ -10,7 +10,7 @@ import 'package:motokosan/data/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/privacy_policy.dart';
 
 import '../widgets/unconnect.dart';
-import 'data.dart';
+import 'bord_item.dart';
 
 class TopPage extends StatelessWidget {
   final bool unConnect;

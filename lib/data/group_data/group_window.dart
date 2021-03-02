@@ -21,7 +21,7 @@ class GroupWindow extends StatefulWidget {
   final UserData userData;
   final Function onTap;
 
-  GroupWindow({this.radius = 15, this.userData, this.onTap});
+  GroupWindow({this.radius = 10, this.userData, this.onTap});
 
   @override
   _GroupWindowState createState() => _GroupWindowState();
@@ -124,13 +124,21 @@ class _GroupWindowState extends State<GroupWindow> {
   }
 
   Widget _buildListItem(BuildContext context, GroupData snap) {
-    final model = Provider.of<AuthModel>(context, listen: false);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
       child: Container(
         decoration: BoxDecoration(
+          color: Colors.white,
           border: Border.all(color: Colors.grey),
           borderRadius: BorderRadius.circular(widget.radius),
+          boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 5.0,
+            spreadRadius: 0.5,
+            offset: Offset(0.5, 0.5),
+          )
+        ],
         ),
         child: ListTile(
           dense: true,
@@ -143,43 +151,49 @@ class _GroupWindowState extends State<GroupWindow> {
             ),
             textScaleFactor: 1,
           ),
-          onTap: () async {
-            // グループ名をタップしたらグループコードを聞く
-            await _groupCodeDialog(
-              context: context,
-              groupCode: '',
-              mainTitle: '${snap.name}の\nグループコードを入力して下さい',
-              okProcess: (String txt) async {
-                if (txt.isNotEmpty) {
-                  // グループコードが合致した場合
-                  Navigator.of(context).pop();
-                  if (txt == snap.groupCode) {
-                    widget.onTap(snap.name);
-                    // groupDataの処理
-                    model.groupData = snap;
-                    await GroupDataSaveBody.instance.save(snap);
-                    Navigator.of(context).pop();
-                  } else {
-                    // グループコードが違う場合
-                    await MyDialog.instance.okShowDialog(
-                      context,
-                      "グループコードが違いました！",
-                      Colors.red,
-                    );
-                  }
-                } else {
-                  // 入力が空白の場合
-                  await MyDialog.instance.okShowDialog(
-                    context,
-                    "グループコードが空白です！",
-                    Colors.red,
-                  );
-                }
-              },
-            );
-          },
+          onTap: () => _listTileOnTap(context, snap),
         ),
       ),
+    );
+  }
+
+  Future<void> _listTileOnTap(
+    BuildContext context,
+    GroupData snap,
+  ) async {
+    final model = Provider.of<AuthModel>(context, listen: false);
+    // グループ名をタップしたらグループコードを聞く
+    await _groupCodeDialog(
+      context: context,
+      groupCode: '',
+      mainTitle: '${snap.name}の\nグループコードを入力して下さい',
+      okProcess: (String txt) async {
+        if (txt.isNotEmpty) {
+          // グループコードが合致した場合
+          Navigator.of(context).pop();
+          if (txt == snap.groupCode) {
+            widget.onTap(snap.name);
+            // groupDataの処理
+            model.groupData = snap;
+            await GroupDataSaveBody.instance.save(snap);
+            Navigator.of(context).pop();
+          } else {
+            // グループコードが違う場合
+            await MyDialog.instance.okShowDialog(
+              context,
+              "グループコードが違いました！",
+              Colors.red,
+            );
+          }
+        } else {
+          // 入力が空白の場合
+          await MyDialog.instance.okShowDialog(
+            context,
+            "グループコードが空白です！",
+            Colors.red,
+          );
+        }
+      },
     );
   }
 
@@ -208,51 +222,10 @@ class _GroupWindowState extends State<GroupWindow> {
         children: [
           WhiteButton(
             context: context,
-            title: '新規に作成する',
+            title: '新規に作成',
             icon: FontAwesomeIcons.plusCircle,
             iconSize: 18,
-            onPress: () async {
-              await _addGroupDialog(
-                context: context,
-                mainTitle: "グループ作る作業をします",
-                subTitle: "作ったグループの管理人になりますがよろしいですか？",
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  await _addGroupNameDialog(
-                    context: context,
-                    name: '',
-                    mainTitle: "【Step1】\nグループ名称の入力",
-                    okProcess: (String txt) async {
-                      if (txt.isNotEmpty) {
-                        Navigator.of(context).pop();
-                        // groupDatesの中に同じ名前があるかチェック
-                        final _result = groupDates.where((e) => e.name == txt);
-                        if (_result.isEmpty) {
-                          // 同じ名前がなかったらグループコードの入力
-                          _addGropeCodeDialog(
-                              context: context,
-                              groupName: txt,
-                              mainTitle: '【Step2】\nグループコードとパスワードの設定');
-                        } else {
-                          // 同じ名前があったら
-                          await MyDialog.instance.okShowDialog(
-                            context,
-                            "同じグループ名が登録済です！",
-                            Colors.red,
-                          );
-                        }
-                      } else {
-                        await MyDialog.instance.okShowDialog(
-                          context,
-                          "グループ名が空欄です！",
-                          Colors.red,
-                        );
-                      }
-                    },
-                  );
-                },
-              );
-            },
+            onPress: () => _groupCreateOnPressed(context),
           ),
           WhiteButton(
             context: context,
@@ -266,6 +239,49 @@ class _GroupWindowState extends State<GroupWindow> {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _groupCreateOnPressed(BuildContext context) async {
+    await _addGroupDialog(
+      context: context,
+      mainTitle: "グループ作る作業をします",
+      subTitle: "作ったグループの管理人になりますがよろしいですか？",
+      onPressed: () async {
+        Navigator.of(context).pop();
+        await _addGroupNameDialog(
+          context: context,
+          name: '',
+          mainTitle: "【Step1】\nグループ名称の入力",
+          okProcess: (String txt) async {
+            if (txt.isNotEmpty) {
+              Navigator.of(context).pop();
+              // groupDatesの中に同じ名前があるかチェック
+              final _result = groupDates.where((e) => e.name == txt);
+              if (_result.isEmpty) {
+                // 同じ名前がなかったらグループコードの入力
+                _addGropeCodeDialog(
+                    context: context,
+                    groupName: txt,
+                    mainTitle: '【Step2】\nグループコードとパスワードの設定');
+              } else {
+                // 同じ名前があったら
+                await MyDialog.instance.okShowDialog(
+                  context,
+                  "同じグループ名が登録済です！",
+                  Colors.red,
+                );
+              }
+            } else {
+              await MyDialog.instance.okShowDialog(
+                context,
+                "グループ名が空欄です！",
+                Colors.red,
+              );
+            }
+          },
+        );
+      },
     );
   }
 
@@ -289,18 +305,6 @@ class _GroupWindowState extends State<GroupWindow> {
       return await FSGroupData.instance.createDates();
     }
   }
-
-  // Future<List<GroupData>> createDates() async {
-  //   print("${widget.userData.userEmail}でログイン中");
-  //   final _docs = await FirebaseFirestore.instance.collection("Groups").get();
-  //   final List<GroupData> groupDates = _docs.docs
-  //       .map((doc) => GroupData(
-  //             name: doc['name'] ?? "",
-  //             groupCode: doc['groupCode'] ?? "",
-  //           ))
-  //       .toList();
-  //   return groupDates;
-  // }
 
   Future<Widget> _groupCodeDialog({
     BuildContext context,
@@ -420,7 +424,6 @@ class _GroupWindowState extends State<GroupWindow> {
             elevation: 10,
             onPressed: () {
               Navigator.pop(context);
-              // Navigator.pop(context);
             },
           ),
           MaterialButton(
