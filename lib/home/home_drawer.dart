@@ -37,6 +37,7 @@ class HomeDrawer extends StatefulWidget {
 class _HomeDrawerState extends State<HomeDrawer> {
   bool _isToolsShow = false;
   String _menuTitle = "メニュー";
+  bool _isShowSubTitle = false;
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +57,13 @@ class _HomeDrawerState extends State<HomeDrawer> {
                     height: widget.size.height - 150,
                     child: ListView(
                       children: [
+                        HomeUserData(
+                          widget._userData,
+                          (String txt) {
+                            widget._userData.userName = txt;
+                            model.setUpdate();
+                          },
+                        ),
                         DrawerMenuItem(
                           context: context,
                           title: "プライバシーポリシー",
@@ -86,16 +94,11 @@ class _HomeDrawerState extends State<HomeDrawer> {
                               FontAwesomeIcons.doorOpen,
                               color: Colors.green[800],
                             ),
-                            child: _logOutMenuSubTitle(),
+                            child: _isShowSubTitle
+                                ? _logOutMenuSubTitle()
+                                : Container(),
                             onTap: () => _logOutOnTap(context),
                           ),
-                        HomeUserData(
-                          widget._userData,
-                          (String txt) {
-                            widget._userData.userName = txt;
-                            model.setUpdate();
-                          },
-                        ),
                         if (_isToolsShow)
                           DrawerMenuItem(
                             context: context,
@@ -165,13 +168,14 @@ class _HomeDrawerState extends State<HomeDrawer> {
                           DrawerMenuItem(
                             context: context,
                             title: "拡張メニュー",
-                            titleColor: Colors.blue[700],
                             titleSize: 14,
                             icon: Icon(
                               FontAwesomeIcons.tools,
-                              color: Colors.blue[800],
+                              color: Colors.green[800],
                             ),
-                            child: _extendMenuSubTitle(),
+                            child: _isShowSubTitle
+                                ? _extendMenuSubTitle()
+                                : Container(),
                             onTap: () => _editToolOnTap(context),
                           ),
                       ],
@@ -234,27 +238,47 @@ class _HomeDrawerState extends State<HomeDrawer> {
   }
 
   Widget _title(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.pop(context);
-      },
-      child: Container(
-        width: double.infinity,
-        height: 50,
-        color: Colors.green[600],
-        child: Row(
-          children: [
-            Expanded(
-              flex: 1,
-              child: Icon(FontAwesomeIcons.solidWindowClose,
-                  color: Colors.white, size: 20),
+    return Container(
+      width: double.infinity,
+      height: 50,
+      color: Colors.green[600],
+      child: Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: GestureDetector(
+              child: Icon(
+                FontAwesomeIcons.solidWindowClose,
+                color: Colors.white,
+                size: 20,
+              ),
+              onTap: () {
+                Navigator.pop(context);
+              },
             ),
-            Expanded(
-              flex: 2,
-              child: Text(_menuTitle, style: cTextUpBarLL, textScaleFactor: 1),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(_menuTitle, style: cTextUpBarLL, textScaleFactor: 1),
+          ),
+          Expanded(
+            flex: 1,
+            child: GestureDetector(
+              child: Icon(
+                _isShowSubTitle
+                    ? FontAwesomeIcons.solidQuestionCircle
+                    : FontAwesomeIcons.questionCircle,
+                color: Colors.white,
+                size: 20,
+              ),
+              onTap: () {
+                setState(() {
+                  _isShowSubTitle = !_isShowSubTitle;
+                });
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -419,8 +443,6 @@ class _HomeDrawerState extends State<HomeDrawer> {
   }
 
   Future<void> _editToolOnTap(BuildContext context) async {
-    // final _groupData =
-    //     await FSGroupData.instance.fetchGroupData(widget._userData.userGroup);
     final _groupData = Provider.of<AuthModel>(context, listen: false).groupData;
     if (_groupData.email == widget._userData.userEmail) {
       setState(() {

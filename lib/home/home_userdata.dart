@@ -94,6 +94,14 @@ class _HomeUserDataState extends State<HomeUserData> {
                         borderRadius: const BorderRadius.all(
                           const Radius.circular(3.0),
                         ),
+                        boxShadow: [
+                          const BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 3.0,
+                            spreadRadius: 0.5,
+                            offset: Offset(0.5, 0.5),
+                          )
+                        ],
                         color: Colors.grey[100],
                       ),
                       child: Column(

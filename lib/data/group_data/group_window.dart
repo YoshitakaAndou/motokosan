@@ -132,13 +132,13 @@ class _GroupWindowState extends State<GroupWindow> {
           border: Border.all(color: Colors.grey),
           borderRadius: BorderRadius.circular(widget.radius),
           boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 5.0,
-            spreadRadius: 0.5,
-            offset: Offset(0.5, 0.5),
-          )
-        ],
+            const BoxShadow(
+              color: Colors.black26,
+              blurRadius: 3.0,
+              spreadRadius: 0.5,
+              offset: Offset(0.5, 0.5),
+            )
+          ],
         ),
         child: ListTile(
           dense: true,
