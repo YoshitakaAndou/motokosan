@@ -13,9 +13,13 @@ import 'lecture_add_textmovie.dart';
 
 class LectureAddMain extends StatelessWidget {
   final String groupName;
-  final Organizer _organizer;
-  final Workshop _workshop;
-  LectureAddMain(this.groupName, this._organizer, this._workshop);
+  final Organizer organizer;
+  final Workshop workshop;
+  LectureAddMain(
+    this.groupName,
+    this.organizer,
+    this.workshop,
+  );
 
   final _tab = <Tab>[
     Tab(
@@ -68,8 +72,8 @@ class LectureAddMain extends StatelessWidget {
                 children: <Widget>[
                   LectureAddTextMovie(
                     groupName,
-                    _organizer,
-                    _workshop,
+                    organizer,
+                    workshop,
                     titleTextController,
                     subTitleTextController,
                     descTextController,
@@ -77,13 +81,13 @@ class LectureAddMain extends StatelessWidget {
                   ),
                   LectureAddImage(
                     groupName,
-                    _organizer,
-                    _workshop,
+                    organizer,
+                    workshop,
                   ),
                   LectureAddQuestion(
                     groupName,
-                    _organizer,
-                    _workshop,
+                    organizer,
+                    workshop,
                   ),
                 ],
               ),

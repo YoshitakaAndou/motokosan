@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 import 'lec_model.dart';
 
 Future<List<Lec>> lFetchFsCloud(_lecsId) async {
@@ -46,8 +46,8 @@ Future<void> lAddFsCloud(_lecsId, _data, _timeStamp) async {
     "incorrectQuestion": _data.incorrectQuestion,
     "incorrectAnswer": _data.incorrectAnswer,
     "slideUrl": _data.slideUrl,
-    "update": ConvertItems.instance.dateToInt(_timeStamp),
-    "createAt": ConvertItems.instance.dateToInt(_timeStamp),
+    "update": ConvertDateTime.instance.dateToInt(_timeStamp),
+    "createAt": ConvertDateTime.instance.dateToInt(_timeStamp),
   }).catchError((onError) {
     print(onError.toString());
   });
@@ -67,7 +67,7 @@ Future<void> lUpdateFsCloud(_lecsId, _lecId, _data) async {
     "incorrectQuestion": _data.incorrectQuestion,
     "incorrectAnswer": _data.incorrectAnswer,
     "slideUrl": _data.slideUrl,
-    "update": ConvertItems.instance.dateToInt(DateTime.now()),
+    "update": ConvertDateTime.instance.dateToInt(DateTime.now()),
     "createAt": _data.createAt,
   }).catchError((onError) {
     print(onError.toString());

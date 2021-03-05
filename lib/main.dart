@@ -8,6 +8,7 @@ import 'package:motokosan/auth/google_login.dart';
 import 'package:motokosan/home/home.dart';
 import 'package:motokosan/intro/top_page.dart';
 import 'package:motokosan/data/user_data/userdata_firebase.dart';
+import 'package:motokosan/take_a_lecture/lecture/list/lecture_list_page.dart';
 import 'auth/auth_model.dart';
 import 'data/data_save_body.dart';
 import 'home/home_model.dart';
@@ -223,6 +224,12 @@ class _MyAppState extends State<MyApp> {
           iconTheme: IconThemeData(color: Colors.black87),
         ),
       ),
+      routes: <String, WidgetBuilder> {
+      '/home': (BuildContext context) => Home(),
+      '/workshopList': (BuildContext context) => LectureListPage(),
+      '/lectureList': (BuildContext context) => Home(),
+      },
+    
       home: !_policy
           ? TopPage(
               unConnect: _unConnect,
@@ -232,7 +239,7 @@ class _MyAppState extends State<MyApp> {
           : _unConnect
               ? UnConnect()
               : _isCurrentUserSignIn
-                  ? Home(model.userData)
+                  ? Home(userData:model.userData)
                   : model.userData.userPassword == "google認証"
                       ? GoogleLogin(
                           userName: model.userData.userName,

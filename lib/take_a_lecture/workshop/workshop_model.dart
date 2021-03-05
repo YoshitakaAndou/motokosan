@@ -110,19 +110,19 @@ class WorkshopModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchLists(String _groupName) async {
+  Future<void> fetchLists(String groupName) async {
     final List<Workshop> _workshops =
-        await FSWorkshop.instance.fetchDatesAll(_groupName);
+        await FSWorkshop.instance.fetchDatesAll(groupName);
     if (_workshops.isNotEmpty) {
       // workshopListを作成
       // listNoはorganizerNo+workshopNoです
       // それを作ります
-      workshopLists = List();
+      workshopLists = [];
       for (Workshop _workshop in _workshops) {
         // OrganizerからorganizerNoを取る
         final _doc = await FirebaseFirestore.instance
             .collection("Groups")
-            .doc(_groupName)
+            .doc(groupName)
             .collection("Organizer")
             .doc(_workshop.organizerId)
             .get();
@@ -152,24 +152,25 @@ class WorkshopModel extends ChangeNotifier {
       // workshopListsを番号順でソート
       workshopLists.sort((a, b) => a.listNo.compareTo(b.listNo));
     } else {
-      workshopLists = List();
+      workshopLists = [];
     }
     notifyListeners();
   }
 
-  Future<void> fetchListsInfo(String _groupName) async {
+  Future<void> fetchListsInfo(String groupName) async {
     final List<Workshop> _workshops =
-        await FSWorkshop.instance.fetchDatesDeadlineAt(_groupName);
+        await FSWorkshop.instance.fetchDatesDeadlineAt(groupName);
     if (_workshops.isNotEmpty) {
       // workshopListを作成
       // listNoはorganizerNo+workshopNoです
       // それを作ります
-      workshopLists = List();
+      workshopLists = [];
+      print("***************** Home _Workshops.lengt : ${_workshops.length}県");
       for (Workshop _workshop in _workshops) {
         // OrganizerからorganizerNoを取る
         final _doc = await FirebaseFirestore.instance
             .collection("Groups")
-            .doc(_groupName)
+            .doc(groupName)
             .collection("Organizer")
             .doc(_workshop.organizerId)
             .get();
@@ -199,17 +200,17 @@ class WorkshopModel extends ChangeNotifier {
       // workshopListsを番号順でソート
       workshopLists.sort((a, b) => a.listNo.compareTo(b.listNo));
     } else {
-      workshopLists = List();
+      workshopLists = [];
     }
     notifyListeners();
   }
 
   Future<void> fetchListsByOrganizer(
-      String _groupName, Organizer _organizer) async {
-    List<Workshop> _workshops = await FSWorkshop.instance
-        .fetchDates(_groupName, _organizer.organizerId);
+      String groupName, Organizer _organizer) async {
+    List<Workshop> _workshops =
+        await FSWorkshop.instance.fetchDates(groupName, _organizer.organizerId);
     // workshopListを作成
-    workshopLists = List();
+    workshopLists = [];
     for (Workshop _workshop in _workshops) {
       // workshopListを作る
       final _workshopResults = await WorkshopDatabase.instance
@@ -237,31 +238,30 @@ class WorkshopModel extends ChangeNotifier {
   }
 
   Future<void> fetchWorkshopByOrganizer(
-      String _groupName, String _organizer) async {
-    workshops = await FSWorkshop.instance.fetchDates(_groupName, _organizer);
+      String groupName, String _organizer) async {
+    workshops = await FSWorkshop.instance.fetchDates(groupName, _organizer);
     notifyListeners();
   }
 
-  Future<void> fetchWorkshopMake(String _groupName, String _organizer) async {
-    workshops =
-        await FSWorkshop.instance.fetchDatesMake(_groupName, _organizer);
+  Future<void> fetchWorkshopMake(String groupName, String _organizer) async {
+    workshops = await FSWorkshop.instance.fetchDatesMake(groupName, _organizer);
     notifyListeners();
   }
 
-  Future<void> addWorkshopFs(_groupName, _timeStamp) async {
+  Future<void> addWorkshopFs(groupName, _timeStamp) async {
     if (workshop.title.isEmpty) {
       throw "タイトル が入力されていません！";
     }
     workshop.workshopId = _timeStamp.toString();
-    await FSWorkshop.instance.setData(true, _groupName, workshop, _timeStamp);
+    await FSWorkshop.instance.setData(true, groupName, workshop, _timeStamp);
     notifyListeners();
   }
 
-  Future<void> updateWorkshopFs(_groupName, _timeStamp) async {
+  Future<void> updateWorkshopFs(groupName, _timeStamp) async {
     if (workshop.title.isEmpty) {
       throw "タイトル が入力されていません！";
     }
-    await FSWorkshop.instance.setData(false, _groupName, workshop, _timeStamp);
+    await FSWorkshop.instance.setData(false, groupName, workshop, _timeStamp);
     notifyListeners();
   }
 }

@@ -13,15 +13,15 @@ import 'target_class.dart';
 import 'target_model.dart';
 
 class TargetPage extends StatelessWidget {
-  final UserData _userData;
-  TargetPage(this._userData);
+  final UserData userData;
+  TargetPage(this.userData);
 
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<TargetModel>(context, listen: false);
     Future(() async {
       model.startLoading();
-      await model.fetchTarget(_userData.userGroup);
+      await model.fetchTarget(userData.userGroup);
       model.stopLoading();
     });
     return Consumer<TargetModel>(builder: (context, model, child) {
@@ -79,11 +79,11 @@ class TargetPage extends StatelessWidget {
         _data.targetNo = (_count + 1).toString().padLeft(4, "0");
         //Fsにアップデート
         await FSTarget.instance
-            .setTargetFs(false, _userData.userGroup, _data, DateTime.now());
+            .setTargetFs(false, userData.userGroup, _data, DateTime.now());
         _count += 1;
       }
       //一通り終わったらFsから読み込んで再描画させる
-      await model.fetchTarget(_userData.userGroup);
+      await model.fetchTarget(userData.userGroup);
     } catch (e) {
       MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
     }
@@ -131,10 +131,10 @@ class TargetPage extends StatelessWidget {
           await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => TargetEdit(_userData.userGroup, _target),
+                builder: (context) => TargetEdit(userData.userGroup, _target),
                 fullscreenDialog: true,
               ));
-          await model.fetchTarget(_userData.userGroup);
+          await model.fetchTarget(userData.userGroup);
         },
       ),
     );
@@ -149,10 +149,10 @@ class TargetPage extends StatelessWidget {
         await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => TargetAdd(groupName: _userData.userGroup),
+              builder: (context) => TargetAdd(groupName: userData.userGroup),
               fullscreenDialog: true,
             ));
-        await model.fetchTarget(_userData.userGroup);
+        await model.fetchTarget(userData.userGroup);
       },
     );
   }

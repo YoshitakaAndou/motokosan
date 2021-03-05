@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/widgets/bar_title.dart';
 import 'package:motokosan/widgets/bubble/bubble.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 import 'package:motokosan/widgets/go_back.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
@@ -616,7 +616,7 @@ class _LecPlayState extends State<LecPlay> {
             _dataLec.answered = "○";
             _dataLec.viewed = "済み";
             _dataLec.answeredDate =
-                ConvertItems.instance.dateToInt(DateTime.now());
+                ConvertDateTime.instance.dateToInt(DateTime.now());
             _database.updateLecAtId(_dataLec);
             if (numberOfRemaining == 1) {
               nextTitle = "閉じる";

@@ -149,7 +149,7 @@ class EmailSignup extends StatelessWidget {
       await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => Home(model.userData),
+          builder: (context) => Home(userData:model.userData),
         ),
       );
     } catch (e) {

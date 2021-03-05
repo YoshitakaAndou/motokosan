@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:motokosan/take_a_lecture/lecture/lecture_list_page.dart';
 import 'package:motokosan/data/user_data/userdata_class.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/take_a_lecture/lecture/list/lecture_list_page.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 import '../../constants.dart';
@@ -9,10 +9,14 @@ import '../../widgets/return_argument.dart';
 import 'workshop_model.dart';
 
 class WorkshopListTileBody extends StatelessWidget {
-  final UserData _userData;
+  final UserData userData;
   final WorkshopModel model;
   final int index;
-  WorkshopListTileBody(this._userData, this.model, this.index);
+  WorkshopListTileBody(
+    this.userData,
+    this.model,
+    this.index,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +87,7 @@ class WorkshopListTileBody extends StatelessWidget {
   Widget _title(BuildContext context, WorkshopModel model, int index) {
     final bool _overDeadlineAt =
         model.workshopLists[index].workshop.deadlineAt <=
-            ConvertItems.instance.dateToInt(DateTime.now());
+            ConvertDateTime.instance.dateToInt(DateTime.now());
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -98,7 +102,7 @@ class WorkshopListTileBody extends StatelessWidget {
             Container(
               // color: Colors.red.withOpacity(0.1),
               child: Text(
-                "期限：${ConvertItems.instance.intToString(model.workshopLists[index].workshop.deadlineAt)}",
+                "期限：${ConvertDateTime.instance.intToString(model.workshopLists[index].workshop.deadlineAt)}",
                 style: _overDeadlineAt ? cTextListSR : cTextListS,
                 textScaleFactor: 1,
               ),
@@ -166,7 +170,10 @@ class WorkshopListTileBody extends StatelessWidget {
       context,
       MaterialPageRoute(
         builder: (context) => LectureListPage(
-            _userData, model.workshopLists[index], "fromWorkshop"),
+          userData: userData,
+          workshopList: model.workshopLists[index],
+          routeName: "fromWorkshop",
+        ),
       ),
     );
     // todo 必須

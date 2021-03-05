@@ -2,21 +2,25 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:motokosan/constants.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_model.dart';
 import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:provider/provider.dart';
 
-import '../../constants.dart';
-import '../../take_a_lecture/lecture/lecture_class.dart';
-import '../../take_a_lecture/lecture/lecture_model.dart';
 
 class LectureEditImage extends StatelessWidget {
   final String groupName;
-  final Lecture _lecture;
-  final Workshop _workshop;
-  final Organizer _organizer;
+  final Lecture lecture;
+  final Workshop workshop;
+  final Organizer organizer;
   LectureEditImage(
-      this.groupName, this._lecture, this._workshop, this._organizer);
+    this.groupName,
+    this.lecture,
+    this.workshop,
+    this.organizer,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +65,7 @@ class LectureEditImage extends StatelessWidget {
           children: [
             Expanded(
               flex: 2,
-              child: Text("　番号：${_lecture.lectureNo}",
+              child: Text("　番号：${lecture.lectureNo}",
                   style: cTextUpBarL, textScaleFactor: 1),
             ),
             Expanded(
@@ -70,9 +74,9 @@ class LectureEditImage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("主催：${_organizer.title}",
+                  Text("主催：${organizer.title}",
                       style: cTextUpBarS, textScaleFactor: 1),
-                  Text("研修会：${_workshop.title}",
+                  Text("研修会：${workshop.title}",
                       style: cTextUpBarS, textScaleFactor: 1),
                 ],
               ),

@@ -1,24 +1,27 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:motokosan/constants.dart';
 import 'package:motokosan/take_a_lecture/graduater/graduater_class.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_model.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_database.dart';
 import 'package:motokosan/data/user_data/userdata_class.dart';
 import 'package:motokosan/buttons/custom_button.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import '../../constants.dart';
-import 'lecture_model.dart';
-
 class LectureListBottomSheetSendItems extends StatelessWidget {
-  final UserData _userData;
-  final WorkshopList _workshopList;
+  final UserData userData;
+  final WorkshopList workshopList;
   final LectureModel model;
   final bool fromButton;
   LectureListBottomSheetSendItems(
-      this._userData, this._workshopList, this.model, this.fromButton);
+    this.userData,
+    this.workshopList,
+    this.model,
+    this.fromButton,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -62,8 +65,8 @@ class LectureListBottomSheetSendItems extends StatelessWidget {
         children: [
           Text(
             _fromButton
-                ? "「${_workshopList.workshop.title}」を修了済み"
-                : "「${_workshopList.workshop.title}」を修了されました。",
+                ? "「${workshopList.workshop.title}」を修了済み"
+                : "「${workshopList.workshop.title}」を修了されました。",
             style: cTextListM,
             textScaleFactor: 1,
             maxLines: 3,
@@ -90,7 +93,7 @@ class LectureListBottomSheetSendItems extends StatelessWidget {
                 maxLines: 1,
               ),
               Text(
-                "${_userData.userName}",
+                "${userData.userName}",
                 style: cTextListM,
                 textScaleFactor: 1,
                 maxLines: 1,
@@ -107,7 +110,7 @@ class LectureListBottomSheetSendItems extends StatelessWidget {
                 maxLines: 1,
               ),
               Text(
-                "${_workshopList.workshopResult.isTakenAt}",
+                "${workshopList.workshopResult.isTakenAt}",
                 style: cTextListM,
                 textScaleFactor: 1,
                 maxLines: 1,
@@ -191,13 +194,13 @@ class LectureListBottomSheetSendItems extends StatelessWidget {
                 // todo 送信する情報
                 final graduater = Graduater(
                   graduaterId: DateTime.now().toString(),
-                  uid: _userData.uid,
-                  workshopId: _workshopList.workshopResult.workshopId,
-                  takenAt: _workshopList.workshopResult.isTakenAt,
-                  sendAt: ConvertItems.instance.dateToInt(DateTime.now()),
+                  uid: userData.uid,
+                  workshopId: workshopList.workshopResult.workshopId,
+                  takenAt: workshopList.workshopResult.isTakenAt,
+                  sendAt: ConvertDateTime.instance.dateToInt(DateTime.now()),
                 );
                 // todo FSのGraduatesに送信
-                await model.sendGraduaterData(_userData.userGroup, graduater);
+                await model.sendGraduaterData(userData.userGroup, graduater);
                 // todo DBのworkshopResultも更新
                 await _saveWorkshopResult(
                     context, model, graduater.sendAt, graduater.graduaterId);
@@ -218,14 +221,14 @@ class LectureListBottomSheetSendItems extends StatelessWidget {
 
   Future<void> _saveWorkshopResult(BuildContext context, LectureModel model,
       int _isSendAt, String _graduaterId) async {
-    _workshopList.workshopResult.graduaterId = _graduaterId;
-    _workshopList.workshopResult.workshopId = _workshopList.workshop.workshopId;
-    _workshopList.workshopResult.lectureCount = model.lectureLists.length;
-    _workshopList.workshopResult.takenCount = model.takenCount;
-    _workshopList.workshopResult.isTakenAt =
-        ConvertItems.instance.dateToInt(DateTime.now());
-    _workshopList.workshopResult.isSendAt = _isSendAt;
+    workshopList.workshopResult.graduaterId = _graduaterId;
+    workshopList.workshopResult.workshopId = workshopList.workshop.workshopId;
+    workshopList.workshopResult.lectureCount = model.lectureLists.length;
+    workshopList.workshopResult.takenCount = model.takenCount;
+    workshopList.workshopResult.isTakenAt =
+        ConvertDateTime.instance.dateToInt(DateTime.now());
+    workshopList.workshopResult.isSendAt = _isSendAt;
     await WorkshopDatabase.instance
-        .saveValue(_workshopList.workshopResult, true);
+        .saveValue(workshopList.workshopResult, true);
   }
 }

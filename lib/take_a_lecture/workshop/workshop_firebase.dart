@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:motokosan/take_a_lecture/lecture/lecture_firebase.dart';
 import 'package:motokosan/take_a_lecture/question/question_firebase.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 
 import 'workshop_class.dart';
 
@@ -45,9 +45,9 @@ class FSWorkshop {
       "questionLength": _data.questionLength,
       "numOfExam": _data.numOfExam,
       "passingScore": _data.passingScore,
-      "upDate": ConvertItems.instance.dateToInt(_timeStamp),
+      "upDate": ConvertDateTime.instance.dateToInt(_timeStamp),
       "createAt":
-          _isAdd ? ConvertItems.instance.dateToInt(_timeStamp) : _data.createAt,
+          _isAdd ? ConvertDateTime.instance.dateToInt(_timeStamp) : _data.createAt,
       "deadlineAt": _data.deadlineAt,
       "targetId": _data.targetId,
       "organizerId": _data.organizerId,
@@ -106,7 +106,7 @@ class FSWorkshop {
   }
 
   Future<List<Workshop>> fetchDatesDeadlineAt(String _groupName) async {
-    final int _todayInt = ConvertItems.instance.dateToInt(DateTime.now());
+    final int _todayInt = ConvertDateTime.instance.dateToInt(DateTime.now());
     final _docs = await fetchDatesAll(_groupName);
     // 期限が過ているものを弾きます
     final List<Workshop> _results =

@@ -15,9 +15,9 @@ import 'home_drawer.dart';
 import 'home_info_not_signin.dart';
 
 class Home extends StatelessWidget {
-  final UserData _userData;
+  final UserData userData;
 
-  Home(this._userData);
+  Home({this.userData});
 
   @override
   Widget build(BuildContext context) {
@@ -29,16 +29,18 @@ class Home extends StatelessWidget {
         title: BarTitle.instance.barTitle(context),
         centerTitle: true,
       ),
-      drawer: HomeDrawer(_userData, _size),
+      drawer: HomeDrawer(userData, _size),
       body: _body(context, model, _size),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: _floatingActionButton(context, model),
-      bottomNavigationBar: _bottomNavigationBar(context, _userData),
+      bottomNavigationBar: _bottomNavigationBar(context, userData),
     );
   }
 
   Future<List<WorkshopList>> _getWorkshopLists(WorkshopModel model) async {
-    await model.fetchListsInfo(_userData.userGroup);
+    await model.fetchListsInfo(userData.userGroup);
+    print(
+        "****************** Home WokshopList.length : ${model.workshopLists.length}けん");
     return model.workshopLists;
   }
 
@@ -57,7 +59,7 @@ class Home extends StatelessWidget {
                     return Container();
                   }
                   if (snapshot.hasData) {
-                    return HomeInfo(_userData, snapshot.data, _size);
+                    return HomeInfo(userData, snapshot.data, _size);
                   } else {
                     return Container();
                   }
@@ -97,22 +99,23 @@ class Home extends StatelessWidget {
       await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => WorkshopListPage(_userData, _organizers[0]),
+          builder: (context) => WorkshopListPage(
+            userData: userData,
+            organizer: _organizers[0],
+          ),
         ),
       );
-      await model.fetchListsInfo(_userData.userGroup);
-      // model.stopLoading();
     } else {
       InfoNotSignin.instance.function(
         context,
         "サインアウトしているので\n実行できません",
         "サインインしますか？",
-        _userData,
+        userData,
       );
     }
   }
 
-  Widget _bottomNavigationBar(BuildContext context, UserData _userData) {
+  Widget _bottomNavigationBar(BuildContext context, UserData userData) {
     return BottomAppBar(
       color: Theme.of(context).primaryColor,
       notchMargin: 6.0,

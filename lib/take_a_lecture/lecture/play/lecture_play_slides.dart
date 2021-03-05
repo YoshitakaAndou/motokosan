@@ -5,7 +5,10 @@ class LecturePlaySlides extends StatefulWidget {
   final List<Slide> slides;
   final Size size;
 
-  LecturePlaySlides({this.slides, this.size});
+  LecturePlaySlides({
+    this.slides,
+    this.size,
+  });
 
   @override
   _LecturePlaySlidesState createState() => _LecturePlaySlidesState();

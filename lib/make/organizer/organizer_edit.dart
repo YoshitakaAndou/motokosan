@@ -10,8 +10,11 @@ import '../../take_a_lecture/organizer/organizer_model.dart';
 
 class OrganizerEdit extends StatelessWidget {
   final String groupName;
-  final Organizer _organizer;
-  OrganizerEdit(this.groupName, this._organizer);
+  final Organizer organizer;
+  OrganizerEdit(
+    this.groupName,
+    this.organizer,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -21,11 +24,11 @@ class OrganizerEdit extends StatelessWidget {
     final option1TextController = TextEditingController();
     final option2TextController = TextEditingController();
     final option3TextController = TextEditingController();
-    titleTextController.text = _organizer.title;
-    subTitleTextController.text = _organizer.subTitle;
-    option1TextController.text = _organizer.option1;
-    option2TextController.text = _organizer.option2;
-    option3TextController.text = _organizer.option3;
+    titleTextController.text = organizer.title;
+    subTitleTextController.text = organizer.subTitle;
+    option1TextController.text = organizer.option1;
+    option2TextController.text = organizer.option2;
+    option3TextController.text = organizer.option3;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -117,7 +120,7 @@ class OrganizerEdit extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: Text("　番号：${_organizer.organizerNo}",
+              child: Text("　番号：${organizer.organizerNo}",
                   style: cTextUpBarL, textScaleFactor: 1),
             ),
             Expanded(
@@ -393,10 +396,10 @@ class OrganizerEdit extends StatelessWidget {
     model.organizer.option1 = option1TextController.text;
     model.organizer.option2 = option2TextController.text;
     model.organizer.option3 = option3TextController.text;
-    model.organizer.organizerId = _organizer.organizerId;
-    model.organizer.organizerNo = _organizer.organizerNo;
-    model.organizer.createAt = _organizer.createAt;
-    model.organizer.updateAt = _organizer.updateAt;
+    model.organizer.organizerId = organizer.organizerId;
+    model.organizer.organizerNo = organizer.organizerNo;
+    model.organizer.createAt = organizer.createAt;
+    model.organizer.updateAt = organizer.updateAt;
     try {
       await model.updateOrganizerFs(groupName, DateTime.now());
       await model.fetchOrganizer(groupName);
@@ -419,7 +422,7 @@ class OrganizerEdit extends StatelessWidget {
       onPress: () {
         MyDialog.instance.okShowDialogFunc(
           context: context,
-          mainTitle: _organizer.title,
+          mainTitle: organizer.title,
           subTitle: "削除しますか？",
           // delete
           onPressed: () async {
@@ -427,7 +430,7 @@ class OrganizerEdit extends StatelessWidget {
             await _deleteSave(
               context,
               model,
-              _organizer.organizerId,
+              organizer.organizerId,
             );
             Navigator.pop(context);
           },
@@ -437,12 +440,12 @@ class OrganizerEdit extends StatelessWidget {
   }
 
   Future<void> _deleteSave(
-      BuildContext context, OrganizerModel model, _organizerId) async {
+      BuildContext context, OrganizerModel model, organizerId) async {
     final FSOrganizer fsOrganizer = FSOrganizer();
     model.startLoading();
     try {
       //FsをTargetIdで削除
-      await model.deleteOrganizerFs(groupName, _organizerId);
+      await model.deleteOrganizerFs(groupName, organizerId);
       //配列を削除するのは無理だから再びFsをフェッチ
       await model.fetchOrganizer(groupName);
       //頭から順にtargetNoを振る

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 import 'qa_model.dart';
 
 Future<List<QuesAns>> fetchFsCloud(String _qasId) async {
@@ -32,8 +32,8 @@ Future<void> addFsCloud(_qasId, _data, _timeStamp) async {
     "answer": _data.answer,
     "description": _data.description,
     "imageUrl": _data.imageUrl,
-    "update": ConvertItems.instance.dateToInt(_timeStamp),
-    "createAt": ConvertItems.instance.dateToInt(_timeStamp),
+    "update": ConvertDateTime.instance.dateToInt(_timeStamp),
+    "createAt": ConvertDateTime.instance.dateToInt(_timeStamp),
   }).catchError((onError) {
     print(onError.toString());
   });
@@ -47,7 +47,7 @@ Future<void> updateFsCloud(_qasId, _qaId, _data) async {
     "answer": _data.answer,
     "description": _data.description,
     "imageUrl": _data.imageUrl,
-    "update": ConvertItems.instance.dateToInt(DateTime.now()),
+    "update": ConvertDateTime.instance.dateToInt(DateTime.now()),
     "createAt": _data.createAt,
   }).catchError((onError) {
     print(onError.toString());

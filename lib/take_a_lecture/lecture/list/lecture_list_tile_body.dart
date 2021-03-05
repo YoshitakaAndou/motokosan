@@ -1,37 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:motokosan/constants.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
 import 'package:motokosan/take_a_lecture/lecture/lecture_firebase.dart';
-import 'package:motokosan/take_a_lecture/lecture/lecture_play.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_model.dart';
+import 'package:motokosan/take_a_lecture/lecture/play/lecture_play.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_database.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/data/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/check_deadline_at.dart';
-import 'package:motokosan/widgets/convert_items.dart';
-import '../../constants.dart';
-import '../../widgets/return_argument.dart';
-import 'lecture_class.dart';
-import 'lecture_model.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
+import 'package:motokosan/widgets/return_argument.dart';
 import 'lecture_list_bottomsheet_send_items.dart';
 
 class LectureListTileBody extends StatelessWidget {
-  final UserData _userData;
-  final WorkshopList _workshopList;
+  final UserData userData;
+  final WorkshopList workshopList;
   final LectureModel model;
-  final int _index;
+  final int index;
+  final String routeName;
+
   LectureListTileBody(
-      this._userData, this._workshopList, this.model, this._index);
+    this.userData,
+    this.workshopList,
+    this.model,
+    this.index,
+    this.routeName,
+  );
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       contentPadding: EdgeInsets.symmetric(vertical: 1, horizontal: 5),
       // dense: true,
-      leading: _leading(context, model, _index),
-      title: _title(context, model, _index),
-      subtitle: _subtitle(context, model, _index),
-      trailing: _trailing(context, model, _index),
-      onTap: () => _onTap(context, model, _index, _userData.userGroup,
-          _workshopList.workshop.workshopId),
+      leading: _leading(context, model, index),
+      title: _title(context, model, index),
+      subtitle: _subtitle(context, model, index),
+      trailing: _trailing(context, model, index),
+      onTap: () => _onTap(context, model, index, userData.userGroup,
+          workshopList.workshop.workshopId),
     );
   }
 
@@ -41,11 +48,12 @@ class LectureListTileBody extends StatelessWidget {
     // スライドが登録されていたら準備をする
     if (_slideLength > 0) {
       _results =
-          await FSSlide.instance.fetchDates(_userData.userGroup, _lectureId);
+          await FSSlide.instance.fetchDates(userData.userGroup, _lectureId);
     }
     return _results;
   }
 
+  // 動画のサムネイル
   Widget _leading(BuildContext context, LectureModel model, int _index) {
     final _imageUrl = model.lectureLists[_index].lecture.thumbnailUrl ?? "";
     if (_imageUrl.isNotEmpty) {
@@ -197,16 +205,17 @@ class LectureListTileBody extends StatelessWidget {
           DeviceOrientation.portraitUp,
         ]);
       }
-      // Trainingへ 終わったら値を受け取る
+      // LecturePlayへ （終わったら値を受け取る）
       returnArgument = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => LecturePlay(
-            _userData,
-            _workshopList,
+            userData,
+            workshopList,
             model.lectureLists[_index],
             _slides1,
             model.lectureLists.length - _index == 1 ? true : false,
+            routeName,
           ),
         ),
       );
@@ -236,14 +245,14 @@ class LectureListTileBody extends StatelessWidget {
     if (_sendCheck.length > 0 && _sendCheck[0].graduaterId.isNotEmpty) {
       return;
     }
-    // todo workshopResultの保存
+    // workshopResultの保存
     await _saveWorkshopResult(context, model, 0, "");
     if (model.lectureLists.length == model.takenCount) {
       final List<WorkshopResult> _results =
           await WorkshopDatabase.instance.getWorkshopResult(_workshopId);
       final CheckDeadlineAt _checkDeadlineAt =
-          CheckDeadlineAt(deadlineAt: _workshopList.workshop.deadlineAt);
-      // todo 修了書を送るボトムシート
+          CheckDeadlineAt(deadlineAt: workshopList.workshop.deadlineAt);
+      // 修了書を送るボトムシート
       if (_results[0].isTaken == "研修済" &&
           _results[0].graduaterId.isEmpty &&
           _checkDeadlineAt.check()) {
@@ -253,15 +262,15 @@ class LectureListTileBody extends StatelessWidget {
   }
 
   _checkWorkshopIsTaken(LectureModel model) {
-    if (_workshopList.workshopResult.isTaken != "研修済") {
+    if (workshopList.workshopResult.isTaken != "研修済") {
       if (model.lectureLists.length > model.takenCount) {
-        _workshopList.workshopResult.isTaken = "受講中";
+        workshopList.workshopResult.isTaken = "受講中";
       } else {
-        if (_workshopList.workshop.isExam) {
+        if (workshopList.workshop.isExam) {
           //修了試験があったら
-          _workshopList.workshopResult.isTaken = "受講済";
+          workshopList.workshopResult.isTaken = "受講済";
         } else {
-          _workshopList.workshopResult.isTaken = "研修済";
+          workshopList.workshopResult.isTaken = "研修済";
         }
       }
     }
@@ -273,16 +282,16 @@ class LectureListTileBody extends StatelessWidget {
     int _isSendAt,
     String _graduaterId,
   ) async {
-    final bool _isExam = _workshopList.workshop.isExam;
-    _workshopList.workshopResult.graduaterId = _isExam ? "" : _graduaterId;
-    _workshopList.workshopResult.workshopId = _workshopList.workshop.workshopId;
-    _workshopList.workshopResult.lectureCount = model.lectureLists.length;
-    _workshopList.workshopResult.takenCount = model.takenCount;
-    _workshopList.workshopResult.isTakenAt =
-        ConvertItems.instance.dateToInt(DateTime.now());
-    _workshopList.workshopResult.isSendAt = _isSendAt;
+    final bool _isExam = workshopList.workshop.isExam;
+    workshopList.workshopResult.graduaterId = _isExam ? "" : _graduaterId;
+    workshopList.workshopResult.workshopId = workshopList.workshop.workshopId;
+    workshopList.workshopResult.lectureCount = model.lectureLists.length;
+    workshopList.workshopResult.takenCount = model.takenCount;
+    workshopList.workshopResult.isTakenAt =
+        ConvertDateTime.instance.dateToInt(DateTime.now());
+    workshopList.workshopResult.isSendAt = _isSendAt;
     await WorkshopDatabase.instance
-        .saveValue(_workshopList.workshopResult, true);
+        .saveValue(workshopList.workshopResult, true);
   }
 
   Future<Widget> _showModalBottomSheetSend(
@@ -300,7 +309,7 @@ class LectureListTileBody extends StatelessWidget {
       ),
       builder: (BuildContext context) {
         return LectureListBottomSheetSendItems(
-            _userData, _workshopList, model, fromButton);
+            userData, workshopList, model, fromButton);
       },
     );
   }

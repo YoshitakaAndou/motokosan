@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:motokosan/home/home.dart';
+import 'package:motokosan/data/user_data/userdata_class.dart';
 import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
 import 'package:motokosan/take_a_lecture/question/question_class.dart';
 import 'package:motokosan/take_a_lecture/question/question_firebase.dart';
-import 'package:motokosan/data/user_data/userdata_class.dart';
+import 'package:motokosan/take_a_lecture/question/question_model.dart';
 import 'package:motokosan/widgets/bar_title.dart';
 import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
@@ -12,22 +13,24 @@ import '../../widgets/show_dialog.dart';
 import '../../constants.dart';
 import 'question_add.dart';
 import 'question_edit.dart';
-import '../../take_a_lecture/question/question_model.dart';
 
 class QuestionPage extends StatelessWidget {
-  final UserData _userData;
-  final Lecture _lecture;
-  QuestionPage(this._userData, this._lecture);
+  final UserData userData;
+  final Lecture lecture;
+  QuestionPage(
+    this.userData,
+    this.lecture,
+  );
 
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<QuestionModel>(context, listen: false);
-    model.question.organizerId = _lecture.organizerId;
-    model.question.workshopId = _lecture.workshopId;
-    model.question.lectureId = _lecture.lectureId;
+    model.question.organizerId = lecture.organizerId;
+    model.question.workshopId = lecture.workshopId;
+    model.question.lectureId = lecture.lectureId;
     Future(() async {
       model.startLoading();
-      await model.fetchQuestion(_userData.userGroup, _lecture.lectureId);
+      await model.fetchQuestion(userData.userGroup, lecture.lectureId);
       model.stopLoading();
     });
     return Consumer<QuestionModel>(builder: (context, model, child) {
@@ -71,7 +74,7 @@ class QuestionPage extends StatelessWidget {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             fullscreenDialog: true,
-            builder: (context) => Home(_userData),
+            builder: (context) => Home(userData: userData),
           ),
         );
       },
@@ -113,7 +116,7 @@ class QuestionPage extends StatelessWidget {
                           // Text("講義：", style: cTextUpBarS, textScaleFactor: 1),
                           Flexible(
                             child: Text(
-                              _lecture.title,
+                              lecture.title,
                               style: cTextUpBarS,
                               textScaleFactor: 1,
                               maxLines: 1,
@@ -128,17 +131,17 @@ class QuestionPage extends StatelessWidget {
                         children: [
                           SizedBox(width: 10),
                           Text(
-                            "問題数：${_lecture.questionLength} 問",
+                            "問題数：${lecture.questionLength} 問",
                             style: cTextUpBarSS,
                             textScaleFactor: 1,
                           ),
                           Text(
-                            "${_lecture.allAnswers} ",
+                            "${lecture.allAnswers} ",
                             style: cTextUpBarSS,
                             textScaleFactor: 1,
                           ),
                           Text(
-                            "合格点：${_lecture.passingScore} 点",
+                            "合格点：${lecture.passingScore} 点",
                             style: cTextUpBarSS,
                             textScaleFactor: 1,
                           ),
@@ -163,11 +166,11 @@ class QuestionPage extends StatelessWidget {
         _data.questionNo = _count.toString().padLeft(4, "0");
         //Fsにアップデート
         await fsQuestion.setData(
-            false, _userData.userGroup, _data, DateTime.now());
+            false, userData.userGroup, _data, DateTime.now());
         _count += 1;
       }
       //一通り終わったらFsから読み込んで再描画させる
-      await model.fetchQuestion(_userData.userGroup, _lecture.lectureId);
+      await model.fetchQuestion(userData.userGroup, lecture.lectureId);
     } catch (e) {
       MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
     }
@@ -222,14 +225,14 @@ class QuestionPage extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => QuestionEdit(
-                    _userData.userGroup,
-                    _lecture,
+                    userData.userGroup,
+                    lecture,
                     _question,
                   ),
                   fullscreenDialog: true,
                 ));
             model.startLoading();
-            await model.fetchQuestion(_userData.userGroup, _lecture.lectureId);
+            await model.fetchQuestion(userData.userGroup, lecture.lectureId);
             model.stopLoading();
           },
         ),
@@ -276,15 +279,15 @@ class QuestionPage extends StatelessWidget {
       label: Text(" 確認テストを追加", style: cTextUpBarL, textScaleFactor: 1),
       // add
       onPressed: () async {
-        model.initQuestion(_lecture);
+        model.initQuestion(lecture);
         model.initProperties();
         await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => QuestionAdd(_userData.userGroup, _lecture),
+              builder: (context) => QuestionAdd(userData.userGroup, lecture),
               fullscreenDialog: true,
             ));
-        await model.fetchQuestion(_userData.userGroup, _lecture.lectureId);
+        await model.fetchQuestion(userData.userGroup, lecture.lectureId);
       },
     );
   }

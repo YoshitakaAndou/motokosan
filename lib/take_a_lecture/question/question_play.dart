@@ -7,7 +7,7 @@ import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
 import 'package:motokosan/widgets/return_argument.dart';
 import 'package:motokosan/take_a_lecture/question/question_database.dart';
 import 'package:motokosan/data/user_data/userdata_class.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 import '../../widgets/bar_title.dart';
 import '../../widgets/go_back.dart';
 import 'package:soundpool/soundpool.dart';
@@ -15,14 +15,19 @@ import '../../constants.dart';
 import 'question_class.dart';
 
 class QuestionPlay extends StatefulWidget {
-  final UserData _userData;
+  final UserData userData;
   final Question dataQs;
   final LectureList lectureList;
-  final int _remains;
+  final int remains;
   final bool isShowOnly;
 
-  QuestionPlay(this._userData, this.dataQs, this.lectureList, this._remains,
-      this.isShowOnly);
+  QuestionPlay(
+    this.userData,
+    this.dataQs,
+    this.lectureList,
+    this.remains,
+    this.isShowOnly,
+  );
 
   @override
   _QuestionPlayState createState() => _QuestionPlayState();
@@ -55,12 +60,12 @@ class _QuestionPlayState extends State<QuestionPlay> {
   @override
   void initState() {
     super.initState();
-    print(widget._userData.userGroup);
+    print(widget.userData.userGroup);
     isPlay = !widget.isShowOnly;
     _dataQs = widget.dataQs;
     isButton = true;
     _lectureList = widget.lectureList;
-    numberOfRemaining = widget._remains;
+    numberOfRemaining = widget.remains;
     //todo
     initSounds();
     setQuestion();
@@ -345,7 +350,7 @@ class _QuestionPlayState extends State<QuestionPlay> {
             _questionResult.questionId = _dataQs.questionId;
             _questionResult.answerResult = "○";
             _questionResult.answerAt =
-                ConvertItems.instance.dateToInt(DateTime.now());
+                ConvertDateTime.instance.dateToInt(DateTime.now());
             _questionResult.lectureId = _dataQs.lectureId;
             _questionResult.flag1 = "";
             await QuestionDatabase.instance.saveValue(_questionResult);
@@ -360,7 +365,7 @@ class _QuestionPlayState extends State<QuestionPlay> {
             _questionResult.questionId = _dataQs.questionId;
             _questionResult.answerResult = "×";
             _questionResult.answerAt =
-                ConvertItems.instance.dateToInt(DateTime.now());
+                ConvertDateTime.instance.dateToInt(DateTime.now());
             _questionResult.lectureId = _dataQs.lectureId;
             _questionResult.flag1 = "";
             await QuestionDatabase.instance.saveValue(_questionResult);

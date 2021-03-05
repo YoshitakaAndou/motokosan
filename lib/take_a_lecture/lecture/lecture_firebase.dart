@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_firebase.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 
 import 'lecture_class.dart';
 
@@ -72,9 +72,9 @@ class FSLecture {
       "passingScore": _data.passingScore,
       "slideLength": _data.slideLength,
       "questionLength": _data.questionLength,
-      "upDate": ConvertItems.instance.dateToInt(_timeStamp),
+      "upDate": ConvertDateTime.instance.dateToInt(_timeStamp),
       "createAt":
-          _isAdd ? ConvertItems.instance.dateToInt(_timeStamp) : _data.createAt,
+          _isAdd ? ConvertDateTime.instance.dateToInt(_timeStamp) : _data.createAt,
       "targetId": _data.targetId,
       "organizerId": _data.organizerId,
       "workshopId": _data.workshopId,

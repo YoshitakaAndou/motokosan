@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:motokosan/buttons/white_button.dart';
 import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_firebase.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../take_a_lecture/workshop/workshop_model.dart';
@@ -14,9 +14,13 @@ import 'dart:async';
 
 class WorkshopEdit extends StatelessWidget {
   final String groupName;
-  final Workshop _workshop;
-  final Organizer _organizer;
-  WorkshopEdit(this.groupName, this._workshop, this._organizer);
+  final Workshop workshop;
+  final Organizer organizer;
+  WorkshopEdit(
+    this.groupName,
+    this.workshop,
+    this.organizer,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -25,11 +29,11 @@ class WorkshopEdit extends StatelessWidget {
     final option1TextController = TextEditingController();
     final option2TextController = TextEditingController();
     final option3TextController = TextEditingController();
-    titleTextController.text = _workshop.title;
-    subTitleTextController.text = _workshop.subTitle;
-    option1TextController.text = _workshop.information;
-    option2TextController.text = _workshop.subInformation;
-    option3TextController.text = _workshop.option3;
+    titleTextController.text = workshop.title;
+    subTitleTextController.text = workshop.subTitle;
+    option1TextController.text = workshop.information;
+    option2TextController.text = workshop.subInformation;
+    option3TextController.text = workshop.option3;
 
     return Consumer<WorkshopModel>(builder: (context, model, child) {
       return Scaffold(
@@ -122,7 +126,7 @@ class WorkshopEdit extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: Text("　番号：${_workshop.workshopNo}",
+              child: Text("　番号：${workshop.workshopNo}",
                   style: cTextUpBarL, textScaleFactor: 1),
             ),
             Expanded(
@@ -130,7 +134,7 @@ class WorkshopEdit extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("主催：${_organizer.title}",
+                  Text("主催：${organizer.title}",
                       style: cTextUpBarS, textScaleFactor: 1),
                 ],
               ),
@@ -152,13 +156,13 @@ class WorkshopEdit extends StatelessWidget {
   }
 
   Widget _switchRelease(BuildContext context, WorkshopModel model) {
-    final _okSwitch = _workshop.lectureLength > 0;
+    final _okSwitch = workshop.lectureLength > 0;
     return Column(
       children: [
         Row(
           children: [
             if (_okSwitch)
-              Text("登録講座 ${_workshop.lectureLength}件",
+              Text("登録講座 ${workshop.lectureLength}件",
                   style: TextStyle(fontSize: 12, color: Colors.black87),
                   textScaleFactor: 1),
             if (!_okSwitch)
@@ -171,24 +175,24 @@ class WorkshopEdit extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Switch(
-              value: _workshop.isRelease,
+              value: workshop.isRelease,
               activeColor: Colors.green,
               activeTrackColor: Colors.grey,
               inactiveThumbColor: Colors.white,
               inactiveTrackColor: Colors.grey,
               onChanged: (value) {
-                if (_workshop.lectureLength > 0) {
-                  _workshop.isRelease = value;
+                if (workshop.lectureLength > 0) {
+                  workshop.isRelease = value;
                   model.setUpdate();
                 }
               },
             ),
             SizedBox(width: 20),
-            Text(_workshop.isRelease ? '公開する' : '非公開',
+            Text(workshop.isRelease ? '公開する' : '非公開',
                 style: TextStyle(
                     fontSize: 15,
                     color:
-                        _workshop.isRelease ? Colors.black87 : Colors.black26),
+                        workshop.isRelease ? Colors.black87 : Colors.black26),
                 textScaleFactor: 1),
           ],
         ),
@@ -200,10 +204,10 @@ class WorkshopEdit extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Text("期日：${ConvertItems.instance.intToString(_workshop.deadlineAt)}",
+        Text("期日：${ConvertDateTime.instance.intToString(workshop.deadlineAt)}",
             style: TextStyle(
                 fontSize: 12,
-                color: _workshop.isRelease ? Colors.black87 : Colors.black26),
+                color: workshop.isRelease ? Colors.black87 : Colors.black26),
             textScaleFactor: 1),
         SizedBox(width: 10),
         IconButton(
@@ -216,7 +220,7 @@ class WorkshopEdit extends StatelessWidget {
   }
 
   Future<void> _deadlineOnTap(BuildContext context, WorkshopModel model) async {
-    final DateTime _initDate = DateTime.parse(_workshop.deadlineAt.toString());
+    final DateTime _initDate = DateTime.parse(workshop.deadlineAt.toString());
     final DateTime selected = await showDatePicker(
       context: context,
       initialDate: _initDate,
@@ -224,8 +228,8 @@ class WorkshopEdit extends StatelessWidget {
       lastDate: DateTime.now().add(Duration(days: 770)),
     );
     if (selected != null) {
-      _workshop.deadlineAt = ConvertItems.instance.dateToInt(selected);
-      // model.workshop.deadlineAt = _workshop.deadlineAt;
+      workshop.deadlineAt = ConvertDateTime.instance.dateToInt(selected);
+      // model.workshop.deadlineAt = workshop.deadlineAt;
       model.setUpdate();
     }
   }
@@ -366,18 +370,17 @@ class WorkshopEdit extends StatelessWidget {
         SizedBox(height: 10),
         _switchExam(context, model),
         SizedBox(height: 10),
-        if (_workshop.isExam) _numOfExam(context, model),
+        if (workshop.isExam) _numOfExam(context, model),
         SizedBox(height: 10),
-        if (_workshop.isExam) _passingScore(context, model),
+        if (workshop.isExam) _passingScore(context, model),
         SizedBox(height: 10),
       ],
     );
   }
 
   Widget _switchExam(BuildContext context, WorkshopModel model) {
-    final _okSwitch = _workshop.lectureLength > 0;
-    final _isMax =
-        _workshop.questionLength == _workshop.numOfExam ? true : false;
+    final _okSwitch = workshop.lectureLength > 0;
+    final _isMax = workshop.questionLength == workshop.numOfExam ? true : false;
     return Row(
       children: [
         Expanded(
@@ -389,7 +392,7 @@ class WorkshopEdit extends StatelessWidget {
                   style: TextStyle(fontSize: 13, color: Colors.black87),
                   textScaleFactor: 1),
               if (_okSwitch)
-                Text("  登録問題 ${_workshop.questionLength}問",
+                Text("  登録問題 ${workshop.questionLength}問",
                     style: TextStyle(
                         fontSize: 10,
                         color: _isMax ? Colors.red : Colors.black87),
@@ -407,23 +410,22 @@ class WorkshopEdit extends StatelessWidget {
           child: Row(
             children: [
               Switch(
-                value: _workshop.isExam,
+                value: workshop.isExam,
                 activeColor: Colors.green,
                 activeTrackColor: Colors.grey,
                 inactiveThumbColor: Colors.white,
                 inactiveTrackColor: Colors.grey,
                 onChanged: (value) {
-                  if (_workshop.questionLength > 0) {
-                    _workshop.isExam = value;
+                  if (workshop.questionLength > 0) {
+                    workshop.isExam = value;
                     model.setUpdate();
                   }
                 },
               ),
-              Text(_workshop.isExam ? '実施する' : '実施しない',
+              Text(workshop.isExam ? '実施する' : '実施しない',
                   style: TextStyle(
                       fontSize: 15,
-                      color:
-                          _workshop.isExam ? Colors.black87 : Colors.black26),
+                      color: workshop.isExam ? Colors.black87 : Colors.black26),
                   textScaleFactor: 1),
             ],
           ),
@@ -439,16 +441,16 @@ class WorkshopEdit extends StatelessWidget {
         Text("修了試験の問題数 :", style: cTextListM, textScaleFactor: 1),
         Container(
           child: _numCounter(
-            initNum: _workshop.numOfExam,
+            initNum: workshop.numOfExam,
             pressedMinus: () {
-              if (_workshop.numOfExam > 1) {
-                _workshop.numOfExam -= 1;
+              if (workshop.numOfExam > 1) {
+                workshop.numOfExam -= 1;
                 model.setUpdate();
               }
             },
             pressedPlus: () {
-              if (_workshop.numOfExam < _workshop.questionLength) {
-                _workshop.numOfExam += 1;
+              if (workshop.numOfExam < workshop.questionLength) {
+                workshop.numOfExam += 1;
                 model.setUpdate();
               }
             },
@@ -465,16 +467,16 @@ class WorkshopEdit extends StatelessWidget {
         Text("修了試験の合格点 :", style: cTextListM, textScaleFactor: 1),
         Container(
           child: _numCounter(
-            initNum: _workshop.passingScore,
+            initNum: workshop.passingScore,
             pressedMinus: () {
-              if (_workshop.passingScore > 0) {
-                _workshop.passingScore -= 5;
+              if (workshop.passingScore > 0) {
+                workshop.passingScore -= 5;
                 model.setUpdate();
               }
             },
             pressedPlus: () {
-              if (_workshop.passingScore < 100) {
-                _workshop.passingScore += 5;
+              if (workshop.passingScore < 100) {
+                workshop.passingScore += 5;
                 model.setUpdate();
               }
             },
@@ -640,18 +642,18 @@ class WorkshopEdit extends StatelessWidget {
     model.workshop.information = option1TextController.text;
     model.workshop.subInformation = option2TextController.text;
     model.workshop.option3 = option3TextController.text;
-    model.workshop.isRelease = _workshop.isRelease;
-    model.workshop.isExam = _workshop.isExam;
-    model.workshop.workshopId = _workshop.workshopId;
-    model.workshop.workshopNo = _workshop.workshopNo;
-    model.workshop.createAt = _workshop.createAt;
-    model.workshop.updateAt = _workshop.updateAt;
-    model.workshop.deadlineAt = _workshop.deadlineAt;
-    model.workshop.numOfExam = _workshop.numOfExam;
-    model.workshop.passingScore = _workshop.passingScore;
+    model.workshop.isRelease = workshop.isRelease;
+    model.workshop.isExam = workshop.isExam;
+    model.workshop.workshopId = workshop.workshopId;
+    model.workshop.workshopNo = workshop.workshopNo;
+    model.workshop.createAt = workshop.createAt;
+    model.workshop.updateAt = workshop.updateAt;
+    model.workshop.deadlineAt = workshop.deadlineAt;
+    model.workshop.numOfExam = workshop.numOfExam;
+    model.workshop.passingScore = workshop.passingScore;
     try {
       await model.updateWorkshopFs(groupName, DateTime.now());
-      await model.fetchWorkshopByOrganizer(groupName, _organizer.organizerId);
+      await model.fetchWorkshopByOrganizer(groupName, organizer.organizerId);
       model.stopLoading();
       await MyDialog.instance.okShowDialog(context, "更新しました", Colors.black);
       Navigator.pop(context);
@@ -671,7 +673,7 @@ class WorkshopEdit extends StatelessWidget {
       onPress: () {
         MyDialog.instance.okShowDialogFunc(
           context: context,
-          mainTitle: _workshop.title,
+          mainTitle: workshop.title,
           subTitle: "削除しますか？",
           // delete
           onPressed: () async {
@@ -679,8 +681,8 @@ class WorkshopEdit extends StatelessWidget {
             await _deleteSave(
               context,
               model,
-              _workshop.organizerId,
-              _workshop.workshopId,
+              workshop.organizerId,
+              workshop.workshopId,
             );
             Navigator.pop(context);
           },
@@ -690,14 +692,14 @@ class WorkshopEdit extends StatelessWidget {
   }
 
   Future<void> _deleteSave(BuildContext context, WorkshopModel model,
-      _categoryId, _workshopId) async {
+      _categoryId, workshopId) async {
     model.startLoading();
     try {
       // todo workShop以下のデータは消せていないから消す様にする
-      //Fsを_workshopIdで削除
-      await FSWorkshop.instance.deleteData(groupName, _workshopId);
+      //FsをworkshopIdで削除
+      await FSWorkshop.instance.deleteData(groupName, workshopId);
       //配列を削除するのは無理だから再びFsをフェッチ
-      await model.fetchWorkshopByOrganizer(groupName, _organizer.organizerId);
+      await model.fetchWorkshopByOrganizer(groupName, organizer.organizerId);
       //頭から順にtargetNoを振る
       int _count = 1;
       for (Workshop _data in model.workshops) {
@@ -708,7 +710,7 @@ class WorkshopEdit extends StatelessWidget {
         _count += 1;
       }
       //一通り終わったらFsから読み込んで再描画させる
-      await model.fetchWorkshopByOrganizer(groupName, _organizer.organizerId);
+      await model.fetchWorkshopByOrganizer(groupName, organizer.organizerId);
     } catch (e) {
       MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
     }

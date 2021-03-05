@@ -14,14 +14,14 @@ import 'package:soundpool/soundpool.dart';
 import '../../constants.dart';
 
 class ExamPlay extends StatefulWidget {
-  final UserData _userData;
+  final UserData userData;
   final List<ExamList> datesQs;
   final WorkshopList workshopList;
   final int index;
   final bool isShowOnly;
 
   ExamPlay(
-    this._userData,
+    this.userData,
     this.datesQs,
     this.workshopList,
     this.index,
@@ -59,7 +59,7 @@ class _ExamPlayState extends State<ExamPlay> {
   @override
   void initState() {
     super.initState();
-    print(widget._userData.uid);
+    print(widget.userData.uid);
     isPlaying = !widget.isShowOnly;
     _datesQs = widget.datesQs;
     isButton = true;

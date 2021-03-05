@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:motokosan/constants.dart';
 import 'package:motokosan/data/data_save_body.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_model.dart';
 import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 
-import '../../constants.dart';
-import '../../take_a_lecture/lecture/lecture_class.dart';
-import '../../take_a_lecture/lecture/lecture_model.dart';
 import 'lecture_video.dart';
 import 'lecture_web.dart';
 
 class LectureEditTextMovie extends StatelessWidget {
   final String groupName;
-  final Lecture _lecture;
-  final Workshop _workshop;
-  final Organizer _organizer;
+  final Lecture lecture;
+  final Workshop workshop;
+  final Organizer organizer;
   final TextEditingController titleTextController;
   final TextEditingController subTitleTextController;
   final TextEditingController descTextController;
@@ -24,9 +24,9 @@ class LectureEditTextMovie extends StatelessWidget {
 
   LectureEditTextMovie(
     this.groupName,
-    this._lecture,
-    this._workshop,
-    this._organizer,
+    this.lecture,
+    this.workshop,
+    this.organizer,
     this.titleTextController,
     this.subTitleTextController,
     this.descTextController,
@@ -38,11 +38,11 @@ class LectureEditTextMovie extends StatelessWidget {
   Widget build(BuildContext context) {
     // final model = Provider.of<LectureModel>(context, listen: false);
     final Size _size = MediaQuery.of(context).size;
-    titleTextController.text = _lecture.title;
-    subTitleTextController.text = _lecture.subTitle;
-    descTextController.text = _lecture.description;
-    videoUrlTextController.text = _lecture.videoUrl;
-    model.isVideoPlay = _lecture.videoUrl.isNotEmpty ? true : false;
+    titleTextController.text = lecture.title;
+    subTitleTextController.text = lecture.subTitle;
+    descTextController.text = lecture.description;
+    videoUrlTextController.text = lecture.videoUrl;
+    model.isVideoPlay = lecture.videoUrl.isNotEmpty ? true : false;
 
     // return Consumer<LectureModel>(builder: (context, model, child) {
     return Scaffold(
@@ -117,7 +117,7 @@ class LectureEditTextMovie extends StatelessWidget {
           children: [
             Expanded(
               flex: 2,
-              child: Text("　番号：${_lecture.lectureNo}",
+              child: Text("　番号：${lecture.lectureNo}",
                   style: cTextUpBarL, textScaleFactor: 1),
             ),
             Expanded(
@@ -126,9 +126,9 @@ class LectureEditTextMovie extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("主催：${_organizer.title}",
+                  Text("主催：${organizer.title}",
                       style: cTextUpBarS, textScaleFactor: 1),
-                  Text("研修会：${_workshop.title}",
+                  Text("研修会：${workshop.title}",
                       style: cTextUpBarS, textScaleFactor: 1),
                 ],
               ),

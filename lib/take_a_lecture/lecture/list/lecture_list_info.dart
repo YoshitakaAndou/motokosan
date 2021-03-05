@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:motokosan/constants.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 
 class LectureListInfo {
   static final LectureListInfo instance = LectureListInfo();
@@ -71,7 +71,7 @@ class LectureListInfo {
               ),
               _columnItem(
                 "更新日",
-                ConvertItems.instance
+                ConvertDateTime.instance
                     .intToString(_workshopList.workshop.updateAt),
               ),
               _columnItem(

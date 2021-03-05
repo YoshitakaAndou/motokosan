@@ -3,7 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/constants.dart';
 import 'package:motokosan/take_a_lecture/graduater/graduater_class.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 
 class GraduaterLicense {
   static final GraduaterLicense instance = GraduaterLicense();
@@ -63,7 +63,7 @@ class GraduaterLicense {
               _columnItem("受講者", _graduaterList.userData.userName),
               _columnItem(
                 "修了日",
-                ConvertItems.instance
+                ConvertDateTime.instance
                     .intToString((_graduaterList.graduater.takenAt)),
               ),
             ],

@@ -5,16 +5,20 @@ import 'package:motokosan/take_a_lecture/exam/exam_play.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_database.dart';
 import 'package:motokosan/data/user_data/userdata_class.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 import 'package:motokosan/widgets/flare_actors.dart';
 
 import '../../constants.dart';
 
 class ExamListBottomSheetInfoItems extends StatelessWidget {
   final ExamModel model;
-  final UserData _userData;
-  final WorkshopList _workshopList;
-  ExamListBottomSheetInfoItems(this.model, this._userData, this._workshopList);
+  final UserData userData;
+  final WorkshopList workshopList;
+  ExamListBottomSheetInfoItems(
+    this.model,
+    this.userData,
+    this.workshopList,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +28,7 @@ class ExamListBottomSheetInfoItems extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _bottomSheetTitle(context, model, _size),
-        _bottomSheetText(context, _workshopList, _size),
+        _bottomSheetText(context, workshopList, _size),
         _bottomSheetButton(context, model, _size),
         SizedBox(height: 50),
       ],
@@ -75,7 +79,7 @@ class ExamListBottomSheetInfoItems extends StatelessWidget {
   }
 
   Widget _bottomSheetText(
-      BuildContext context, WorkshopList _workshopList, Size _size) {
+      BuildContext context, WorkshopList workshopList, Size _size) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
@@ -96,8 +100,8 @@ class ExamListBottomSheetInfoItems extends StatelessWidget {
                   ),
                   SizedBox(height: 5),
                   Text(
-                    "全問題：${_workshopList.workshop.numOfExam}問"
-                    "\n得　点：${_workshopList.workshop.passingScore}点以上",
+                    "全問題：${workshopList.workshop.numOfExam}問"
+                    "\n得　点：${workshopList.workshop.passingScore}点以上",
                     style: cTextListM,
                     textScaleFactor: 1,
                     maxLines: 2,
@@ -171,9 +175,9 @@ class ExamListBottomSheetInfoItems extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => ExamPlay(
-                      _userData,
+                      userData,
                       model.examLists,
-                      _workshopList,
+                      workshopList,
                       0,
                       false,
                     ),
@@ -181,7 +185,7 @@ class ExamListBottomSheetInfoItems extends StatelessWidget {
                   ),
                 );
                 Navigator.of(context).pop();
-                _checkClear(context, model, _workshopList);
+                _checkClear(context, model, workshopList);
                 // todo WorkshopResultの保存
                 if (model.isClear) {
                   await _saveWorkshopResult();
@@ -229,7 +233,7 @@ class ExamListBottomSheetInfoItems extends StatelessWidget {
   }
 
   void _checkClear(
-      BuildContext context, ExamModel model, WorkshopList _workshopList) {
+      BuildContext context, ExamModel model, WorkshopList workshopList) {
     // AllAnswersClearのチェック
     // model.setAllAnswersClear(model.examLists
     //     .every((element) => element.examResult.answerResult == "○"));
@@ -238,14 +242,14 @@ class ExamListBottomSheetInfoItems extends StatelessWidget {
         model.examLists.any((element) => element.examResult.answerResult == "");
     model.setAllAnswers(!_result);
     // ScoreClearのチェック
-    model.setScoreClear((_getScore(context, model, _workshopList) >=
-                _workshopList.workshop.passingScore ||
-            _getScore(context, model, _workshopList) == 100)
+    model.setScoreClear((_getScore(context, model, workshopList) >=
+                workshopList.workshop.passingScore ||
+            _getScore(context, model, workshopList) == 100)
         ? true
         : false);
     // isClear のチェック
-    if (_workshopList.workshop.isExam) {
-      if (_workshopList.workshop.passingScore == 0) {
+    if (workshopList.workshop.isExam) {
+      if (workshopList.workshop.passingScore == 0) {
         model.setClear(model.isAllAnswers);
       } else {
         model.setClear(model.isScoreClear && model.isAllAnswers ? true : false);
@@ -256,7 +260,7 @@ class ExamListBottomSheetInfoItems extends StatelessWidget {
   }
 
   int _getScore(
-      BuildContext context, ExamModel model, WorkshopList _workshopList) {
+      BuildContext context, ExamModel model, WorkshopList workshopList) {
     int result = 0;
     if (model.examLists.length > 0) {
       double _result = (model.correctCount / model.examLists.length) * 100;
@@ -266,10 +270,10 @@ class ExamListBottomSheetInfoItems extends StatelessWidget {
   }
 
   Future<void> _saveWorkshopResult() async {
-    _workshopList.workshopResult.isTaken = "研修済";
-    _workshopList.workshopResult.isTakenAt =
-        ConvertItems.instance.dateToInt(DateTime.now());
+    workshopList.workshopResult.isTaken = "研修済";
+    workshopList.workshopResult.isTakenAt =
+        ConvertDateTime.instance.dateToInt(DateTime.now());
     await WorkshopDatabase.instance
-        .saveValue(_workshopList.workshopResult, true);
+        .saveValue(workshopList.workshopResult, true);
   }
 }

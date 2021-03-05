@@ -11,15 +11,15 @@ import 'organizer_model.dart';
 import 'organizer_list_bottomsheet_info_items.dart';
 
 class OrganizerListPage extends StatelessWidget {
-  final UserData _userData;
-  OrganizerListPage(this._userData);
+  final UserData userData;
+  OrganizerListPage({this.userData});
 
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<OrganizerModel>(context, listen: false);
     Future(() async {
       model.startLoading();
-      await model.fetchOrganizerList(_userData.userGroup);
+      await model.fetchOrganizerList(userData.userGroup);
       model.stopLoading();
     });
     return Consumer<OrganizerModel>(builder: (context, model, child) {
@@ -64,8 +64,8 @@ class OrganizerListPage extends StatelessWidget {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => WorkshopListPage(
-                                    _userData,
-                                    model.organizerList[index],
+                                    userData:userData,
+                                    organizer:model.organizerList[index],
                                   ),
                                 ),
                               );

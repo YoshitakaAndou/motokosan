@@ -4,7 +4,7 @@ import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_firebase.dart';
 import 'package:motokosan/data/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/bar_title.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -17,19 +17,21 @@ import 'workshop_add.dart';
 import 'workshop_edit.dart';
 
 class WorkshopPage extends StatelessWidget {
-  final UserData _userData;
-  final Organizer _organizer;
-  WorkshopPage(this._userData, this._organizer);
+  final UserData userData;
+  final Organizer organizer;
+  WorkshopPage(
+    this.userData,
+    this.organizer,
+  );
 
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<WorkshopModel>(context, listen: false);
-    model.workshop.organizerId = _organizer.organizerId;
+    model.workshop.organizerId = organizer.organizerId;
     model.isLoading = false;
     Future(() async {
       model.startLoading();
-      await model.fetchWorkshopMake(
-          _userData.userGroup, _organizer.organizerId);
+      await model.fetchWorkshopMake(userData.userGroup, organizer.organizerId);
       model.stopLoading();
     });
     return Consumer<WorkshopModel>(builder: (context, model, child) {
@@ -74,7 +76,7 @@ class WorkshopPage extends StatelessWidget {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             fullscreenDialog: true,
-            builder: (context) => Home(_userData),
+            builder: (context) => Home(userData: userData),
           ),
         );
       },
@@ -115,7 +117,7 @@ class WorkshopPage extends StatelessWidget {
                         children: [
                           SizedBox(width: 10),
                           Text(
-                            " ${_organizer.title}",
+                            " ${organizer.title}",
                             style: cTextUpBarS,
                             textScaleFactor: 1,
                             maxLines: 1,
@@ -173,7 +175,7 @@ class WorkshopPage extends StatelessWidget {
           // dense: true,
           title:
               Text("${_workshop.title}", style: cTextListL, textScaleFactor: 1),
-          subtitle: _subtitle(_userData.userGroup, model, _workshop),
+          subtitle: _subtitle(userData.userGroup, model, _workshop),
           trailing: InkWell(
             onTap: () async {
               // Trainingへ
@@ -181,15 +183,15 @@ class WorkshopPage extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => LecturePage(
-                    _userData,
-                    _organizer,
+                    userData,
+                    organizer,
                     _workshop,
                   ),
                 ),
               );
               await model.fetchWorkshopMake(
-                _userData.userGroup,
-                _organizer.organizerId,
+                userData.userGroup,
+                organizer.organizerId,
               );
             },
             child: Padding(
@@ -218,16 +220,16 @@ class WorkshopPage extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => WorkshopEdit(
-                  _userData.userGroup,
+                  userData.userGroup,
                   _workshop,
-                  _organizer,
+                  organizer,
                 ),
                 fullscreenDialog: true,
               ),
             );
             await model.fetchWorkshopMake(
-              _userData.userGroup,
-              _organizer.organizerId,
+              userData.userGroup,
+              organizer.organizerId,
             );
           },
         ),
@@ -253,7 +255,7 @@ class WorkshopPage extends StatelessWidget {
           color: Colors.grey.withOpacity(0.2),
           padding: EdgeInsets.symmetric(horizontal: 2),
           child: Text(
-            "期日 ${ConvertItems.instance.intToString(_workshop.deadlineAt)}",
+            "期日 ${ConvertDateTime.instance.intToString(_workshop.deadlineAt)}",
             style: _haveLecture ? cTextListS : cTextUpBarS,
             textScaleFactor: 1,
           ),
@@ -278,16 +280,15 @@ class WorkshopPage extends StatelessWidget {
       icon: Icon(FontAwesomeIcons.plus),
       label: Text(" 研修会を追加", style: cTextUpBarL, textScaleFactor: 1),
       onPressed: () async {
-        model.initData(_organizer);
+        model.initData(organizer);
         await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  WorkshopAdd(_userData.userGroup, _organizer),
+              builder: (context) => WorkshopAdd(userData.userGroup, organizer),
               fullscreenDialog: true,
             ));
         await model.fetchWorkshopMake(
-            _userData.userGroup, _organizer.organizerId);
+            userData.userGroup, organizer.organizerId);
       },
     );
   }
@@ -321,12 +322,12 @@ class WorkshopPage extends StatelessWidget {
         _data.workshopNo = _count.toString().padLeft(4, "0");
         //Fsにアップデート
         await FSWorkshop.instance
-            .setData(false, _userData.userGroup, _data, DateTime.now());
+            .setData(false, userData.userGroup, _data, DateTime.now());
         _count += 1;
       }
       //一通り終わったらFsから読み込んで再描画させる
       await model.fetchWorkshopByOrganizer(
-          _userData.userGroup, _organizer.organizerId);
+          userData.userGroup, organizer.organizerId);
     } catch (e) {
       MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
     }

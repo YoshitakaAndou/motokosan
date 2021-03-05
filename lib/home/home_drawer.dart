@@ -25,10 +25,13 @@ import 'package:motokosan/constants.dart';
 import 'widgets/drawer_menu_item.dart';
 
 class HomeDrawer extends StatefulWidget {
-  final UserData _userData;
+  final UserData userData;
   final Size size;
 
-  HomeDrawer(this._userData, this.size);
+  HomeDrawer(
+    this.userData,
+    this.size,
+  );
 
   @override
   _HomeDrawerState createState() => _HomeDrawerState();
@@ -58,9 +61,9 @@ class _HomeDrawerState extends State<HomeDrawer> {
                     child: ListView(
                       children: [
                         HomeUserData(
-                          widget._userData,
+                          widget.userData,
                           (String txt) {
-                            widget._userData.userName = txt;
+                            widget.userData.userName = txt;
                             model.setUpdate();
                           },
                         ),
@@ -162,7 +165,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
                             ),
                             child: Container(),
                             onTap: () => _resetLectureDataOnTap(
-                                context, widget._userData),
+                                context, widget.userData),
                           ),
                         if (!_isToolsShow)
                           DrawerMenuItem(
@@ -289,7 +292,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
       await Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => OrganizerPage(widget._userData),
+          builder: (context) => OrganizerPage(widget.userData),
         ),
       );
     } else {
@@ -297,7 +300,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
         context,
         "ログアウトしているので\n実行できません",
         "ログインしますか？",
-        widget._userData,
+        widget.userData,
       );
     }
   }
@@ -308,7 +311,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
       await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => TargetPage(widget._userData),
+          builder: (context) => TargetPage(widget.userData),
         ),
       );
     } else {
@@ -316,7 +319,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
         context,
         "ログアウトしているので\n実行できません",
         "ログインしますか？",
-        widget._userData,
+        widget.userData,
       );
     }
   }
@@ -346,13 +349,13 @@ class _HomeDrawerState extends State<HomeDrawer> {
       onPressed: () {
         Navigator.of(context).pop();
         Navigator.of(context).pop();
-        if (widget._userData.userPassword == "google認証") {
+        if (widget.userData.userPassword == "google認証") {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => GoogleLogin(
-                userName: widget._userData.userName,
-                groupName: widget._userData.userGroup,
+                userName: widget.userData.userName,
+                groupName: widget.userData.userGroup,
               ),
             ),
           );
@@ -377,13 +380,13 @@ class _HomeDrawerState extends State<HomeDrawer> {
         Navigator.of(context).pop();
         SignOut.instance.signOut();
         Navigator.of(context).pop();
-        if (widget._userData.userPassword == "google認証") {
+        if (widget.userData.userPassword == "google認証") {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => GoogleLogin(
-                groupName: widget._userData.userGroup,
-                userName: widget._userData.userName,
+                groupName: widget.userData.userGroup,
+                userName: widget.userData.userName,
               ),
             ),
           );
@@ -400,7 +403,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
   }
 
   Future<void> _resetLectureDataOnTap(
-      BuildContext context, UserData _userData) async {
+      BuildContext context, UserData userData) async {
     if (FSUserData.instance.isCurrentUserSignIn()) {
       MyDialog.instance.okShowDialogFunc(
         context: context,
@@ -414,11 +417,11 @@ class _HomeDrawerState extends State<HomeDrawer> {
           await DataSaveBody.instance.savePolicy(false);
           // todo 消す前にGraduatesが有るか調べる
           final List<Graduater> _graduater =
-              await FSGraduater.instance.fetchGraduater(_userData);
+              await FSGraduater.instance.fetchGraduater(userData);
           if (_graduater.length != 0) {
             for (Graduater _data in _graduater) {
               await FSGraduater.instance
-                  .deleteGraduater(_userData.userGroup, _data.graduaterId);
+                  .deleteGraduater(userData.userGroup, _data.graduaterId);
             }
           }
           Navigator.of(context).pop();
@@ -427,7 +430,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
       );
     } else {
       InfoNotSignin.instance
-          .function(context, "ログアウトしているので\n実行できません", "ログインしますか？", _userData);
+          .function(context, "ログアウトしているので\n実行できません", "ログインしますか？", userData);
     }
   }
 
@@ -444,7 +447,7 @@ class _HomeDrawerState extends State<HomeDrawer> {
 
   Future<void> _editToolOnTap(BuildContext context) async {
     final _groupData = Provider.of<AuthModel>(context, listen: false).groupData;
-    if (_groupData.email == widget._userData.userEmail) {
+    if (_groupData.email == widget.userData.userEmail) {
       setState(() {
         _isToolsShow = !_isToolsShow;
         if (_isToolsShow) {

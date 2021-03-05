@@ -14,21 +14,24 @@ import 'home_info_not_signin.dart';
 import 'widgets/change_name_dialog.dart';
 
 class HomeUserData extends StatefulWidget {
-  final UserData _userData;
-  final Function _changeUserData;
-  HomeUserData(this._userData, this._changeUserData);
+  final UserData userData;
+  final Function changeUserData;
+  HomeUserData(
+    this.userData,
+    this.changeUserData,
+  );
 
   @override
   _HomeUserDataState createState() => _HomeUserDataState();
 }
 
 class _HomeUserDataState extends State<HomeUserData> {
-  UserData _userData = UserData();
+  UserData userData = UserData();
   bool isEdit = false;
 
   @override
   void initState() {
-    _userData = widget._userData;
+    userData = widget.userData;
     super.initState();
   }
 
@@ -38,7 +41,7 @@ class _HomeUserDataState extends State<HomeUserData> {
     final GroupData _groupData =
         Provider.of<AuthModel>(context, listen: false).groupData;
     final bool _showGroupData =
-        _groupData.email == _userData.userEmail ? true : false;
+        _groupData.email == userData.userEmail ? true : false;
     return Column(
       children: [
         Container(
@@ -107,27 +110,27 @@ class _HomeUserDataState extends State<HomeUserData> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _userDataRow(
+                          userDataRow(
                             "UID：",
-                            _userData.uid,
+                            userData.uid,
                             cTextListSS,
                           ),
-                          _userDataRow(
+                          userDataRow(
                             "グループ：",
-                            _userData.userGroup,
+                            userData.userGroup,
                             cTextListSS,
                           ),
-                          _userDataRow(
+                          userDataRow(
                             "ユーザー名：",
-                            _userData.userName,
+                            userData.userName,
                             cTextListSS,
                           ),
-                          _userDataRow(
+                          userDataRow(
                             "e-mail：",
-                            _userData.userEmail,
+                            userData.userEmail,
                             cTextListSS,
                           ),
-                          _userDataRow(
+                          userDataRow(
                             "グループコード:",
                             _groupData.groupCode,
                             cTextListSS,
@@ -141,12 +144,12 @@ class _HomeUserDataState extends State<HomeUserData> {
                                   height: 5,
                                   thickness: 2,
                                 ),
-                                _userDataRow(
+                                userDataRow(
                                   "group_email :",
                                   _groupData.email,
                                   cTextListSSR,
                                 ),
-                                _userDataRow(
+                                userDataRow(
                                   "group_password :",
                                   _groupData.password,
                                   cTextListSSR,
@@ -178,21 +181,21 @@ class _HomeUserDataState extends State<HomeUserData> {
                             if (FSUserData.instance.isCurrentUserSignIn()) {
                               await ChangeNameDialog.instance.changeNameDialog(
                                 context: context,
-                                userName: _userData.userName,
+                                userName: userData.userName,
                                 mainTitle: "ユーザー名を入力してください",
                                 okProcess: (String txt) async {
                                   if (txt.isNotEmpty) {
                                     Navigator.pop(context);
                                     // Navigator.pop(context);
-                                    if (txt != _userData.userName) {
+                                    if (txt != userData.userName) {
                                       // todo FBのUSERの名前を修正
-                                      _userData.userName = txt;
+                                      userData.userName = txt;
                                       await FSUserData.instance
-                                          .setData(_userData);
+                                          .setData(userData);
                                       // todo Bodyの名前を修正
                                       await UserDataBody.instance
-                                          .save(_userData);
-                                      widget._changeUserData(txt);
+                                          .save(userData);
+                                      widget.changeUserData(txt);
                                       setState(() {});
                                     }
                                   } else {
@@ -209,7 +212,7 @@ class _HomeUserDataState extends State<HomeUserData> {
                                 context,
                                 "サインアウトしているので\n実行できません",
                                 "サインインしますか？",
-                                _userData,
+                                userData,
                               );
                             }
                           },
@@ -247,7 +250,7 @@ class _HomeUserDataState extends State<HomeUserData> {
                                 context,
                                 "サインアウトしているので\n実行できません",
                                 "サインインしますか？",
-                                _userData,
+                                userData,
                               );
                             }
                           },
@@ -265,7 +268,7 @@ class _HomeUserDataState extends State<HomeUserData> {
     );
   }
 
-  Widget _userDataRow(String label, String data, TextStyle style) {
+  Widget userDataRow(String label, String data, TextStyle style) {
     return Row(
       children: [
         Text(label, style: style, textScaleFactor: 1),

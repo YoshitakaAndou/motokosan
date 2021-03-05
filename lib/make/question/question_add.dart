@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
+import 'package:motokosan/take_a_lecture/question/question_model.dart';
 import 'package:provider/provider.dart';
-import '../../take_a_lecture/question/question_model.dart';
 import '../../widgets/show_dialog.dart';
 import '../../constants.dart';
 
 class QuestionAdd extends StatelessWidget {
   final String groupName;
-  final Lecture _lecture;
-  QuestionAdd(this.groupName, this._lecture);
+  final Lecture lecture;
+  QuestionAdd(
+    this.groupName,
+    this.lecture,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +117,7 @@ class QuestionAdd extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("講義：${_lecture.title}",
+                  Text("講義：${lecture.title}",
                       style: cTextUpBarS, textScaleFactor: 1),
                 ],
               ),
@@ -343,7 +346,7 @@ class QuestionAdd extends StatelessWidget {
     try {
       model.startLoading();
       model.inputCheck();
-      await model.addQuestionFs(groupName, _timeStamp, _lecture);
+      await model.addQuestionFs(groupName, _timeStamp, lecture);
       model.stopLoading();
       await MyDialog.instance.okShowDialog(context, "登録完了しました", Colors.black);
       Navigator.pop(context);

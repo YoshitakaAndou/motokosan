@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 import 'package:provider/provider.dart';
 
@@ -10,8 +10,11 @@ import '../../take_a_lecture/workshop/workshop_model.dart';
 
 class WorkshopAdd extends StatelessWidget {
   final String groupName;
-  final Organizer _organizer;
-  WorkshopAdd(this.groupName, this._organizer);
+  final Organizer organizer;
+  WorkshopAdd(
+    this.groupName,
+    this.organizer,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +31,8 @@ class WorkshopAdd extends StatelessWidget {
     option3TextController.text = model.workshop.option3;
     model.workshop.workshopNo =
         (model.workshops.length + 1).toString().padLeft(4, "0");
-    model.workshop.deadlineAt = ConvertItems.instance.dateToInt(DateTime.now());
+    model.workshop.deadlineAt =
+        ConvertDateTime.instance.dateToInt(DateTime.now());
     return Consumer<WorkshopModel>(builder: (context, model, child) {
       model.isEditing = _checkValue(model);
       bool _isRelease = model.workshop.isRelease;
@@ -121,7 +125,7 @@ class WorkshopAdd extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("主催：${_organizer.title}",
+                  Text("主催：${organizer.title}",
                       style: cTextUpBarS, textScaleFactor: 1),
                 ],
               ),
@@ -174,7 +178,7 @@ class WorkshopAdd extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
-            "期日：${ConvertItems.instance.intToString(model.workshop.deadlineAt)}",
+            "期日：${ConvertDateTime.instance.intToString(model.workshop.deadlineAt)}",
             style: TextStyle(
                 fontSize: 12,
                 color:
@@ -200,7 +204,7 @@ class WorkshopAdd extends StatelessWidget {
       lastDate: DateTime.now().add(Duration(days: 770)),
     );
     if (selected != null) {
-      model.workshop.deadlineAt = ConvertItems.instance.dateToInt(selected);
+      model.workshop.deadlineAt = ConvertDateTime.instance.dateToInt(selected);
       model.setUpdate();
     }
   }

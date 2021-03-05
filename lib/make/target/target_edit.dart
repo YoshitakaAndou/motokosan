@@ -10,8 +10,11 @@ import '../../constants.dart';
 
 class TargetEdit extends StatelessWidget {
   final String groupName;
-  final Target _target;
-  TargetEdit(this.groupName, this._target);
+  final Target target;
+  TargetEdit(
+    this.groupName,
+    this.target,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -20,11 +23,11 @@ class TargetEdit extends StatelessWidget {
     final option1TextController = TextEditingController();
     final option2TextController = TextEditingController();
     final option3TextController = TextEditingController();
-    titleTextController.text = _target.title;
-    subTitleTextController.text = _target.subTitle;
-    option1TextController.text = _target.option1;
-    option2TextController.text = _target.option2;
-    option3TextController.text = _target.option3;
+    titleTextController.text = target.title;
+    subTitleTextController.text = target.subTitle;
+    option1TextController.text = target.option1;
+    option2TextController.text = target.option2;
+    option3TextController.text = target.option3;
 
     return Consumer<TargetModel>(builder: (context, model, child) {
       return Scaffold(
@@ -131,7 +134,7 @@ class TargetEdit extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: Text("　番号：${_target.targetNo}",
+              child: Text("　番号：${target.targetNo}",
                   style: cTextUpBarL, textScaleFactor: 1),
             ),
             Expanded(
@@ -408,10 +411,10 @@ class TargetEdit extends StatelessWidget {
     model.target.option1 = option1TextController.text;
     model.target.option2 = option2TextController.text;
     model.target.option3 = option3TextController.text;
-    model.target.targetId = _target.targetId;
-    model.target.targetNo = _target.targetNo;
-    model.target.createAt = _target.createAt;
-    model.target.updateAt = _target.updateAt;
+    model.target.targetId = target.targetId;
+    model.target.targetNo = target.targetNo;
+    model.target.createAt = target.createAt;
+    model.target.updateAt = target.updateAt;
     try {
       await model.updateTargetFs(groupName, DateTime.now());
       await model.fetchTarget(groupName);
@@ -434,7 +437,7 @@ class TargetEdit extends StatelessWidget {
       onPress: () {
         MyDialog.instance.okShowDialogFunc(
           context: context,
-          mainTitle: _target.title,
+          mainTitle: target.title,
           subTitle: "削除しますか？",
           // delete
           onPressed: () async {
@@ -442,7 +445,7 @@ class TargetEdit extends StatelessWidget {
             await _deleteSave(
               context,
               model,
-              _target.targetId,
+              target.targetId,
             );
             Navigator.pop(context);
           },

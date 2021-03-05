@@ -1,33 +1,39 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:motokosan/take_a_lecture/lecture/bottomsheet_play_items.dart';
-import 'package:motokosan/take_a_lecture/lecture/lecture_play_info.dart';
-import 'package:motokosan/take_a_lecture/lecture/lecture_play_slides.dart';
+import 'package:motokosan/home/home.dart';
+import 'package:motokosan/take_a_lecture/lecture/list/lecture_list_info.dart';
+import 'package:motokosan/take_a_lecture/lecture/play/bottomsheet_play_items.dart';
+import 'package:motokosan/take_a_lecture/lecture/play/drawer/lecture_play_drawer.dart';
+import 'package:motokosan/take_a_lecture/lecture/play/lecture_play_info.dart';
+import 'package:motokosan/take_a_lecture/lecture/play/lecture_play_slides.dart';
 import 'package:motokosan/widgets/return_argument.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/data/user_data/userdata_class.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:flutter/services.dart';
-import '../../constants.dart';
-import 'lecture_class.dart';
-import '../../widgets/bar_title.dart';
-import '../../widgets/go_back.dart';
+import '../../../constants.dart';
+import '../lecture_class.dart';
+import '../../../widgets/bar_title.dart';
+import '../../../widgets/go_back.dart';
+import '../lecture_database.dart';
 
 class LecturePlay extends StatefulWidget {
-  final UserData _userData;
-  final WorkshopList _workshopList;
-  final LectureList _lectureList;
-  final List<Slide> _slides;
-  final bool _isLast;
+  final UserData userData;
+  final WorkshopList workshopList;
+  final LectureList lectureList;
+  final List<Slide> slides;
+  final bool isLast;
+  final String routeName;
 
   LecturePlay(
-    this._userData,
-    this._workshopList,
-    this._lectureList,
-    this._slides,
-    this._isLast,
+    this.userData,
+    this.workshopList,
+    this.lectureList,
+    this.slides,
+    this.isLast,
+    this.routeName,
   );
 
   @override
@@ -37,7 +43,8 @@ class LecturePlay extends StatefulWidget {
 class _LecturePlayState extends State<LecturePlay> {
   final ScrollController _homeController = ScrollController();
 
-  // final GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  // LectureResultの初期化
   LectureResult _lectureResult = LectureResult();
 
   // 状態設定
@@ -45,13 +52,15 @@ class _LecturePlayState extends State<LecturePlay> {
   bool isSlideButton = true;
   bool isSlide = false;
   bool isVideoStop = false;
+  bool isStopTaped = false;
+  String _videoDuration = "";
   YoutubePlayerController _controller;
 
   @override
   void initState() {
     super.initState();
-    if (widget._lectureList.lecture.videoUrl.isNotEmpty) {
-      startVideo(widget._lectureList.lecture.videoUrl, true);
+    if (widget.lectureList.lecture.videoUrl.isNotEmpty) {
+      startVideo(widget.lectureList.lecture.videoUrl, true);
     }
   }
 
@@ -65,7 +74,8 @@ class _LecturePlayState extends State<LecturePlay> {
       initialVideoId: YoutubePlayer.convertUrlToId(_videoUrl),
       flags: YoutubePlayerFlags(
         autoPlay: _autoPlay,
-        startAt: 0,
+        startAt: ConvertDateTime.instance
+            .stringTimeToInt(widget.lectureList.lectureResult.playBackTime),
         endAt: videoEndAt,
         hideControls: true,
         hideThumbnail: true,
@@ -98,22 +108,62 @@ class _LecturePlayState extends State<LecturePlay> {
 
   Widget _portrait(BuildContext context) {
     final Size _size = MediaQuery.of(context).size;
-    print("height:${_size.height},width:${_size.width}");
     final _movieHeight = _size.width / 1.42; //1.42
     final _bottomHeight = _size.height - _movieHeight - cInfoAreaH - 40;
+
+    pauseVideo() {
+      if (_controller.value.isPlaying) {
+        isVideoStop = true;
+        _controller.pause();
+      }
+    }
+
+    playVideo() {
+      if (!isStopTaped) {
+        isVideoStop = false;
+        _controller.play();
+      }
+    }
+
+    backLectureList() {
+      Navigator.of(context).pop();
+      Navigator.of(context).pop(ReturnArgument(isNextQuestion: false));
+    }
+
+    backHome() {
+      Navigator.popUntil(context, ModalRoute.withName("/home"));
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => Home(userData: widget.userData),
+        ),
+      );
+    }
+
+    showInfo() {
+      //タップすると研修会の情報をダイアログに表示
+      LectureListInfo.instance.lectureListInfo(context, widget.workshopList);
+    }
+
+    void _openEndDrawer() {
+      _scaffoldKey.currentState.openEndDrawer();
+    }
+
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         toolbarHeight: cToolBarH,
         centerTitle: true,
         title: BarTitle.instance.barTitle(context),
-        leading: GoBack.instance.goBackWithReturnArg(
-          context: context,
-          icon: Icon(FontAwesomeIcons.arrowLeft),
-          returnArgument: ReturnArgument(isNextQuestion: false),
-          num: 1,
+        leading: IconButton(
+          icon: Icon(
+            FontAwesomeIcons.bars,
+            size: 20,
+            color: Colors.black54,
+          ),
+          onPressed: _openEndDrawer,
         ),
         actions: [
-          widget._isLast
+          widget.isLast
               ? Container()
               : GoBack.instance.goBackWithReturnArg(
                   context: context,
@@ -123,6 +173,18 @@ class _LecturePlayState extends State<LecturePlay> {
                 ),
         ],
       ),
+
+      // ドローワーだぞ！
+      endDrawer: LecturePlayDrawer(
+        size: _size,
+        pauseVideo: pauseVideo,
+        playVideo: playVideo,
+        saveLectureResult: _saveLectureResult,
+        backLectureList: backLectureList,
+        backHome: backHome,
+        showInfo: showInfo,
+      ),
+
       body: Stack(
         children: [
           Column(
@@ -139,7 +201,7 @@ class _LecturePlayState extends State<LecturePlay> {
                   children: [
                     _infoArea(context),
                     SizedBox(height: 2),
-                    if (widget._lectureList.lecture.videoUrl.isNotEmpty)
+                    if (widget.lectureList.lecture.videoUrl.isNotEmpty)
                       _videoTile(true, _size),
                   ],
                 ),
@@ -154,7 +216,7 @@ class _LecturePlayState extends State<LecturePlay> {
                     children: [
                       SizedBox(height: 10),
                       LecturePlaySlides(
-                        slides: widget._slides,
+                        slides: widget.slides,
                         size: _size,
                       ),
                       // if (widget._slides.length > 0 && isSlideButton)
@@ -203,7 +265,7 @@ class _LecturePlayState extends State<LecturePlay> {
                   mainAxisSize: MainAxisSize.max,
                   // crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    if (widget._lectureList.lecture.videoUrl.isNotEmpty)
+                    if (widget.lectureList.lecture.videoUrl.isNotEmpty)
                       _videoTile(false, _size),
                   ],
                 ),
@@ -223,13 +285,13 @@ class _LecturePlayState extends State<LecturePlay> {
           _controller.pause();
           isVideoStop = true;
           await LecturePlayInfo.instance.lecturePlayInfo(
-              context, widget._workshopList, widget._lectureList);
+              context, widget.workshopList, widget.lectureList);
           _controller.play();
           isVideoStop = false;
           setState(() {});
         } else {
           await LecturePlayInfo.instance.lecturePlayInfo(
-              context, widget._workshopList, widget._lectureList);
+              context, widget.workshopList, widget.lectureList);
           setState(() {});
         }
       },
@@ -242,12 +304,12 @@ class _LecturePlayState extends State<LecturePlay> {
           child: Row(
             children: [
               Expanded(
-                flex: 5,
+                // flex: 5,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Text(
-                      widget._lectureList.lecture.title,
+                      widget.lectureList.lecture.title,
                       style: cTextUpBarM,
                       textScaleFactor: 1,
                       maxLines: 1,
@@ -257,7 +319,7 @@ class _LecturePlayState extends State<LecturePlay> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Text(
-                          "再生時間（${widget._lectureList.lecture.videoDuration}）",
+                          "再生時間（${widget.lectureList.lecture.videoDuration}）",
                           style: cTextUpBarM,
                           textScaleFactor: 1,
                           maxLines: 1,
@@ -266,9 +328,9 @@ class _LecturePlayState extends State<LecturePlay> {
                         Container(
                           color: Colors.white.withOpacity(0.3),
                           child: Text(
-                            widget._lectureList.lectureResult.isTaken == "受講済"
+                            widget.lectureList.lectureResult.isTaken == "受講済"
                                 ? "受講済"
-                                : widget._lectureList.lecture.allAnswers ==
+                                : widget.lectureList.lecture.allAnswers ==
                                         "全問解答が必要"
                                     ? "テスト解答必須"
                                     : "",
@@ -282,18 +344,18 @@ class _LecturePlayState extends State<LecturePlay> {
                   ],
                 ),
               ),
-              Expanded(
-                flex: 1,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Image.asset(
-                      "assets/images/nurse_quiz.png",
-                      fit: BoxFit.fitHeight,
-                    ),
-                  ],
-                ),
-              ),
+              // Expanded(
+              //   flex: 1,
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.end,
+              //     children: [
+              //       Image.asset(
+              //         "assets/images/nurse_quiz.png",
+              //         fit: BoxFit.fitHeight,
+              //       ),
+              //     ],
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -312,28 +374,35 @@ class _LecturePlayState extends State<LecturePlay> {
             onEnded: (data) async {
               isVideoStop = true;
               _controller.pause();
+              _videoDuration =
+                  _controller.value.position.toString().substring(0, 7);
               // 画面の向き固定を元に戻す
               SystemChrome.setPreferredOrientations(
                 [DeviceOrientation.portraitUp],
               );
               // 講義を見た証をDBに登録
-              _lectureResult.lectureId = widget._lectureList.lecture.lectureId;
+              _lectureResult.lectureId = widget.lectureList.lecture.lectureId;
               _lectureResult.isTaken = "終了";
               _lectureResult.isTakenAt =
-                  ConvertItems.instance.dateToInt(DateTime.now());
+                  ConvertDateTime.instance.dateToInt(DateTime.now());
+              _lectureResult.isBrowsing = "閲覧済";
+              _lectureResult.playBackTime = _videoDuration;
               // ボトムシートを表示して次の動作を選択してもらう
               await _showModalBottomSheetPlay(context);
             },
           ),
+          // 縦
           if (_isPortrait)
             GestureDetector(
               onTap: () {
                 if (_controller.value.isPlaying) {
                   _controller.pause();
                   isVideoStop = true;
+                  isStopTaped = true;
                 } else {
                   _controller.play();
                   isVideoStop = false;
+                  isStopTaped = false;
                 }
                 setState(() {});
               },
@@ -344,6 +413,7 @@ class _LecturePlayState extends State<LecturePlay> {
                 child: isVideoStop ? _videoStop() : Container(),
               ),
             )
+          // 横
           else
             GestureDetector(
               onTap: () {
@@ -369,17 +439,18 @@ class _LecturePlayState extends State<LecturePlay> {
   }
 
   Widget _videoStop() {
-    final _videoDuration =
+    _lectureResult.playBackTime =
         _controller.value.position.toString().substring(0, 7);
+    _saveLectureResult();
     return Container(
-      color: Colors.black87.withOpacity(0.8),
+      color: Colors.black87.withOpacity(0.5),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(FontAwesomeIcons.playCircle, color: Colors.white, size: 50),
           SizedBox(height: 20),
           Text(
-            "$_videoDuration",
+            "${_lectureResult.playBackTime}",
             style: TextStyle(
                 fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
           )
@@ -396,7 +467,7 @@ class _LecturePlayState extends State<LecturePlay> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text("【解説】", textScaleFactor: 1, style: cTextListL),
-          Text("${widget._lectureList.lecture.description}",
+          Text("${widget.lectureList.lecture.description}",
               textScaleFactor: 1, style: cTextListL),
         ],
       ),
@@ -417,9 +488,22 @@ class _LecturePlayState extends State<LecturePlay> {
         ),
       ),
       builder: (BuildContext context) {
-        return BottomSheetPlayItems(widget._userData, widget._lectureList,
-            widget._isLast, _lectureResult);
+        return BottomSheetPlayItems(
+            widget.userData, widget.lectureList, widget.isLast, _lectureResult);
       },
+    );
+  }
+
+  _saveLectureResult() async {
+    final _playBackTime = _controller.value.position.toString().substring(0, 7);
+    print("-------------- saveLectureResultPlaybackTime:$_playBackTime");
+    widget.lectureList.lectureResult.lectureId =
+        widget.lectureList.lecture.lectureId;
+    widget.lectureList.lectureResult.isBrowsing = _lectureResult.isBrowsing;
+    widget.lectureList.lectureResult.playBackTime = _playBackTime;
+    await LectureDatabase.instance.saveValue(
+      data: widget.lectureList.lectureResult,
+      isUpDate: true,
     );
   }
 }

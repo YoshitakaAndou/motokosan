@@ -3,34 +3,38 @@ import 'package:motokosan/buttons/white_button.dart';
 import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
 import 'package:motokosan/take_a_lecture/question/question_class.dart';
 import 'package:motokosan/take_a_lecture/question/question_firebase.dart';
+import 'package:motokosan/take_a_lecture/question/question_model.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../take_a_lecture/question/question_model.dart';
 import '../../widgets/show_dialog.dart';
 import '../../constants.dart';
 
 class QuestionEdit extends StatelessWidget {
   final String groupName;
-  final Lecture _lecture;
-  final Question _question;
-  QuestionEdit(this.groupName, this._lecture, this._question);
+  final Lecture lecture;
+  final Question question;
+  QuestionEdit(
+    this.groupName,
+    this.lecture,
+    this.question,
+  );
 
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<QuestionModel>(context, listen: false);
-    model.question = _question;
+    model.question = question;
     final qsTextController = TextEditingController();
     final ch1TitleTextController = TextEditingController();
     final ch2TitleTextController = TextEditingController();
     final ch3TitleTextController = TextEditingController();
     final ch4TitleTextController = TextEditingController();
     final adTextController = TextEditingController();
-    qsTextController.text = _question.question;
-    ch1TitleTextController.text = _question.choices1;
-    ch2TitleTextController.text = _question.choices2;
-    ch3TitleTextController.text = _question.choices3;
-    ch4TitleTextController.text = _question.choices4;
-    adTextController.text = _question.answerDescription;
+    qsTextController.text = question.question;
+    ch1TitleTextController.text = question.choices1;
+    ch2TitleTextController.text = question.choices2;
+    ch3TitleTextController.text = question.choices3;
+    ch4TitleTextController.text = question.choices4;
+    adTextController.text = question.answerDescription;
 
     return Consumer<QuestionModel>(builder: (context, model, child) {
       return Scaffold(
@@ -76,7 +80,7 @@ class QuestionEdit extends StatelessWidget {
                     shrinkWrap: true,
                     padding: EdgeInsets.all(10),
                     children: [
-                      _questionTile(model, qsTextController),
+                      questionTile(model, qsTextController),
                       _choices1(model, ch1TitleTextController),
                       _choices2(model, ch2TitleTextController),
                       _choices3(model, ch3TitleTextController),
@@ -142,7 +146,7 @@ class QuestionEdit extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: Text("テスト番号：${_question.questionNo}",
+              child: Text("テスト番号：${question.questionNo}",
                   style: cTextUpBarL, textScaleFactor: 1),
             ),
             Expanded(
@@ -150,7 +154,7 @@ class QuestionEdit extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("講義：${_lecture.title}",
+                  Text("講義：${lecture.title}",
                       style: cTextUpBarS, textScaleFactor: 1),
                 ],
               ),
@@ -161,7 +165,7 @@ class QuestionEdit extends StatelessWidget {
     );
   }
 
-  Widget _questionTile(QuestionModel model, qsTextController) {
+  Widget questionTile(QuestionModel model, qsTextController) {
     return TextField(
       maxLines: null,
       textInputAction: TextInputAction.done,
@@ -514,8 +518,8 @@ class QuestionEdit extends StatelessWidget {
     model.question.answerDescription = adTextController.text;
     try {
       model.inputCheck();
-      await model.updateQuestionFs(groupName, DateTime.now(), _lecture);
-      await model.fetchQuestion(groupName, _question.questionId);
+      await model.updateQuestionFs(groupName, DateTime.now(), lecture);
+      await model.fetchQuestion(groupName, question.questionId);
       model.stopLoading();
       await MyDialog.instance.okShowDialog(context, "更新しました", Colors.black);
       Navigator.pop(context);
@@ -535,7 +539,7 @@ class QuestionEdit extends StatelessWidget {
       onPress: () {
         MyDialog.instance.okShowDialogFunc(
           context: context,
-          mainTitle: _question.question,
+          mainTitle: question.question,
           subTitle: "削除しますか？",
           // delete
           onPressed: () async {
@@ -543,7 +547,7 @@ class QuestionEdit extends StatelessWidget {
             await _deleteSave(
               context,
               model,
-              _question.questionId,
+              question.questionId,
             );
             Navigator.pop(context);
           },
@@ -553,13 +557,13 @@ class QuestionEdit extends StatelessWidget {
   }
 
   Future<void> _deleteSave(
-      BuildContext context, QuestionModel model, _questionId) async {
+      BuildContext context, QuestionModel model, questionId) async {
     model.startLoading();
     try {
       //FsをQuestionIdで削除
-      await model.deleteQuestionFs(groupName, _questionId);
+      await model.deleteQuestionFs(groupName, questionId);
       //配列を削除するのは無理だから再びFsをフェッチ
-      await model.fetchQuestion(groupName, _lecture.lectureId);
+      await model.fetchQuestion(groupName, lecture.lectureId);
       //頭から順にquestionNoを振る
       int _count = 1;
       for (Question _data in model.questions) {
@@ -570,9 +574,9 @@ class QuestionEdit extends StatelessWidget {
         _count += 1;
       }
       // LectureにQuestion.lengthを書き込む
-      await model.setQSLengthToLecture(groupName, _lecture);
+      await model.setQSLengthToLecture(groupName, lecture);
       //一通り終わったらFsから読み込んで再描画させる
-      await model.fetchQuestion(groupName, _lecture.lectureId);
+      await model.fetchQuestion(groupName, lecture.lectureId);
     } catch (e) {
       MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
     }

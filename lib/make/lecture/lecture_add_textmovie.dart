@@ -13,16 +13,16 @@ import 'lecture_web.dart';
 
 class LectureAddTextMovie extends StatelessWidget {
   final String groupName;
-  final Organizer _organizer;
-  final Workshop _workshop;
+  final Organizer organizer;
+  final Workshop workshop;
   final TextEditingController titleTextController;
   final TextEditingController subTitleTextController;
   final TextEditingController descTextController;
   final TextEditingController videoUrlTextController;
   LectureAddTextMovie(
     this.groupName,
-    this._organizer,
-    this._workshop,
+    this.organizer,
+    this.workshop,
     this.titleTextController,
     this.subTitleTextController,
     this.descTextController,
@@ -135,9 +135,9 @@ class LectureAddTextMovie extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("主催：${_organizer.title}",
+                  Text("主催：${organizer.title}",
                       style: cTextUpBarS, textScaleFactor: 1),
-                  Text("研修会：${_workshop.title}",
+                  Text("研修会：${workshop.title}",
                       style: cTextUpBarS, textScaleFactor: 1),
                 ],
               ),

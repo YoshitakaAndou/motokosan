@@ -15,9 +15,12 @@ import 'workshop_list_bottomsheet_info_items.dart';
 import 'workshop_list_tile_body.dart';
 
 class WorkshopListPage extends StatelessWidget {
-  final UserData _userData;
-  final Organizer _organizer;
-  WorkshopListPage(this._userData, this._organizer);
+  final UserData userData;
+  final Organizer organizer;
+  WorkshopListPage({
+    this.userData,
+    this.organizer,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +66,7 @@ class WorkshopListPage extends StatelessWidget {
                               model.workshopLists[index].workshop.workshopId),
                           shape: cListCardShape,
                           elevation: 20,
-                          child: WorkshopListTileBody(_userData, model, index),
+                          child: WorkshopListTileBody(userData, model, index),
                         );
                       },
                     ),
@@ -83,11 +86,11 @@ class WorkshopListPage extends StatelessWidget {
       BuildContext context, WorkshopModel model, bool _isHideBS) async {
     _isHideBS = await DataSaveBody.instance.getIsHideWSBS();
     model.startLoading();
-    if (_organizer.title == "指定無し") {
+    if (organizer.title == "指定無し") {
       //前画面で”指定無し”を選んだ場合は全ての研修会を取得
-      await model.fetchLists(_userData.userGroup);
+      await model.fetchLists(userData.userGroup);
     } else {
-      await model.fetchListsByOrganizer(_userData.userGroup, _organizer);
+      await model.fetchListsByOrganizer(userData.userGroup, organizer);
     }
     model.stopLoading();
     if (_isHideBS == false) {
@@ -119,7 +122,7 @@ class WorkshopListPage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text("主催：${_organizer.title}",
+                Text("主催：${organizer.title}",
                     style: cTextUpBarS, textScaleFactor: 1),
               ],
             )
@@ -143,13 +146,13 @@ class WorkshopListPage extends StatelessWidget {
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _bottomButton(context, _userData),
+          _bottomButton(context, userData),
         ],
       ),
     );
   }
 
-  Widget _bottomButton(BuildContext context, UserData _userData) {
+  Widget _bottomButton(BuildContext context, UserData userData) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: FlatButton.icon(
@@ -162,7 +165,7 @@ class WorkshopListPage extends StatelessWidget {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => OrganizerListPage(_userData),
+              builder: (context) => OrganizerListPage(userData:userData),
             ),
           );
         },

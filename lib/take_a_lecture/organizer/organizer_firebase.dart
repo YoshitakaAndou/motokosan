@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 
 import 'organizer_class.dart';
 
@@ -50,9 +50,9 @@ class FSOrganizer {
       "option1": _data.option1,
       "option2": _data.option2,
       "option3": _data.option3,
-      "upDate": ConvertItems.instance.dateToInt(_timeStamp),
+      "upDate": ConvertDateTime.instance.dateToInt(_timeStamp),
       "createAt":
-          _isAdd ? ConvertItems.instance.dateToInt(_timeStamp) : _data.createAt,
+          _isAdd ? ConvertDateTime.instance.dateToInt(_timeStamp) : _data.createAt,
     }).catchError((onError) {
       print(onError.toString());
     });

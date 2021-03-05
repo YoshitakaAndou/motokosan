@@ -9,7 +9,10 @@ class GroupButton extends StatelessWidget {
   final BuildContext context;
   final AuthModel model;
 
-  GroupButton({this.context, this.model});
+  GroupButton({
+    this.context,
+    this.model,
+  });
 
   @override
   Widget build(BuildContext context) {

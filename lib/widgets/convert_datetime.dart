@@ -1,7 +1,7 @@
 import 'package:intl/intl.dart';
 
-class ConvertItems {
-  static final ConvertItems instance = ConvertItems();
+class ConvertDateTime {
+  static final ConvertDateTime instance = ConvertDateTime();
 
   int dateToInt(DateTime _timeStamp) {
     // today is DateTime.now();
@@ -19,6 +19,22 @@ class ConvertItems {
       return "$_year.$_month.$_day";
     } else {
       return "";
+    }
+  }
+
+  int stringTimeToInt(String data) {
+    // 0:59:00 => 3540sec
+    print("-------------stringTimeToInt :$data");
+    if (data.isNotEmpty) {
+      final hou = int.parse(data.substring(0, 1));
+      final min = int.parse(data.substring(2, 4));
+      final sec = int.parse(data.substring(5, 7));
+      final res = hou * 3600 + min * 60 + sec;
+      print("再生開始時刻：$res秒");
+      return res;
+    } else {
+      print("空でした！");
+      return 0;
     }
   }
 }

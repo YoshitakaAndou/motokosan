@@ -5,7 +5,7 @@ import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_database.dart';
 import 'package:motokosan/data/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/bar_title.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 import 'package:motokosan/widgets/flare_actors.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 import 'package:provider/provider.dart';
@@ -16,10 +16,13 @@ import 'exam_list_bottomsheet_info_items.dart';
 import 'exam_play.dart';
 
 class ExamListPage extends StatelessWidget {
-  final UserData _userData;
-  final WorkshopList _workshopList;
+  final UserData userData;
+  final WorkshopList workshopList;
 
-  ExamListPage(this._userData, this._workshopList);
+  ExamListPage(
+    this.userData,
+    this.workshopList,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -29,12 +32,9 @@ class ExamListPage extends StatelessWidget {
 
     Future(
       () async {
-        await model.generateExamList(
-            _userData.userGroup,
-            _workshopList.workshop.workshopId,
-            _workshopList.workshop.numOfExam);
-        await _showModalBottomSheetInfo(
-            context, model, _userData, _workshopList);
+        await model.generateExamList(userData.userGroup,
+            workshopList.workshop.workshopId, workshopList.workshop.numOfExam);
+        await _showModalBottomSheetInfo(context, model, userData, workshopList);
 
         model.setShowOk(true);
       },
@@ -77,9 +77,9 @@ class ExamListPage extends StatelessWidget {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => ExamPlay(
-                                        _userData,
+                                        userData,
                                         model.examLists,
-                                        _workshopList,
+                                        workshopList,
                                         index,
                                         true,
                                       ),
@@ -114,9 +114,9 @@ class ExamListPage extends StatelessWidget {
                         if (!model.isClear) _playButton(context, model),
                         SizedBox(height: 30),
                         if (!model.isClear)
-                          _description(context, model, _workshopList),
+                          _description(context, model, workshopList),
                         if (model.isClear) _passedMessage(context, model),
-                        _score(context, model, _workshopList),
+                        _score(context, model, workshopList),
                       ],
                     ),
                   ),
@@ -155,7 +155,7 @@ class ExamListPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "  ${_workshopList.workshop.title}",
+                    "  ${workshopList.workshop.title}",
                     style: cTextUpBarM,
                     textScaleFactor: 1,
                     maxLines: 3,
@@ -231,16 +231,16 @@ class ExamListPage extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => ExamPlay(
-                _userData,
+                userData,
                 model.examLists,
-                _workshopList,
+                workshopList,
                 0,
                 false,
               ),
               fullscreenDialog: true,
             ),
           );
-          _checkClear(context, model, _workshopList);
+          _checkClear(context, model, workshopList);
           // todo WorkshopResultの保存
           if (model.isClear) {
             await _saveWorkshopResult();
@@ -254,7 +254,7 @@ class ExamListPage extends StatelessWidget {
   }
 
   Widget _description(
-      BuildContext context, ExamModel model, WorkshopList _workshopList) {
+      BuildContext context, ExamModel model, WorkshopList workshopList) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -263,7 +263,7 @@ class ExamListPage extends StatelessWidget {
           child: Row(
             children: [
               Text("この修了試験を合格するには ", style: cTextListM, textScaleFactor: 1),
-              Text("${_workshopList.workshop.numOfExam}",
+              Text("${workshopList.workshop.numOfExam}",
                   style: cTextListMR, textScaleFactor: 1),
               Text(" 問の全問解答で、", style: cTextListM, textScaleFactor: 1),
             ],
@@ -274,7 +274,7 @@ class ExamListPage extends StatelessWidget {
           child: Row(
             children: [
               Text(
-                "${_workshopList.workshop.passingScore}点以上が必要です。",
+                "${workshopList.workshop.passingScore}点以上が必要です。",
                 style: cTextListMR,
                 textScaleFactor: 1,
               ),
@@ -294,7 +294,7 @@ class ExamListPage extends StatelessWidget {
   }
 
   void _checkClear(
-      BuildContext context, ExamModel model, WorkshopList _workshopList) {
+      BuildContext context, ExamModel model, WorkshopList workshopList) {
     // AllAnswersClearのチェック
     // model.setAllAnswersClear(model.examLists
     //     .every((element) => element.examResult.answerResult == "○"));
@@ -303,14 +303,14 @@ class ExamListPage extends StatelessWidget {
         model.examLists.any((element) => element.examResult.answerResult == "");
     model.setAllAnswers(!_result);
     // ScoreClearのチェック
-    model.setScoreClear((_getScore(context, model, _workshopList) >=
-                _workshopList.workshop.passingScore ||
-            _getScore(context, model, _workshopList) == 100)
+    model.setScoreClear((_getScore(context, model, workshopList) >=
+                workshopList.workshop.passingScore ||
+            _getScore(context, model, workshopList) == 100)
         ? true
         : false);
     // isClear のチェック
-    if (_workshopList.workshop.isExam) {
-      if (_workshopList.workshop.passingScore == 0) {
+    if (workshopList.workshop.isExam) {
+      if (workshopList.workshop.passingScore == 0) {
         model.setClear(model.isAllAnswers);
       } else {
         model.setClear(model.isScoreClear && model.isAllAnswers ? true : false);
@@ -321,7 +321,7 @@ class ExamListPage extends StatelessWidget {
   }
 
   Widget _score(
-      BuildContext context, ExamModel model, WorkshopList _workshopList) {
+      BuildContext context, ExamModel model, WorkshopList workshopList) {
     if (model.examLists.length > 0) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -332,7 +332,7 @@ class ExamListPage extends StatelessWidget {
             Text("結果   ", style: cTextListM, textScaleFactor: 1),
             Row(
               children: [
-                Text("${_getScore(context, model, _workshopList)}",
+                Text("${_getScore(context, model, workshopList)}",
                     style: TextStyle(fontSize: 20), textScaleFactor: 1),
                 Text(" 点", style: cTextListM, textScaleFactor: 1),
               ],
@@ -346,7 +346,7 @@ class ExamListPage extends StatelessWidget {
   }
 
   int _getScore(
-      BuildContext context, ExamModel model, WorkshopList _workshopList) {
+      BuildContext context, ExamModel model, WorkshopList workshopList) {
     int result = 0;
     if (model.examLists.length > 0) {
       double _result = (model.correctCount / model.examLists.length) * 100;
@@ -356,11 +356,11 @@ class ExamListPage extends StatelessWidget {
   }
 
   Future<void> _saveWorkshopResult() async {
-    _workshopList.workshopResult.isTaken = "研修済";
-    _workshopList.workshopResult.isTakenAt =
-        ConvertItems.instance.dateToInt(DateTime.now());
+    workshopList.workshopResult.isTaken = "研修済";
+    workshopList.workshopResult.isTakenAt =
+        ConvertDateTime.instance.dateToInt(DateTime.now());
     await WorkshopDatabase.instance
-        .saveValue(_workshopList.workshopResult, true);
+        .saveValue(workshopList.workshopResult, true);
   }
 
   Widget _bottomNavigationBar(BuildContext context, ExamModel model) {
@@ -443,7 +443,7 @@ class ExamListPage extends StatelessWidget {
   }
 
   Future<Widget> _showModalBottomSheetInfo(BuildContext context,
-      ExamModel model, UserData _userData, WorkshopList _workshopList) async {
+      ExamModel model, UserData userData, WorkshopList workshopList) async {
     return await showModalBottomSheet(
       context: context,
       isDismissible: false,
@@ -456,7 +456,7 @@ class ExamListPage extends StatelessWidget {
         ),
       ),
       builder: (BuildContext context) {
-        return ExamListBottomSheetInfoItems(model, _userData, _workshopList);
+        return ExamListBottomSheetInfoItems(model, userData, workshopList);
       },
     );
   }

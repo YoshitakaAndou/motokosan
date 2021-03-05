@@ -16,6 +16,8 @@ class LectureDatabase {
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           lectureId TEXT,
           isTaken TEXT,
+          isBrowsing TEXT,
+          playBackTime TEXT,
           questionCount INTEGER,
           correctCount INTEGER,
           isTakenAt INTEGER
@@ -25,18 +27,18 @@ class LectureDatabase {
     );
   }
 
-  Future<void> saveValue(LectureResult _data, bool _isUpDate) async {
+  Future<void> saveValue({data: LectureResult, isUpDate: bool}) async {
     final Database db = await dbLecture();
     final List<Map<String, dynamic>> maps = await db.rawQuery(
-        'SELECT * FROM lecture_result WHERE lectureId = ?', [_data.lectureId]);
+        'SELECT * FROM lecture_result WHERE lectureId = ?', [data.lectureId]);
     // todo
-    print("saveValueのlectureId:${_data.lectureId}");
+    print("saveValueのlectureId:${data.lectureId}");
     if (maps.length == 0) {
-      await _insert(_data);
+      await _insert(data);
       print("LectureResultを新規登録したよ");
     } else {
-      if (_isUpDate) {
-        await _update(_data);
+      if (isUpDate) {
+        await _update(data);
         print("LectureResultを更新したよ");
       } else {
         print("LectureResultを登録しなかったよ");
@@ -64,14 +66,14 @@ class LectureDatabase {
     );
   }
 
-  Future<void> deleteLectureResult(String _lectureId) async {
-    final Database db = await dbLecture();
-    await db.delete(
-      'lecture_result',
-      where: "lectureId = ?",
-      whereArgs: [_lectureId],
-    );
-  }
+  // Future<void> deleteLectureResult(String _lectureId) async {
+  //   final Database db = await dbLecture();
+  //   await db.delete(
+  //     'lecture_result',
+  //     where: "lectureId = ?",
+  //     whereArgs: [_lectureId],
+  //   );
+  // }
 
   Future<List<LectureResult>> getLectureResult(String _lectureId) async {
     final Database db = await dbLecture();
@@ -89,6 +91,8 @@ class LectureDatabase {
         id: maps[i]['id'],
         lectureId: maps[i]['lectureId'],
         isTaken: maps[i]['isTaken'],
+        isBrowsing: maps[i]['isBrowsing'],
+        playBackTime: maps[i]['playBackTime'],
         questionCount: maps[i]['questionCount'],
         correctCount: maps[i]['correctCount'],
         isTakenAt: maps[i]['isTakenAt'],

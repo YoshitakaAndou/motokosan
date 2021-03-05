@@ -2,24 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/take_a_lecture/question/question_list_page.dart';
 import 'package:motokosan/data/user_data/userdata_class.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 
-import '../../constants.dart';
-import '../../widgets/return_argument.dart';
-import 'lecture_class.dart';
-import 'lecture_database.dart';
+import '../../../constants.dart';
+import '../../../widgets/return_argument.dart';
+import '../lecture_class.dart';
+import '../lecture_database.dart';
 
 class BottomSheetPlayItems extends StatelessWidget {
-  final UserData _userData;
-  final LectureList _lectureList;
-  final bool _isLast;
-  final LectureResult _lectureResult;
+  final UserData userData;
+  final LectureList lectureList;
+  final bool isLast;
+  final LectureResult lectureResult;
 
   BottomSheetPlayItems(
-    this._userData,
-    this._lectureList,
-    this._isLast,
-    this._lectureResult,
+    this.userData,
+    this.lectureList,
+    this.isLast,
+    this.lectureResult,
   );
 
   @override
@@ -29,11 +29,11 @@ class BottomSheetPlayItems extends StatelessWidget {
       children: [
         _bottomSheetTitle(),
         constHeight10,
-        if (_lectureList.lecture.questionLength != 0 &&
-            _lectureList.lectureResult.isTakenAt == 0 &&
-            _lectureList.lecture.allAnswers == "全問解答が必要")
-          _bottomSheetTest(context, _lectureResult),
-        if (!_isLast) _bottomSheetNext(context),
+        if (lectureList.lecture.questionLength != 0 &&
+            lectureList.lectureResult.isTakenAt == 0 &&
+            lectureList.lecture.allAnswers == "全問解答が必要")
+          _bottomSheetTest(context, lectureResult),
+        if (!isLast) _bottomSheetNext(context),
         _bottomSheetReturn(context),
         SizedBox(
           height: MediaQuery.of(context).size.height / 15,
@@ -73,8 +73,8 @@ class BottomSheetPlayItems extends StatelessWidget {
           leading: Icon(FontAwesomeIcons.youtube),
           title: Text('次を見る', style: cTextListL, textScaleFactor: 1),
           onTap: () async {
-            if (_lectureList.lecture.questionLength == 0) {
-              await _saveLectureResult(context);
+            if (lectureList.lecture.questionLength == 0) {
+              await _saveLectureResult();
             }
             Navigator.of(context).pop();
             Navigator.of(context).pop(ReturnArgument(isNextQuestion: true));
@@ -97,8 +97,8 @@ class BottomSheetPlayItems extends StatelessWidget {
           leading: Icon(FontAwesomeIcons.undo),
           title: Text('一覧へ戻る', style: cTextListL, textScaleFactor: 1),
           onTap: () async {
-            if (_lectureList.lecture.questionLength == 0) {
-              await _saveLectureResult(context);
+            if (lectureList.lecture.questionLength == 0) {
+              await _saveLectureResult();
             }
             Navigator.of(context).pop();
             Navigator.of(context).pop(ReturnArgument(isNextQuestion: false));
@@ -122,21 +122,21 @@ class BottomSheetPlayItems extends StatelessWidget {
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (_lectureList.lecture.allAnswers == "全問解答が必要")
+              if (lectureList.lecture.allAnswers == "全問解答が必要")
                 Text('確認テストへ進む', style: cTextListL, textScaleFactor: 1),
-              // if (_lectureList.lecture.allAnswers != "全問解答が必要")
+              // if (lectureList.lecture.allAnswers != "全問解答が必要")
               //   Text('確認テストを解いてみる', style: cTextListL, textScaleFactor: 1),
-              if (_lectureList.lecture.allAnswers == "全問解答が必要")
+              if (lectureList.lecture.allAnswers == "全問解答が必要")
                 Text(
-                    "受講完了には確認テスト(${_lectureList.lecture.questionLength}問)の全問解答が必要です。",
+                    "受講完了には確認テスト(${lectureList.lecture.questionLength}問)の全問解答が必要です。",
                     style: cTextListSR,
                     textScaleFactor: 1),
-              if (_lectureList.lecture.allAnswers == "全問解答が必要" &&
-                  _lectureList.lecture.passingScore == 0)
+              if (lectureList.lecture.allAnswers == "全問解答が必要" &&
+                  lectureList.lecture.passingScore == 0)
                 Text("合格点は設けておりません。", style: cTextListSR, textScaleFactor: 1),
-              if (_lectureList.lecture.allAnswers == "全問解答が必要" &&
-                  _lectureList.lecture.passingScore != 0)
-                Text("${_lectureList.lecture.passingScore}点以上が合格です。",
+              if (lectureList.lecture.allAnswers == "全問解答が必要" &&
+                  lectureList.lecture.passingScore != 0)
+                Text("${lectureList.lecture.passingScore}点以上が合格です。",
                     style: cTextListSR, textScaleFactor: 1),
             ],
           ),
@@ -146,9 +146,9 @@ class BottomSheetPlayItems extends StatelessWidget {
               context,
               MaterialPageRoute(
                   builder: (context) => QuestionListPage(
-                        _userData,
-                        _lectureList,
-                        _isLast,
+                        userData,
+                        lectureList,
+                        isLast,
                       ),
                   fullscreenDialog: true),
             );
@@ -158,13 +158,18 @@ class BottomSheetPlayItems extends StatelessWidget {
     );
   }
 
-  Future<void> _saveLectureResult(BuildContext context) async {
-    _lectureList.lectureResult.lectureId = _lectureList.lecture.lectureId;
-    _lectureList.lectureResult.isTaken = "受講済";
-    _lectureList.lectureResult.questionCount = 0;
-    _lectureList.lectureResult.correctCount = 0;
-    _lectureList.lectureResult.isTakenAt =
-        ConvertItems.instance.dateToInt(DateTime.now());
-    await LectureDatabase.instance.saveValue(_lectureList.lectureResult, false);
+  _saveLectureResult() async {
+    lectureList.lectureResult.lectureId = lectureList.lecture.lectureId;
+    lectureList.lectureResult.isTaken = "受講済";
+    lectureList.lectureResult.isBrowsing = lectureResult.isBrowsing;
+    lectureList.lectureResult.playBackTime = lectureResult.playBackTime;
+    lectureList.lectureResult.questionCount = lectureList.lecture.questionLength;
+    lectureList.lectureResult.correctCount = lectureList.lecture.questionLength;
+    lectureList.lectureResult.isTakenAt =
+        ConvertDateTime.instance.dateToInt(DateTime.now());
+    await LectureDatabase.instance.saveValue(
+      data: lectureList.lectureResult,
+      isUpDate: false,
+    );
   }
 }

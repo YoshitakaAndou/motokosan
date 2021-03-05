@@ -8,7 +8,7 @@ import 'package:motokosan/take_a_lecture/question/question_database.dart';
 import 'package:motokosan/take_a_lecture/question/question_model.dart';
 import 'package:motokosan/data/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/bar_title.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:motokosan/widgets/guriguri.dart';
@@ -16,11 +16,11 @@ import '../../constants.dart';
 import 'question_play.dart';
 
 class QuestionListPage extends StatelessWidget {
-  final UserData _userData;
-  final LectureList _lectureList;
-  final bool _isLast;
+  final UserData userData;
+  final LectureList lectureList;
+  final bool isLast;
 
-  QuestionListPage(this._userData, this._lectureList, this._isLast);
+  QuestionListPage(this.userData, this.lectureList, this.isLast);
 
   @override
   Widget build(BuildContext context) {
@@ -30,10 +30,10 @@ class QuestionListPage extends StatelessWidget {
     Future(() async {
       model.startLoading();
       await model.fetchQuestion(
-          _userData.userGroup, _lectureList.lecture.lectureId);
+          userData.userGroup, lectureList.lecture.lectureId);
       await model.generateQuestionList(
-          _userData.userGroup, _lectureList.lecture.lectureId);
-      _checkClear(context, model, _lectureList);
+          userData.userGroup, lectureList.lecture.lectureId);
+      _checkClear(context, model, lectureList);
       model.stopLoading();
     });
 
@@ -76,7 +76,7 @@ class QuestionListPage extends StatelessWidget {
                           onTap: () => _onTap(
                             context,
                             model,
-                            _lectureList,
+                            lectureList,
                             index,
                             false,
                             model.questionLists[index].questionResult
@@ -86,7 +86,7 @@ class QuestionListPage extends StatelessWidget {
                                 : false,
                           ),
                           // onTap: () => _onTap(
-                          //     context, model, _lectureList, index, false),
+                          //     context, model, lectureList, index, false),
                         ),
                       );
                     },
@@ -110,9 +110,9 @@ class QuestionListPage extends StatelessWidget {
                             // if (model.isClear) _backButton(context, model),
                             SizedBox(height: 30),
                             if (!model.isClear)
-                              _description(context, model, _lectureList),
+                              _description(context, model, lectureList),
                             if (model.isClear) _passedMessage(context, model),
-                            _score(context, model, _lectureList),
+                            _score(context, model, lectureList),
                           ],
                         ),
                       ),
@@ -154,7 +154,7 @@ class QuestionListPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "  ${_lectureList.lecture.title}",
+                    "  ${lectureList.lecture.title}",
                     style: cTextUpBarM,
                     textScaleFactor: 1,
                     maxLines: 3,
@@ -219,7 +219,7 @@ class QuestionListPage extends StatelessWidget {
         color: cFAB,
         splashColor: Colors.white.withOpacity(0.5),
         textColor: Colors.white,
-        onPressed: () => _onTap(context, model, _lectureList, 0, true, false),
+        onPressed: () => _onTap(context, model, lectureList, 0, true, false),
       ),
     );
   }
@@ -241,7 +241,7 @@ class QuestionListPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _backListButton(context, model),
-            if (!_isLast) _nextButton(context, model),
+            if (!isLast) _nextButton(context, model),
           ],
         ),
       ),
@@ -249,7 +249,7 @@ class QuestionListPage extends StatelessWidget {
   }
 
   Widget _description(
-      BuildContext context, QuestionModel model, LectureList _lectureList) {
+      BuildContext context, QuestionModel model, LectureList lectureList) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -258,7 +258,7 @@ class QuestionListPage extends StatelessWidget {
           child: Row(
             children: [
               Text("この講義を受講完了するには", style: cTextListM, textScaleFactor: 1),
-              Text("${_lectureList.lecture.allAnswers}",
+              Text("${lectureList.lecture.allAnswers}",
                   style: cTextListMR, textScaleFactor: 1),
               Text("です。", style: cTextListM, textScaleFactor: 1),
             ],
@@ -270,9 +270,9 @@ class QuestionListPage extends StatelessWidget {
             children: [
               Text("合格点は", style: cTextListM, textScaleFactor: 1),
               Text(
-                _lectureList.lecture.passingScore == 0
+                lectureList.lecture.passingScore == 0
                     ? "設けていません。"
-                    : "　${_lectureList.lecture.passingScore}点です。",
+                    : "　${lectureList.lecture.passingScore}点です。",
                 style: cTextListMR,
                 textScaleFactor: 1,
               ),
@@ -282,7 +282,7 @@ class QuestionListPage extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Text(
-            _lectureList.lecture.passingScore == 0
+            lectureList.lecture.passingScore == 0
                 ? "気軽にチャレンジしてください。"
                 : "クリア目指して頑張ってください。",
             style: cTextListM,
@@ -318,7 +318,7 @@ class QuestionListPage extends StatelessWidget {
     }
   }
 
-  Future<void> _onTap(BuildContext context, QuestionModel model, _lectureList,
+  Future<void> _onTap(BuildContext context, QuestionModel model, lectureList,
       int index, bool fromButton, bool isShowOnly) async {
     ReturnArgument lectureArgument = ReturnArgument();
     lectureArgument.isNextQuestion = true;
@@ -329,9 +329,9 @@ class QuestionListPage extends StatelessWidget {
         context,
         MaterialPageRoute(
           builder: (context) => QuestionPlay(
-            _userData,
+            userData,
             model.questions[index],
-            _lectureList,
+            lectureList,
             fromButton ? model.questions.length - index : 1,
             isShowOnly,
           ),
@@ -353,29 +353,36 @@ class QuestionListPage extends StatelessWidget {
     }
     // todo 問題解答が終わったら
     await model.generateQuestionList(
-        _userData.userGroup, _lectureList.lecture.lectureId);
+        userData.userGroup, lectureList.lecture.lectureId);
     await QuestionDatabase.instance
-        .deleteFlag1(_lectureList.lecture.lectureId, "");
+        .deleteFlag1(lectureList.lecture.lectureId, "");
     // scoreCheck
-    _checkClear(context, model, _lectureList);
+    _checkClear(context, model, lectureList);
     if (model.isClear) {
       // todo lectureResultの保存
       await _saveLectureResult(context, model);
     }
     // if (fromButton) {
-    //   await _checkFire(context, model, _lectureList);
+    //   await _checkFire(context, model, lectureList);
     // }
   }
 
   Future<void> _saveLectureResult(
       BuildContext context, QuestionModel model) async {
-    _lectureList.lectureResult.lectureId = _lectureList.lecture.lectureId;
-    _lectureList.lectureResult.isTaken = "受講済";
-    _lectureList.lectureResult.questionCount = model.questionLists.length;
-    _lectureList.lectureResult.correctCount = model.correctCount;
-    _lectureList.lectureResult.isTakenAt =
-        ConvertItems.instance.dateToInt(DateTime.now());
-    await LectureDatabase.instance.saveValue(_lectureList.lectureResult, false);
+    lectureList.lectureResult.lectureId = lectureList.lecture.lectureId;
+    lectureList.lectureResult.isTaken = "受講済";
+    lectureList.lectureResult.isBrowsing =
+        lectureList.lectureResult.isBrowsing;
+    lectureList.lectureResult.playBackTime =
+        lectureList.lectureResult.playBackTime;
+    lectureList.lectureResult.questionCount = model.questionLists.length;
+    lectureList.lectureResult.correctCount = model.correctCount;
+    lectureList.lectureResult.isTakenAt =
+        ConvertDateTime.instance.dateToInt(DateTime.now());
+    await LectureDatabase.instance.saveValue(
+      data: lectureList.lectureResult,
+      isUpDate: false,
+    );
   }
 
   void _checkClear(
@@ -384,14 +391,14 @@ class QuestionListPage extends StatelessWidget {
     model.setAllAnswersClear(model.questionLists
         .every((element) => element.questionResult.answerAt != 0));
     // ScoreClearのチェック
-    model.setScoreClear((_getScore(context, model, _lectureList) >
-                _lectureList.lecture.passingScore ||
-            _getScore(context, model, _lectureList) == 100)
+    model.setScoreClear((_getScore(context, model, lectureList) >
+                lectureList.lecture.passingScore ||
+            _getScore(context, model, lectureList) == 100)
         ? true
         : false);
     // isClear のチェック
-    if (_lectureList.lecture.allAnswers == "全問解答が必要") {
-      if (_lectureList.lecture.passingScore == 0) {
+    if (lectureList.lecture.allAnswers == "全問解答が必要") {
+      if (lectureList.lecture.passingScore == 0) {
         model.setClear(model.isAllAnswersClear);
       } else {
         model.setClear(
@@ -450,25 +457,25 @@ class QuestionListPage extends StatelessWidget {
         subTitle: "次回、講義動画を最初から見ることになりますが"
             "よろしいですか？",
         onPressed: () {
-          // todo _lectureListを返す
+          // todo lectureListを返す
           model.setIsStack(true);
           Navigator.of(context).pop();
           Navigator.of(context).pop();
           Navigator.of(context).pop(
             ReturnArgument(
-              lectureList: _lectureList,
+              lectureList: lectureList,
               isNextQuestion: false,
             ),
           );
         },
       );
     } else {
-      // todo _lectureListを返す
+      // todo lectureListを返す
       model.setIsStack(true);
       Navigator.of(context).pop();
       Navigator.of(context).pop(
         ReturnArgument(
-          lectureList: _lectureList,
+          lectureList: lectureList,
           isNextQuestion: false,
         ),
       );
@@ -504,25 +511,25 @@ class QuestionListPage extends StatelessWidget {
                     subTitle: "次回、講義動画を最初から見ることになりますが"
                         "よろしいですか？",
                     onPressed: () {
-                      // todo _lectureListを返す
+                      // todo lectureListを返す
                       model.setIsStack(true);
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop(
                         ReturnArgument(
-                          lectureList: _lectureList,
+                          lectureList: lectureList,
                           isNextQuestion: true,
                         ),
                       );
                     },
                   );
                 } else {
-                  // todo _lectureListを返す
+                  // todo lectureListを返す
                   model.setIsStack(true);
                   Navigator.of(context).pop();
                   Navigator.of(context).pop(
                     ReturnArgument(
-                      lectureList: _lectureList,
+                      lectureList: lectureList,
                       isNextQuestion: true,
                     ),
                   );
@@ -552,7 +559,7 @@ class QuestionListPage extends StatelessWidget {
   //     icon: Icon(FontAwesomeIcons.undo),
   //     onPressed: () {
   //       final ReturnArgument returnArgument = ReturnArgument(
-  //         lectureList: _lectureList,
+  //         lectureList: lectureList,
   //         isNextQuestion: false,
   //       );
   //       Navigator.of(context).pop(returnArgument);

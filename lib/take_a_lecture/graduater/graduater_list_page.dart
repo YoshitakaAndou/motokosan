@@ -5,7 +5,7 @@ import 'package:motokosan/take_a_lecture/graduater/graduater_license.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/data/user_data/userdata_class.dart';
 import 'package:motokosan/widgets/bar_title.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 import 'package:motokosan/widgets/go_back.dart';
 import 'package:motokosan/widgets/guriguri.dart';
 import 'package:provider/provider.dart';
@@ -14,16 +14,19 @@ import '../../constants.dart';
 import 'graduater_model.dart';
 
 class GraduaterListPage extends StatelessWidget {
-  final UserData _userData;
-  final WorkshopList _workshopList;
+  final UserData userData;
+  final WorkshopList workshopList;
 
-  GraduaterListPage(this._userData, this._workshopList);
+  GraduaterListPage(
+    this.userData,
+    this.workshopList,
+  );
 
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<GraduaterModel>(context, listen: false);
     Future(() async {
-      await model.generateGraduaterList(_userData.userGroup, _workshopList);
+      await model.generateGraduaterList(userData.userGroup, workshopList);
     });
     return Consumer<GraduaterModel>(builder: (context, model, child) {
       return Scaffold(
@@ -60,10 +63,10 @@ class GraduaterListPage extends StatelessWidget {
                             subtitle: _subtitle(context, model, index),
                             onTap: () {
                               if (model.graduaterLists[index].userData.uid ==
-                                  _userData.uid) {
+                                  userData.uid) {
                                 GraduaterLicense.instance.licenseShowDialog(
                                   context,
-                                  _workshopList,
+                                  workshopList,
                                   model.graduaterLists[index],
                                 );
                               } else {
@@ -109,7 +112,7 @@ class GraduaterListPage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text("${_workshopList.workshop.title}",
+                Text("${workshopList.workshop.title}",
                     style: cTextUpBarM, textScaleFactor: 1),
               ],
             ),
@@ -146,7 +149,7 @@ class GraduaterListPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(
-          "修了日：${ConvertItems.instance.intToString(model.graduaterLists[index].graduater.takenAt)}",
+          "修了日：${ConvertDateTime.instance.intToString(model.graduaterLists[index].graduater.takenAt)}",
           style: cTextListS,
           textScaleFactor: 1,
         ),

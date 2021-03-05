@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:motokosan/take_a_lecture/question/question_class.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 
 class FSExam {
   static final FSExam instance = FSExam();
@@ -62,11 +62,11 @@ class FSExam {
       "choices4": _data.choices4,
       "correctChoices": _data.correctChoices,
       "answerDescription": _data.answerDescription,
-      "upDate": ConvertItems.instance.dateToInt(_timeStamp),
+      "upDate": ConvertDateTime.instance.dateToInt(_timeStamp),
       "createAt":
-          _isAdd ? ConvertItems.instance.dateToInt(_timeStamp) : _data.createAt,
+          _isAdd ? ConvertDateTime.instance.dateToInt(_timeStamp) : _data.createAt,
       "answeredAt": _isAdd
-          ? ConvertItems.instance.dateToInt(_timeStamp)
+          ? ConvertDateTime.instance.dateToInt(_timeStamp)
           : _data.answeredAt,
       "answered": _data.answered,
       "organizerId": _data.organizerId,

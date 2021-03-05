@@ -7,8 +7,11 @@ import 'workshop_model.dart';
 
 class WorkshopListBottomSheetInfoItems extends StatelessWidget {
   final WorkshopModel model;
-  final bool _isHideBS;
-  WorkshopListBottomSheetInfoItems(this.model, this._isHideBS);
+  final bool isHideBS;
+  WorkshopListBottomSheetInfoItems(
+    this.model,
+    this.isHideBS,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +19,7 @@ class WorkshopListBottomSheetInfoItems extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _bottomSheetTitle(context, model, _isHideBS),
+        _bottomSheetTitle(context, model, isHideBS),
         _bottomSheetText(context),
         _bottomSheetButton(context, model),
         SizedBox(height: 30),
@@ -25,7 +28,7 @@ class WorkshopListBottomSheetInfoItems extends StatelessWidget {
   }
 
   Widget _bottomSheetTitle(
-      BuildContext context, WorkshopModel model, bool _isHideBS) {
+      BuildContext context, WorkshopModel model, bool isHideBS) {
     return Container(
       width: double.infinity,
       height: 35,
@@ -38,7 +41,7 @@ class WorkshopListBottomSheetInfoItems extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _bottomSheetTitleLetter(),
-          _bottomSheetTitleCheckButton(context, model, _isHideBS),
+          _bottomSheetTitleCheckButton(context, model, isHideBS),
         ],
       ),
     );
@@ -64,12 +67,12 @@ class WorkshopListBottomSheetInfoItems extends StatelessWidget {
   }
 
   Widget _bottomSheetTitleCheckButton(
-      BuildContext context, WorkshopModel model, bool _isHideBS) {
+      BuildContext context, WorkshopModel model, bool isHideBS) {
     return Row(
       children: [
         Text("自動で表示しない", style: cTextUpBarS, textScaleFactor: 1),
         // SizedBox(width: 5),
-        BottomSheetTitleCheckBoxWS(isHideBS: _isHideBS),
+        BottomSheetTitleCheckBoxWS(isHideBS: isHideBS),
       ],
     );
   }

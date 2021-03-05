@@ -24,7 +24,10 @@ import 'widgets/to_signUp_button.dart';
 class EmailSignin extends StatelessWidget {
   final String userName;
   final String groupName;
-  EmailSignin({this.userName, this.groupName});
+  EmailSignin({
+    this.userName,
+    this.groupName,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -221,7 +224,7 @@ class EmailSignin extends StatelessWidget {
       await Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => Home(model.userData),
+          builder: (context) => Home(userData: model.userData),
         ),
       );
       model.setIsLoading(false);

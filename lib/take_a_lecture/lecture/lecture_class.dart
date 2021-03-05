@@ -54,6 +54,8 @@ class LectureResult {
   int id;
   String lectureId;
   String isTaken; //"受講済","受講中",""
+  String isBrowsing; //閲覧済か
+  String playBackTime; //再生時間
   int questionCount;
   int correctCount;
   int isTakenAt;
@@ -62,6 +64,8 @@ class LectureResult {
     this.id,
     this.lectureId = "",
     this.isTaken = "",
+    this.isBrowsing = "",
+    this.playBackTime = "",
     this.questionCount = 0,
     this.correctCount = 0,
     this.isTakenAt = 0,
@@ -71,6 +75,8 @@ class LectureResult {
 //      'id': id,
       'lectureId': lectureId,
       'isTaken': isTaken,
+      'isBrowsing': isBrowsing,
+      'playBackTime': playBackTime,
       'questionCount': questionCount,
       'correctCount': correctCount,
       'isTakenAt': isTakenAt,

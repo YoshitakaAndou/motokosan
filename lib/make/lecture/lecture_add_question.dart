@@ -8,9 +8,13 @@ import '../../take_a_lecture/lecture/lecture_model.dart';
 
 class LectureAddQuestion extends StatelessWidget {
   final String groupName;
-  final Organizer _organizer;
-  final Workshop _workshop;
-  LectureAddQuestion(this.groupName, this._organizer, this._workshop);
+  final Organizer organizer;
+  final Workshop workshop;
+  LectureAddQuestion(
+    this.groupName,
+    this.organizer,
+    this.workshop,
+  );
 
   final BoxDecoration _boxDecoration = BoxDecoration(
     border: Border.all(color: cPopWindow),
@@ -86,9 +90,9 @@ class LectureAddQuestion extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("主催：${_organizer.title}",
+                  Text("主催：${organizer.title}",
                       style: cTextUpBarS, textScaleFactor: 1),
-                  Text("研修会：${_workshop.title}",
+                  Text("研修会：${workshop.title}",
                       style: cTextUpBarS, textScaleFactor: 1),
                 ],
               ),

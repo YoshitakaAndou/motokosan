@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:motokosan/constants.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
-import 'package:motokosan/widgets/convert_items.dart';
+import 'package:motokosan/widgets/convert_datetime.dart';
 
-import 'lecture_class.dart';
+import '../lecture_class.dart';
 
 class LecturePlayInfo {
   static final LecturePlayInfo instance = LecturePlayInfo();
@@ -68,7 +68,7 @@ class LecturePlayInfo {
               ),
               _columnItem(
                 "更新日",
-                ConvertItems.instance
+                ConvertDateTime.instance
                     .intToString(_lectureList.lecture.updateAt),
               ),
               _columnItem("確認問題", _lectureList.lecture.allAnswers),
@@ -91,7 +91,7 @@ class LecturePlayInfo {
               ),
               _columnItem(
                 "更新日",
-                ConvertItems.instance
+                ConvertDateTime.instance
                     .intToString(_workshopList.workshop.updateAt),
               ),
               _columnItem(

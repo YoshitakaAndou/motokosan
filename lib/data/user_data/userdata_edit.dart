@@ -5,8 +5,8 @@ import 'package:motokosan/constants.dart';
 import 'userdata_class.dart';
 
 class UserDataEdit extends StatelessWidget {
-  final UserData _userData;
-  UserDataEdit(this._userData);
+  final UserData userData;
+  UserDataEdit(this.userData);
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +100,7 @@ class UserDataEdit extends StatelessWidget {
           Expanded(
             flex: 5,
             child: Text(
-              " ${_userData.uid}",
+              " ${userData.uid}",
               style: TextStyle(
                 fontSize: 15,
                 color: Colors.green,
@@ -134,7 +134,7 @@ class UserDataEdit extends StatelessWidget {
           Expanded(
             flex: 5,
             child: Text(
-              " ${_userData.userGroup}",
+              " ${userData.userGroup}",
               style: TextStyle(
                 fontSize: 15,
                 color: Colors.green,
@@ -172,7 +172,7 @@ class UserDataEdit extends StatelessWidget {
           Expanded(
             flex: 4,
             child: Text(
-              " ${_userData.userName}",
+              " ${userData.userName}",
               style: TextStyle(
                 fontSize: 15,
                 color: Colors.green,
@@ -214,7 +214,7 @@ class UserDataEdit extends StatelessWidget {
           Expanded(
             flex: 5,
             child: Text(
-              " ${_userData.userEmail}",
+              " ${userData.userEmail}",
               style: TextStyle(
                 fontSize: 15,
                 color: Colors.green,
@@ -248,7 +248,7 @@ class UserDataEdit extends StatelessWidget {
           Expanded(
             flex: 5,
             child: Text(
-              " ${_userData.userPassword}",
+              " ${userData.userPassword}",
               style: TextStyle(
                 fontSize: 15,
                 color: Colors.green,

@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 
-// youtubeの再生時間（短い値）
-int videoEndAt = 5;
+// youtubeの再生時間（短い値5,長い値5000）
+int videoEndAt = 5000;
 
 // グループを作成したかどうか
 bool isGroupCreate = false;
 String createGroupName = "";
-String groupPassword = "";
-String groupEmail = "";
 
 //FireBaseのID
 const String cQuizId = "Question:2020-08-18";

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/buttons/white_button.dart';
+import 'package:motokosan/constants.dart';
 import 'package:motokosan/make/lecture/lecture_edit_image.dart';
 import 'package:motokosan/make/lecture/lecture_edit_question.dart';
 import 'package:motokosan/make/lecture/lecture_edit_textmovie.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_firebase.dart';
+import 'package:motokosan/take_a_lecture/lecture/lecture_model.dart';
 import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
 import 'package:motokosan/take_a_lecture/question/question_class.dart';
 import 'package:motokosan/take_a_lecture/question/question_firebase.dart';
@@ -11,18 +15,17 @@ import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 import 'package:provider/provider.dart';
 
-import '../../constants.dart';
-import '../../take_a_lecture/lecture/lecture_class.dart';
-import '../../take_a_lecture/lecture/lecture_firebase.dart';
-import '../../take_a_lecture/lecture/lecture_model.dart';
-
 class LectureEditMain extends StatelessWidget {
   final String groupName;
-  final Lecture _lecture;
-  final Workshop _workshop;
-  final Organizer _organizer;
+  final Lecture lecture;
+  final Workshop workshop;
+  final Organizer organizer;
   LectureEditMain(
-      this.groupName, this._lecture, this._workshop, this._organizer);
+    this.groupName,
+    this.lecture,
+    this.workshop,
+    this.organizer,
+  );
 
   final _tab = <Tab>[
     Tab(
@@ -82,9 +85,9 @@ class LectureEditMain extends StatelessWidget {
                 children: <Widget>[
                   LectureEditTextMovie(
                     groupName,
-                    _lecture,
-                    _workshop,
-                    _organizer,
+                    lecture,
+                    workshop,
+                    organizer,
                     titleTextController,
                     subTitleTextController,
                     descTextController,
@@ -93,15 +96,15 @@ class LectureEditMain extends StatelessWidget {
                   ),
                   LectureEditImage(
                     groupName,
-                    _lecture,
-                    _workshop,
-                    _organizer,
+                    lecture,
+                    workshop,
+                    organizer,
                   ),
                   LectureEditQuestion(
                     groupName,
-                    _lecture,
-                    _workshop,
-                    _organizer,
+                    lecture,
+                    workshop,
+                    organizer,
                   ),
                 ],
               ),
@@ -257,12 +260,12 @@ class LectureEditMain extends StatelessWidget {
       onPress: () {
         MyDialog.instance.okShowDialogFunc(
           context: context,
-          mainTitle: _lecture.title,
+          mainTitle: lecture.title,
           subTitle: "削除しますか？",
           // delete
           onPressed: () async {
             Navigator.pop(context);
-            await _deleteAndSave(context, model, _lecture.lectureId);
+            await _deleteAndSave(context, model, lecture.lectureId);
             Navigator.pop(context);
           },
         );
@@ -285,14 +288,14 @@ class LectureEditMain extends StatelessWidget {
     model.lecture.subTitle = subTitleTextController.text;
     model.lecture.description = descTextController.text;
     model.lecture.videoUrl = videoUrlTextController.text;
-    model.lecture.lectureId = _lecture.lectureId;
-    model.lecture.lectureNo = _lecture.lectureNo;
-    model.lecture.createAt = _lecture.createAt;
-    model.lecture.updateAt = _lecture.updateAt;
-    model.lecture.targetId = _lecture.targetId;
-    model.lecture.organizerId = _lecture.organizerId;
-    model.lecture.workshopId = _lecture.workshopId;
-    model.lecture.slideLength = _lecture.slideLength;
+    model.lecture.lectureId = lecture.lectureId;
+    model.lecture.lectureNo = lecture.lectureNo;
+    model.lecture.createAt = lecture.createAt;
+    model.lecture.updateAt = lecture.updateAt;
+    model.lecture.targetId = lecture.targetId;
+    model.lecture.organizerId = lecture.organizerId;
+    model.lecture.workshopId = lecture.workshopId;
+    model.lecture.slideLength = lecture.slideLength;
     try {
       // 変更があったときだけSlideの処理を行う
       if (model.isSlideUpdate) {
@@ -303,7 +306,7 @@ class LectureEditMain extends StatelessWidget {
       // 入力チェック
       model.inputCheck();
       await model.updateLectureFs(groupName, DateTime.now());
-      await model.fetchLecture(groupName, _workshop.workshopId);
+      await model.fetchLecture(groupName, workshop.workshopId);
       model.stopLoading();
       await MyDialog.instance.okShowDialog(context, "更新しました", Colors.black);
       Navigator.pop(context);
@@ -317,14 +320,14 @@ class LectureEditMain extends StatelessWidget {
   Future<void> _deleteAndSave(
     BuildContext context,
     LectureModel model,
-    _lectureId,
+    lectureId,
   ) async {
     model.startLoading();
     try {
       //QuestionとQuestionResultの削除
       // fetchして削除対象のListを作成
       final _questions =
-          await FSQuestion.instance.fetchDates(groupName, _lectureId);
+          await FSQuestion.instance.fetchDates(groupName, lectureId);
       if (_questions.length > 0) {
         for (Question _data in _questions) {
           await FSQuestion.instance.deleteData(groupName, _data.questionId);
@@ -333,11 +336,11 @@ class LectureEditMain extends StatelessWidget {
         }
       }
       //StorageのImageとFSのSlideを削除
-      await model.deleteStorageImages(groupName, _lectureId);
+      await model.deleteStorageImages(groupName, lectureId);
       //FsをLectureIdで削除
-      await FSLecture.instance.deleteData(groupName, _lectureId);
+      await FSLecture.instance.deleteData(groupName, lectureId);
       //配列を削除するのは無理だから再びFsをフェッチ
-      await model.fetchLecture(groupName, _workshop.workshopId);
+      await model.fetchLecture(groupName, workshop.workshopId);
       //頭から順にlectureNoを振る
       int _count = 1;
       for (Lecture _data in model.lectures) {
@@ -348,7 +351,7 @@ class LectureEditMain extends StatelessWidget {
         _count += 1;
       }
       //一通り終わったらFsから読み込んで再描画させる
-      await model.fetchLecture(groupName, _workshop.workshopId);
+      await model.fetchLecture(groupName, workshop.workshopId);
     } catch (e) {
       MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
     }

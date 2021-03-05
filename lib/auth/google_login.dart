@@ -20,7 +20,10 @@ class GoogleLogin extends StatelessWidget {
   final String userName;
   final String groupName;
 
-  GoogleLogin({this.userName, this.groupName});
+  GoogleLogin({
+    this.userName,
+    this.groupName,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -175,7 +178,7 @@ class GoogleLogin extends StatelessWidget {
         await Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => Home(model.userData),
+            builder: (context) => Home(userData: model.userData),
           ),
         );
       } else {

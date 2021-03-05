@@ -17,19 +17,23 @@ import '../question/question_page.dart';
 import '../../take_a_lecture/lecture/lecture_model.dart';
 
 class LecturePage extends StatelessWidget {
-  final UserData _userData;
-  final Organizer _organizer;
-  final Workshop _workshop;
-  LecturePage(this._userData, this._organizer, this._workshop);
+  final UserData userData;
+  final Organizer organizer;
+  final Workshop workshop;
+  LecturePage(
+    this.userData,
+    this.organizer,
+    this.workshop,
+  );
 
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<LectureModel>(context, listen: false);
-    model.lecture.organizerId = _organizer.organizerId;
-    model.lecture.workshopId = _workshop.workshopId;
+    model.lecture.organizerId = organizer.organizerId;
+    model.lecture.workshopId = workshop.workshopId;
     Future(() async {
       model.startLoading();
-      await model.fetchLecture(_userData.userGroup, _workshop.workshopId);
+      await model.fetchLecture(userData.userGroup, workshop.workshopId);
       model.stopLoading();
     });
     return Consumer<LectureModel>(builder: (context, model, child) {
@@ -72,7 +76,7 @@ class LecturePage extends StatelessWidget {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             fullscreenDialog: true,
-            builder: (context) => Home(_userData),
+            builder: (context) => Home(userData: userData),
           ),
         );
       },
@@ -113,7 +117,7 @@ class LecturePage extends StatelessWidget {
                         children: [
                           // Text("研修会：", style: cTextListS, textScaleFactor: 1),
                           Text(
-                            "${_organizer.title}",
+                            "${organizer.title}",
                             style: cTextUpBarS,
                             textScaleFactor: 1,
                             maxLines: 1,
@@ -125,7 +129,7 @@ class LecturePage extends StatelessWidget {
                         children: [
                           SizedBox(width: 10),
                           Text(
-                            " ${_workshop.title}",
+                            " ${workshop.title}",
                             style: cTextUpBarS,
                             textScaleFactor: 1,
                             maxLines: 1,
@@ -151,11 +155,11 @@ class LecturePage extends StatelessWidget {
         _data.lectureNo = _count.toString().padLeft(4, "0");
         //Fsにアップデート
         await fsLecture.setData(
-            false, _userData.userGroup, _data, DateTime.now());
+            false, userData.userGroup, _data, DateTime.now());
         _count += 1;
       }
       //一通り終わったらFsから読み込んで再描画させる
-      await model.fetchLecture(_userData.userGroup, _workshop.workshopId);
+      await model.fetchLecture(userData.userGroup, workshop.workshopId);
     } catch (e) {
       MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
     }
@@ -208,13 +212,12 @@ class LecturePage extends StatelessWidget {
               await Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => QuestionPage(
-                    _userData,
+                    userData,
                     _lecture,
                   ),
                 ),
               );
-              await model.fetchLecture(
-                  _userData.userGroup, _workshop.workshopId);
+              await model.fetchLecture(userData.userGroup, workshop.workshopId);
             },
             child: Container(
               decoration: BoxDecoration(
@@ -235,22 +238,22 @@ class LecturePage extends StatelessWidget {
             model.lecture = _lecture;
             model.initProperties();
             // Slideデータの作成 => model.slides
-            await model.getSlideUrls(_userData.userGroup, _lecture.lectureId);
+            await model.getSlideUrls(userData.userGroup, _lecture.lectureId);
             model.slides.add(Slide(slideImage: null));
             // 編集へ
             await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => LectureEditMain(
-                  _userData.userGroup,
+                  userData.userGroup,
                   _lecture,
-                  _workshop,
-                  _organizer,
+                  workshop,
+                  organizer,
                 ),
                 fullscreenDialog: true,
               ),
             );
-            await model.fetchLecture(_userData.userGroup, _workshop.workshopId);
+            await model.fetchLecture(userData.userGroup, workshop.workshopId);
           },
         ),
       ),
@@ -312,17 +315,17 @@ class LecturePage extends StatelessWidget {
       label: Text(" 講義を追加", style: cTextUpBarL, textScaleFactor: 1),
       onPressed: () async {
         // 新規登録へ
-        model.initLecture(_organizer, _workshop);
+        model.initLecture(organizer, workshop);
         model.initProperties();
         model.initSlide();
         await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) =>
-                  LectureAddMain(_userData.userGroup, _organizer, _workshop),
+                  LectureAddMain(userData.userGroup, organizer, workshop),
               fullscreenDialog: true,
             ));
-        await model.fetchLecture(_userData.userGroup, _workshop.workshopId);
+        await model.fetchLecture(userData.userGroup, workshop.workshopId);
       },
     );
   }

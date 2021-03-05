@@ -17,15 +17,15 @@ import 'organizer_edit.dart';
 import '../../take_a_lecture/organizer/organizer_model.dart';
 
 class OrganizerPage extends StatelessWidget {
-  final UserData _userData;
-  OrganizerPage(this._userData);
+  final UserData userData;
+  OrganizerPage(this.userData);
 
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<OrganizerModel>(context, listen: false);
     Future(() async {
       // model.startLoading();
-      await model.fetchOrganizer(_userData.userGroup);
+      await model.fetchOrganizer(userData.userGroup);
       // model.stopLoading();
     });
     return Consumer<OrganizerModel>(builder: (context, model, child) {
@@ -65,7 +65,7 @@ class OrganizerPage extends StatelessWidget {
           context,
           MaterialPageRoute(
             fullscreenDialog: true,
-            builder: (context) => Home(_userData),
+            builder: (context) => Home(userData:userData),
           ),
         );
       },
@@ -97,11 +97,11 @@ class OrganizerPage extends StatelessWidget {
         _data.organizerNo = _count.toString().padLeft(4, "0");
         //Fsにアップデート
         await fsOrganizer.setData(
-            false, _userData.userGroup, _data, DateTime.now());
+            false, userData.userGroup, _data, DateTime.now());
         _count += 1;
       }
       //一通り終わったらFsから読み込んで再描画させる
-      await model.fetchOrganizer(_userData.userGroup);
+      await model.fetchOrganizer(userData.userGroup);
     } catch (e) {
       MyDialog.instance.okShowDialog(context, e.toString(), Colors.red);
     }
@@ -156,7 +156,7 @@ class OrganizerPage extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => WorkshopPage(_userData, _organizer),
+                  builder: (context) => WorkshopPage(userData, _organizer),
                 ),
               );
             },
@@ -183,11 +183,11 @@ class OrganizerPage extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) =>
-                    OrganizerEdit(_userData.userGroup, _organizer),
+                    OrganizerEdit(userData.userGroup, _organizer),
                 fullscreenDialog: true,
               ),
             );
-            await model.fetchOrganizer(_userData.userGroup);
+            await model.fetchOrganizer(userData.userGroup);
           },
         ),
       ),
@@ -205,11 +205,11 @@ class OrganizerPage extends StatelessWidget {
         await Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => OrganizerAdd(_userData.userGroup),
+            builder: (context) => OrganizerAdd(userData.userGroup),
             fullscreenDialog: true,
           ),
         );
-        await model.fetchOrganizer(_userData.userGroup);
+        await model.fetchOrganizer(userData.userGroup);
       },
     );
   }

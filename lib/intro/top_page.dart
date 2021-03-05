@@ -16,7 +16,11 @@ class TopPage extends StatelessWidget {
   final bool unConnect;
   final bool isCurrentUserSignIn;
   final UserData userData;
-  TopPage({this.unConnect, this.isCurrentUserSignIn, this.userData});
+  TopPage({
+    this.unConnect,
+    this.isCurrentUserSignIn,
+    this.userData,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +49,7 @@ class TopPage extends StatelessWidget {
                     builder: (context) => unConnect
                         ? UnConnect()
                         : isCurrentUserSignIn
-                            ? Home(userData)
+                            ? Home(userData: userData)
                             : userData.userPassword == "google認証"
                                 ? GoogleLogin(
                                     userName: userData.userName,

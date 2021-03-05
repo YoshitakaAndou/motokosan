@@ -21,7 +21,11 @@ class GroupWindow extends StatefulWidget {
   final UserData userData;
   final Function onTap;
 
-  GroupWindow({this.radius = 10, this.userData, this.onTap});
+  GroupWindow({
+    this.radius = 10,
+    this.userData,
+    this.onTap,
+  });
 
   @override
   _GroupWindowState createState() => _GroupWindowState();
