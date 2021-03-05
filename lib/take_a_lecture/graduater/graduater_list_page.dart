@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:motokosan/buttons/white_button.dart';
+import 'package:motokosan/widgets/white_button.dart';
 import 'package:motokosan/take_a_lecture/graduater/graduater_license.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/data/user_data/userdata_class.dart';

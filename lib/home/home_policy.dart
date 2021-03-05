@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/data/data_save_body.dart';
-import 'package:motokosan/buttons/custom_button.dart';
+import 'package:motokosan/widgets/custom_button.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 
 class HomePolicy extends StatefulWidget {
@@ -173,6 +173,9 @@ class _HomePolicyState extends State<HomePolicy> {
                     title: '閉じる',
                     icon: FontAwesomeIcons.times,
                     iconSize: 15,
+                    textColor: Colors.white,
+                    iconColor: Colors.white,
+                    boderColor: Colors.white,
                     onPress: () {
                       Navigator.of(context).pop();
                     },

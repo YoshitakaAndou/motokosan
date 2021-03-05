@@ -6,7 +6,7 @@ import 'package:motokosan/take_a_lecture/lecture/lecture_model.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_class.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_database.dart';
 import 'package:motokosan/data/user_data/userdata_class.dart';
-import 'package:motokosan/buttons/custom_button.dart';
+import 'package:motokosan/widgets/custom_button.dart';
 import 'package:motokosan/widgets/convert_datetime.dart';
 import 'package:motokosan/widgets/show_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -157,7 +157,7 @@ class LectureListBottomSheetSendItems extends StatelessWidget {
               context: context,
               title: '閉じる',
               icon: FontAwesomeIcons.times,
-              iconSize: 15,
+              iconColor: Colors.green,
               onPress: () {
                 Navigator.of(context).pop();
               },

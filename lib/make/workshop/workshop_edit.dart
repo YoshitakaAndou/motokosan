@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:motokosan/buttons/white_button.dart';
+import 'package:motokosan/widgets/white_button.dart';
 import 'package:motokosan/take_a_lecture/organizer/organizer_class.dart';
 import 'package:motokosan/take_a_lecture/workshop/workshop_firebase.dart';
 import 'package:motokosan/widgets/convert_datetime.dart';

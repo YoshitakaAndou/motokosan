@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:motokosan/buttons/white_button.dart';
+import 'package:motokosan/widgets/white_button.dart';
 import 'package:motokosan/take_a_lecture/lecture/lecture_class.dart';
 import 'package:motokosan/take_a_lecture/question/question_class.dart';
 import 'package:motokosan/take_a_lecture/question/question_firebase.dart';

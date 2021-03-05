@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/auth/auth_model.dart';
-import 'package:motokosan/buttons/white_button.dart';
+import 'package:motokosan/widgets/white_button.dart';
 import 'package:motokosan/data/group_data/group_data_save_body.dart';
 import 'package:motokosan/data/user_data/userdata_class.dart';
 import 'package:motokosan/data/user_data/userdata_firebase.dart';

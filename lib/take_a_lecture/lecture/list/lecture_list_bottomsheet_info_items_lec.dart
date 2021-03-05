@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:motokosan/constants.dart';
 import 'package:motokosan/data/data_save_body.dart';
-import 'package:motokosan/buttons/custom_button.dart';
+import 'package:motokosan/widgets/custom_button.dart';
 import 'package:motokosan/take_a_lecture/lecture/lecture_model.dart';
 
 class LectureListBottomSheetInfoItemsLec extends StatelessWidget {
@@ -142,7 +142,7 @@ class LectureListBottomSheetInfoItemsLec extends StatelessWidget {
               context: context,
               title: '閉じる',
               icon: FontAwesomeIcons.times,
-              iconSize: 15,
+              iconColor: Colors.green,
               onPress: () {
                 Navigator.of(context).pop();
               },

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:motokosan/buttons/custom_button.dart';
+import 'package:motokosan/widgets/custom_button.dart';
 
 class PrivacyPolicy extends StatefulWidget {
   final double radius;

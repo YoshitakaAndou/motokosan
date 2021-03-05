@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:motokosan/buttons/white_button.dart';
+import 'package:motokosan/widgets/white_button.dart';
 import 'package:motokosan/constants.dart';
 import 'package:motokosan/make/lecture/lecture_edit_image.dart';
 import 'package:motokosan/make/lecture/lecture_edit_question.dart';
